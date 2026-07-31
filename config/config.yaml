@@ -1,0 +1,35 @@
+model:
+  path: "src/ml/model.pkl"
+  vectorizer_path: "src/ml/vectorizer.pkl"
+  label_encoder_path: "src/ml/labels.pkl"
+  fallback_label: "safe"
+
+llm:
+  model: "qwen2.5:3b-instruct-q4_K_M"
+  base_url: "http://localhost:11434"
+  enabled: true
+  timeout_seconds: 8
+  use_for_ambiguous_only: true
+  ambiguity_threshold: 0.35
+
+ml:
+  enabled: true
+  min_confidence_for_ml_decision: 0.6
+
+rules:
+  path: "config/rules.yaml"
+  whitelist_path: "config/whitelist.yaml"
+
+engine:
+  block_risk_score: 80
+  warn_risk_score: 45
+  log_path: "~/.csengine/audit.log"
+  audit_hashed_only: true
+
+sandbox:
+  enabled: false
+  timeout_seconds: 3
+
+output:
+  json_pretty: true
+  color: true

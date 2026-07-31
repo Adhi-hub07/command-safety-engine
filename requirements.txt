@@ -1,0 +1,11 @@
+scikit-learn==1.4.2
+pandas==2.2.2
+numpy==1.26.4
+bashlex==0.18
+rich==13.7.1
+ollama==0.2.1
+PyYAML==6.0.1
+joblib==1.4.2
+regex==2024.5.15
+psutil==5.9.8
+pytest==8.2.0

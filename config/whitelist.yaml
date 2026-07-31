@@ -1,0 +1,88 @@
+whitelist:
+  - git
+  - git status
+  - git pull
+  - git push
+  - git log
+  - git diff
+  - git add
+  - git commit
+  - ls
+  - ll
+  - ls -la
+  - pwd
+  - cd
+  - cd ~
+  - cd ..
+  - cat
+  - head
+  - tail
+  - less
+  - more
+  - grep
+  - rg
+  - find . -name
+  - echo
+  - printf
+  - touch
+  - mkdir
+  - mkdir -p
+  - cp -r
+  - mv
+  - history
+  - man
+  - which
+  - whoami
+  - date
+  - cal
+  - uptime
+  - free -h
+  - df -h
+  - du -sh
+  - top
+  - htop
+  - ps aux
+  - uname -a
+  - env
+  - id
+  - hostname
+  - clear
+  - exit
+  - ping
+  - curl -I
+  - apt update
+  - apt upgrade
+  - apt install
+  - apt list
+  - pip install
+  - pip list
+  - python --version
+  - python3 --version
+  - node --version
+  - npm install
+  - npm list
+  - docker ps
+  - docker images
+  - docker compose up
+  - systemctl status
+  - systemctl start
+  - systemctl stop
+  - journalctl
+  - journalctl -u
+  - sudo systemctl status
+  - sudo apt update
+  - sudo apt upgrade
+  - ssh
+  - scp -r
+  - tar -xzf
+  - tar -czf
+  - unzip
+  - zip
+  - make
+  - cmake
+  - gcc
+  - python app.py
+  - python3 app.py
+  - npm run
+  - cargo build
+  - cargo run

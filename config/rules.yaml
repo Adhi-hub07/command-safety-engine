@@ -1,0 +1,282 @@
+rules:
+  - id: R001_ROOT_DELETE
+    severity: critical
+    category: Destructive File Deletion
+    mitre: T1485
+    patterns:
+      - "rm -rf /$"
+      - "rm -rf --no-preserve-root /"
+      - "rm -rf /*"
+      - "rm -fr /"
+      - "sudo rm -rf /"
+      - "rm -rf /etc"
+      - "rm -rf /boot"
+      - "rm -rf /bin"
+      - "rm -rf /usr"
+      - "rm -rf /lib"
+      - "find / -delete"
+      - "find / -exec rm"
+    explanation: "Recursively deletes the root filesystem (or a critical system directory). This is irreversible and will destroy the OS."
+    alternative: "rm -rf /path/to/specific/folder  (never target / or system dirs)"
+
+  - id: R002_WILDCARD_RECURSIVE_DELETE
+    severity: high
+    category: Destructive File Deletion
+    mitre: T1485
+    patterns:
+      - "rm -rf \\*"
+      - "rm -rf ."
+      - "rm -rf ~"
+      - "rm -fr \\*"
+      - "rm -rf \\*/"
+    explanation: "Recursive wildcard delete inside the current/home directory. May erase far more than intended (dotfiles, configs, projects)."
+    alternative: "rm -ri *  (interactive, asks before each file) or use a trash command"
+
+  - id: R003_DISK_FORMAT
+    severity: critical
+    category: Disk Destruction
+    mitre: T1485
+    patterns:
+      - "mkfs\\..* /dev/.*"
+      - "mkfs /dev/"
+      - "fdisk.*/dev/"
+      - "parted.*mklabel"
+      - "parted.*rm \\d"
+      - "wipefs .* /dev/"
+      - "dd if=/dev/zero of=/dev/"
+      - "dd if=/dev/urandom of=/dev/"
+      - "shred .* /dev/"
+    explanation: "Formats, wipes, or repartitions a raw disk device. This permanently destroys all data on that disk."
+    alternative: "Target a partition you intend to format and double-check with 'lsblk' first"
+
+  - id: R004_PIPE_TO_SHELL
+    severity: high
+    category: Remote Code Execution
+    mitre: T1059
+    patterns:
+      - "curl .* \\| (bash|sh|zsh)"
+      - "wget .* \\| (bash|sh|zsh)"
+      - "(bash|sh) <\\s*(\\w|\\.\\/|http)"
+      - "curl .* \\| sudo"
+      - "wget .* \\| sudo"
+      - "(bash|sh) \\(.*curl"
+      - "\\| bash$"
+      - "\\| sh$"
+    explanation: "Downloads a remote script and executes it immediately without inspection. The script can do anything with your privileges."
+    alternative: "Download, review, then run: curl -O URL && less script.sh"
+
+  - id: R005_REVERSE_SHELL
+    severity: critical
+    category: Reverse Shell
+    mitre: T1059.004
+    patterns:
+      - "bash -i >& /dev/tcp/"
+      - "bash -i >&/dev/tcp/"
+      - "bash -i >& /dev/udp/"
+      - "nc .* -e /bin/(bash|sh)"
+      - "ncat .* -e /bin/(bash|sh)"
+      - "nc .* -e cmd"
+      - "socat .* EXEC:.*sh"
+      - "python -c .*socket.*connect"
+      - "python3 -c .*socket.*connect"
+      - "perl -e .*socket"
+      - "/dev/tcp/.*4444"
+      - "mkfifo /tmp/.*;.*\\|.*nc"
+      - "bash -i > /dev/tcp/"
+    explanation: "Opens an interactive shell to a remote host. This gives an attacker full control of your machine."
+    alternative: "Never run reverse shell commands. Contact your security team if you found this on your system."
+
+  - id: R006_PRIVILEGE_ESCALATION
+    severity: high
+    category: Privilege Escalation
+    mitre: T1548
+    patterns:
+      - "chmod \\+s /bin/.*"
+      - "chmod 4755 .*"
+      - "chmod u\\+s .*"
+      - "chown root:root .* && chmod"
+      - "echo .* >> /etc/passwd"
+      - "echo .* >> /etc/sudoers"
+      - "useradd -o -u 0"
+      - "usermod -o -u 0"
+      - "cp /bin/bash /tmp/.*; chmod \\+s"
+      - "sudo.*setuid"
+    explanation: "Sets the setuid bit or manipulates accounts to gain root privileges. A common privilege-escalation technique."
+    alternative: "Use sudo with explicit commands instead of setuid binaries"
+
+  - id: R007_PERMISSIONS_777
+    severity: medium
+    category: Weak Permissions
+    mitre: T1222
+    patterns:
+      - "chmod -R 777 /"
+      - "chmod 777 /etc"
+      - "chmod 777 /usr"
+      - "chmod 777 .*passwd"
+      - "chmod -R 777 /var"
+    explanation: "Makes a critical directory world-writable. Any local user can now read, modify, or delete sensitive files."
+    alternative: "chmod -R 755 /var/www  (owner-write only) or 700 for private data"
+
+  - id: R008_FORK_BOMB
+    severity: critical
+    category: Denial of Service
+    mitre: T1498
+    patterns:
+      - ':\(\)\{.*:&\s*\};.*'
+      - ':\{\(.*:&.*\}'
+      - '{.*\|.*&\s*\};'
+      - 'while\s+true\s*(;|do)'
+      - 'yes\s+\|\s+(head|tail|sh)'
+      - 'yes\s+>\s+/dev/null\s+&'
+      - ':\(\|:'
+    explanation: "A fork bomb spawns processes infinitely until the system runs out of resources and freezes."
+    alternative: "Limit process count with ulimit -u 500; do not run infinite loops"
+
+  - id: R009_SUDO_RM_RECURSIVE
+    severity: critical
+    category: Destructive File Deletion
+    mitre: T1485
+    patterns:
+      - "sudo rm -rf "
+      - "sudo rm -fr "
+      - "sudo find / -delete"
+    explanation: "Recursive delete with root privileges. The most common cause of production data loss."
+    alternative: "Use a trash tool or staged deletion (move to a quarantine folder first)"
+
+  - id: R010_DISK_WIPE_SHED
+    severity: critical
+    category: Disk Destruction
+    mitre: T1485
+    patterns:
+      - "shred -u /dev/.*"
+      - "shred -vfz /dev/.*"
+      - "wipe -fd /dev/"
+      - "blkdiscard /dev/"
+    explanation: "Securely wipes a block device. Data is unrecoverable by design."
+    alternative: "Verify the device with lsblk before any wipe operation"
+
+  - id: R011_EVAL_COMMAND_SUBSTITUTION
+    severity: high
+    category: Code Injection
+    mitre: T1059
+    patterns:
+      - "eval .*\\$\\("
+      - "eval .*`"
+      - "bash -c \\$\\(curl"
+      - "sh -c \\$\\(curl"
+      - "bash -c \\$\\(wget"
+    explanation: "Evaluates the output of a remote or constructed string as a command. The real command is hidden until runtime."
+    alternative: "Inspect and expand variables first: echo \"$PAYLOAD\" before eval"
+
+  - id: R012_BASE64_PAYLOAD
+    severity: high
+    category: Obfuscated Execution
+    mitre: T1027
+    patterns:
+      - "base64 -d \\| (bash|sh)"
+      - "echo .* \\| base64 -d \\| bash"
+      - "python -c .*base64.*decode.*exec"
+      - "\\| base64 -d \\| sh"
+    explanation: "Decodes an embedded payload and executes it — a standard malware obfuscation technique."
+    alternative: "Decode to a file and inspect it: echo ... | base64 -d > /tmp/x && file /tmp/x"
+
+  - id: R013_IMMEDIATE_CHAIN_EXEC
+    severity: high
+    category: Supply Chain Risk
+    mitre: T1204
+    patterns:
+      - "chmod \\+x .* && .*\\/"
+      - "chmod \\+x .*; .*\\/"
+      - "chmod \\+x .* && ./"
+      - "wget .* -O .*\\.(sh|py|pl|rb)"
+      - "curl .* -o .*\\.(sh|py|pl|rb)"
+    explanation: "Downloads a script and immediately executes it — the standard 'download and run' attack chain."
+    alternative: "Inspect the file first: less script.sh; run inside a sandbox"
+
+  - id: R014_ENV_OVERWRITE
+    severity: high
+    category: Environment Manipulation
+    mitre: T1574
+    patterns:
+      - "LD_PRELOAD="
+      - "LD_LIBRARY_PATH=.*;? *(sudo|bash|sh)"
+      - "PATH=.*:/tmp"
+      - "PYTHONPATH=.*:/tmp.* sudo"
+    explanation: "Overrides dynamic libraries or PATH to hijack execution of trusted binaries."
+    alternative: "Use absolute paths (/usr/bin/sudo) and verify LD_* env vars"
+
+  - id: R015_TAR_GTFOBINS
+    severity: high
+    category: Shell Escape / LoLBins
+    mitre: T1548.002
+    patterns:
+      - "tar --checkpoint-action=exec="
+      - "tar --checkpoint=1 --checkpoint-action=exec="
+      - "vim -c ':!/bin/sh'"
+      - "awk 'BEGIN \\{system\\(.*sh"
+      - "find .* -exec .*sh"
+      - "gdb -ex 'shell'"
+      - "perl -e 'exec \"/bin/sh\"'"
+    explanation: "Abuses a legitimate tool (GTFOBins pattern) to escape into a shell or execute commands."
+    alternative: "Avoid invoking shells through benign tools; use the direct command"
+
+  - id: R016_NETWORK_EXFIL
+    severity: medium
+    category: Data Exfiltration
+    mitre: T1041
+    patterns:
+      - "cat .*\\.(txt|csv|json) \\| nc"
+      - "tar czf - .* \\| nc"
+      - "scp .*\\.(txt|key|pem) "
+      - "base64 .* -w 0.*\\| nc "
+    explanation: "Sends file contents over the network — a data exfiltration pattern."
+    alternative: "Use sanctioned transfer methods; verify the destination is trusted"
+
+  - id: R017_BOOTLOADER_TOUCH
+    severity: critical
+    category: Bootloader / Firmware
+    mitre: T1542
+    patterns:
+      - "dd if=.* of=/dev/sda"
+      - "dd if=.* of=/dev/mmcblk"
+      - "efibootmgr.*delete"
+      - "grub-install.*--recheck.*--removable"
+    explanation: "Writes directly to a boot device. A mistake here can make the system unbootable."
+    alternative: "Use the distro's update mechanism (update-grub) instead of raw writes"
+
+  - id: R018_SUDO_SU_ACCOUNT
+    severity: medium
+    category: Credential Access
+    mitre: T1078
+    patterns:
+      - "sudo su -$"
+      - "sudo su root"
+      - "su - root$"
+    explanation: "Switches to root interactively. Prevents auditing of individual commands."
+    alternative: "Use 'sudo -i' or prefer per-command sudo for an auditable trail"
+
+  - id: R019_DOCKER_PRIV_ESC
+    severity: high
+    category: Container Escape
+    mitre: T1611
+    patterns:
+      - "docker run -v /:/host"
+      - "docker run --privileged.*"
+      - "docker exec -it .* /bin/sh"
+      - "nsenter -t 1 -m -u -i -n"
+    explanation: "Mounts the host filesystem or escapes a container — a known container-escape path."
+    alternative: "Restrict volumes to specific host paths and drop --privileged"
+
+  - id: R020_SHUTDOWN_ABUSE
+    severity: low
+    category: Availability
+    mitre: T1499
+    patterns:
+      - "shutdown -h now"
+      - "poweroff --force"
+      - "reboot --force"
+      - "kill -9 1"
+      - "kill -9 -1"
+      - ":\\|:&"
+    explanation: "Immediate shutdown, forced reboot, or killing critical PIDs. Disrupts running services."
+    alternative: "Use 'systemctl reboot' or graceful 'shutdown' with a delay"
