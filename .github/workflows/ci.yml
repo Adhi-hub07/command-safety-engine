@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements.txt ruff
+      - name: Lint
+        run: ruff check src tests scripts
+      - name: Regenerate dataset and train model
+        run: |
+          python data/synthetic/generate_synthetic.py
+          python src/ml/train.py
+      - name: Run tests
+        run: pytest tests -q
+      - name: Smoke test CLI
+        run: |
+          python src/main.py check "rm -rf /" && exit 1 || test $? -eq 2
+          python src/main.py check "git status"

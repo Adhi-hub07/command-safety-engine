@@ -48,6 +48,30 @@ def test_safe_command_no_match():
     assert make_engine().match("ls -la") == []
 
 
+def test_rm_specific_dir_not_root_delete():
+    """False-positive regression: rm -rf build/ must NOT match R001 (root delete)."""
+    m = make_engine().match("rm -rf build/")
+    assert not any(r["rule_id"] == "R001_ROOT_DELETE" for r in m)
+
+
+def test_rm_specific_dir_not_wildcard():
+    """False-positive regression: rm -rf build/ must NOT match R002 (wildcard delete)."""
+    m = make_engine().match("rm -rf build/")
+    assert not any(r["rule_id"] == "R002_WILDCARD_RECURSIVE_DELETE" for r in m)
+
+
+def test_rm_root_glob_still_blocks():
+    """rm -rf /* (delete everything at root) is still critical."""
+    m = make_engine().match("rm -rf /*")
+    assert any(r["rule_id"] == "R001_ROOT_DELETE" for r in m)
+
+
+def test_rm_dot_still_matches_wildcard():
+    """rm -rf . (current dir) still matches R002 after the regex fix."""
+    m = make_engine().match("rm -rf .")
+    assert any(r["rule_id"] == "R002_WILDCARD_RECURSIVE_DELETE" for r in m)
+
+
 def test_score_severity():
     engine = make_engine()
     assert engine.score(engine.match("ls")) == 0

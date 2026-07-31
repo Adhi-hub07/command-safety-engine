@@ -31,6 +31,7 @@ def dry_run(command, timeout_seconds=3):
             capture_output=True,
             text=True,
             timeout=timeout_seconds,
+            check=False,
         )
     except subprocess.TimeoutExpired:
         return {"enabled": True, "exit_code": "timeout", "output": "command timed out in sandbox"}

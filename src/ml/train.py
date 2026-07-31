@@ -17,7 +17,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, ROOT)
 
-from src.features.extract import FEATURE_NAMES, extract_features, feature_vector
+from src.features.extract import FEATURE_NAMES, extract_features
 from src.rules.rule_engine import load_whitelist
 
 DATA_PATH = os.path.join(ROOT, "data", "labeled", "commands_labeled.csv")

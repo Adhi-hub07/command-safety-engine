@@ -6,7 +6,7 @@ rules:
     patterns:
       - "rm -rf /$"
       - "rm -rf --no-preserve-root /"
-      - "rm -rf /*"
+      - "rm -rf /\\*"
       - "rm -fr /"
       - "sudo rm -rf /"
       - "rm -rf /etc"
@@ -25,7 +25,7 @@ rules:
     mitre: T1485
     patterns:
       - "rm -rf \\*"
-      - "rm -rf ."
+      - "rm -rf \\."
       - "rm -rf ~"
       - "rm -fr \\*"
       - "rm -rf \\*/"

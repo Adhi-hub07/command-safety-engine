@@ -157,10 +157,12 @@ class CommandSafetyEngine:
             return result
 
     def _blend_risk(self, rule_score, ml_result):
-        cfg = self.config["engine"]
-        ml_weight = 0.35 if ml_result.get("confidence", 0) > 0.6 else 0.15
         label = ml_result.get("predicted_label", "safe")
-        label_risk = {"destructive": 95, "risky": 65, "safe": 15}.get(label, 15)
+        confidence = ml_result.get("confidence", 0.0)
+        label_risk = {"destructive": 95, "risky": 70, "safe": 15}.get(label, 15)
+        if rule_score == 0:
+            return min(100, round(label_risk * (0.4 + 0.6 * min(1.0, confidence))))
+        ml_weight = 0.35 if confidence > 0.6 else 0.15
         blended = rule_score * (1 - ml_weight) + label_risk * ml_weight
         return min(100, round(blended))
 
@@ -168,11 +170,7 @@ class CommandSafetyEngine:
         cfg = self.config["engine"]
         critical_rule = any(m["severity"] == "critical" for m in rule_matches)
         destructive_ml = ml_result.get("predicted_label") == "destructive"
-        if critical_rule:
-            verdict = "BLOCK"
-        elif destructive_ml and ml_result.get("confidence", 0) >= cfg.get("ml_block_confidence", 0.8):
-            verdict = "BLOCK"
-        elif risk_score >= cfg["block_risk_score"]:
+        if critical_rule or destructive_ml and ml_result.get("confidence", 0) >= cfg.get("ml_block_confidence", 0.8) or risk_score >= cfg["block_risk_score"]:
             verdict = "BLOCK"
         elif risk_score >= cfg["warn_risk_score"]:
             verdict = "WARN"

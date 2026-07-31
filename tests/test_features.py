@@ -3,7 +3,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.features.extract import extract_features, feature_vector, FEATURE_NAMES
+from src.features.extract import FEATURE_NAMES, extract_features, feature_vector
 
 
 def test_rm_rf_root_features():

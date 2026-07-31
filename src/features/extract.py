@@ -1,6 +1,5 @@
 """Feature extraction: turn a command string into the 20-feature vector."""
 
-import os
 import re
 
 from src.parser import tokenizer
@@ -48,7 +47,6 @@ def extract_features(command, whitelist=None):
     cmd = tokenizer.normalize_space(command)
     tokens = tokenizer.tokenize(cmd)
     words = [t.text for t in tokens if t.kind == "word"]
-    lower = cmd.lower()
     base = tokenizer.base_command(cmd)
 
     features = {

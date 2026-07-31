@@ -46,3 +46,16 @@ def test_explanation_present_on_block():
     result = make_engine().analyze("rm -rf /")
     assert result["llm_explanation"]["summary"]
     assert result["rule_engine"]["rules"][0]["mitre"]
+
+
+def test_ml_only_risky_warns():
+    """A novel risky command with no matching rule must still WARN (ML carries the risk)."""
+    result = make_engine().analyze("rm -rf build/")
+    assert result["final_decision"]["verdict"] == "WARN"
+    assert result["final_decision"]["risk_score"] >= 45
+
+
+def test_ml_only_destructive_blocks():
+    """A destructive command not covered by rules is still blocked via ML at high confidence."""
+    result = make_engine().analyze("wipefs -a /dev/sda")
+    assert result["final_decision"]["verdict"] == "BLOCK"

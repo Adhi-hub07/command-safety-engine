@@ -1,0 +1,11 @@
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+# BLE001/S110: the engine intentionally falls back silently on any failure —
+# a crash in the safety layer must never block the user's shell.
+ignore = ["BLE001", "S110"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]

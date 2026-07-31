@@ -4,6 +4,14 @@
 # Requires bash-preexec.sh to be sourced first. Kill-switch: CSENGINE_DISABLE=1
 
 if [[ -z "${CSENGINE_DISABLE:-}" ]]; then
+  # auto-load the vendored bash-preexec.sh sibling if no preexec hook is active yet
+  if ! declare -F preexec >/dev/null 2>&1; then
+    _csengine_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    if [[ -f "$_csengine_dir/bash-preexec.sh" ]]; then
+      source "$_csengine_dir/bash-preexec.sh"
+    fi
+  fi
+
   _csengine_bin=""
   if command -v csengine >/dev/null 2>&1; then
     _csengine_bin="csengine"

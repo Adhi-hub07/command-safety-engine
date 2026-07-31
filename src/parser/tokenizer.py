@@ -19,7 +19,7 @@ _GLOB_RE = re.compile(r"(\*|\?|\[.*?\])")
 
 
 class CommandToken:
-    __slots__ = ("text", "kind")
+    __slots__ = ("kind", "text")
 
     def __init__(self, text, kind="word"):
         self.text = text
@@ -79,10 +79,7 @@ def _tokenize_bashlex(command):
     def walk(node):
         kind = getattr(node, "kind", None)
         word = getattr(node, "word", None)
-        if kind == "command":
-            for part in getattr(node, "parts", []):
-                walk(part)
-        elif kind == "pipeline":
+        if kind == "command" or kind == "pipeline":
             for part in getattr(node, "parts", []):
                 walk(part)
         elif kind == "operator":
