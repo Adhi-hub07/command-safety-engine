@@ -1,30 +1,12 @@
-```
-                                     .--.
-                                    /    \
-                       _____________/      \_____
-                      |                    |     |
-                      |  __        __  __  |     |
-                      | |  |       |__ |__| |  _ |
-                      | |__|       |__    | | |_ |
-                      |                    |     |
-                      |       _.._.._      |     |
-                      |     /  _    _ \    |     |
-                      |     | |_|  |_| |   |     |
-                      |     \   ____   /   |     |
-                      |      |_______|     |     |
-                      |____________________|_____|
-                           /    \   /    \
-                          |      | |      |
-                          |      | |      |
-                           \    /   \    /
-                            \__/     \__/
+<p align="center">
+  <img src="assets/tux.png" alt="Linux logo" width="120" />
+  <br />
+  <strong style="font-size: 34px;">COMMAND SAFETY ENGINE</strong>
+  <br />
+  <em>Offline AI guard for the Linux shell</em>
+</p>
 
-          C O M M A N D   S A F E T Y   E N G I N E
-```
-
-# Command Safety Engine
-
-> **An offline AI guard for the Linux shell — C-DAC Secure OS Hackathon 2026 · Track 1 (AI @ Application Level)**
+> **C-DAC Secure OS Hackathon 2026 · Track 1 (AI @ Application Level)**
 
 Every command you type is checked **before it runs**. Dangerous commands are
 **blocked**, risky ones ask for **confirmation**, and everything else passes
@@ -32,14 +14,6 @@ through in milliseconds — fully offline, fully open-source, on a normal laptop
 
 ```
 Command → Rule Engine → ML Classifier → Local LLM (Qwen 2.5 3B) → Allow / Warn / Block
-```
-
-```
-     _  _  ___  ____   __  __   _____  _____  _   _  _____
-    | \| |/ _ \|  _ \  \ \/ /  | ____|| ____|| \ | |/ ___|
-    | .` | | | | |_) |  \  /   |  _|  |  _|  |  \| | |  _
-    | |\ | |_| |  _ <   /  \   | |___ | |___ | |\  | |_| |
-    |_| \_|\___/|_| \_\ /_/\_\ |_____||_____||_| \_|\____|
 ```
 
 ---
