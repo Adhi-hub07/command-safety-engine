@@ -21,7 +21,7 @@
                     │  4. Feature Extraction (20 features)                 │
                     │        │                                             │
                     │        ▼                                             │
-                    │  5. ML Classifier (RandomForest, 3 classes)          │
+                    │  5. ML Classifier (GradientBoosting, 3 classes)          │
                     │     safe / risky / destructive                       │
                     │        │                                             │
                     │        ▼                                             │
@@ -76,7 +76,7 @@ else                             → ALLOW
 | `src/parser/tokenizer.py` | tokenization, alias/$VAR expansion, obfuscation hints |
 | `src/features/extract.py` | 20-feature vector (see `docs/FEATURES.md`) |
 | `src/rules/rule_engine.py` | regex rule matching + severity scoring |
-| `src/ml/train.py` | RandomForest training, evaluation, artifacts |
+| `src/ml/train.py` | GradientBoosting training, evaluation, artifacts |
 | `src/llm/explain.py` | Ollama JSON-mode prompt for explanations |
 | `src/sandbox/bwrap_check.py` | optional bubblewrap dry-run |
 | `src/engine.py` | orchestrator + decision fusion + audit |

@@ -20,9 +20,10 @@ The engine is a three-layer defence-in-depth pipeline. **Layer 1** is a curated
 deterministic rule engine of 20 MITRE ATT&CK-aligned rule groups (recursive
 root deletion, fork bombs, permission escalation, credential scraping, supply-chain
 "download-and-run", network recon, obfuscation, and more), each with human-readable
-explanations and safe alternatives. **Layer 2** is a RandomForest machine-learning
-classifier trained on 1,149 synthetic attack/benign shell commands (92.2% accuracy,
-0.915 macro F1) that generalises to novel commands no rule covers. **Layer 3** is a
+explanations and safe alternatives. **Layer 2** is a GradientBoosting machine-learning
+classifier trained on 1,379 deduplicated synthetic/real-world shell commands
+(83.3% accuracy on a held-out test, 0.80 macro F1, 0.83 destructive-class recall)
+that generalises to novel commands no rule covers. **Layer 3** is a
 local LLM (Qwen 2.5 3B via Ollama) invoked only for genuinely ambiguous commands,
 writing natural-language explanations in the user's language. Every decision is
 audited to a hashed, privacy-preserving log.
@@ -53,7 +54,7 @@ keeps the user in control — without false-positive fatigue.**
 | Component | Technology | Role |
 |---|---|---|
 | Rule Engine | Python + YAML rules | 20 deterministic rule groups, MITRE-mapped, instant |
-| ML Classifier | scikit-learn RandomForest | Generalises to novel commands from 20 hand-crafted features |
+| ML Classifier | scikit-learn GradientBoosting | Generalises to novel commands from 20 hand-crafted features |
 | LLM Explainer | Ollama + Qwen 2.5 3B Q4 | Human explanations for ambiguous/novel commands |
 | Sandbox | bubblewrap (optional) | Safe execution of untrusted downloads |
 | Shell Hooks | bash-preexec / zsh preexec | Intercepts every command before execution |
@@ -64,28 +65,41 @@ ML model is unsure — defence in depth). Otherwise rule risk and ML label risk 
 blended into a 0-100 score: BLOCK ≥ 80, WARN ≥ 45, else ALLOW. Whitelisted
 commands skip analysis entirely (zero false positives for daily workflows).
 
-**Results (measured):**
-- ML accuracy **92.2%**; macro F1 **0.915** (class recall: destructive **0.902**, risky 0.987, safe 0.886)
+**Results (measured, honest = deduplicated + 5-fold CV):**
+- Deployed model (GradientBoosting): **5-fold CV 0.834 ± 0.031 acc, 0.807 ± 0.040 macro-F1**
+- Held-out test (80/20, seed 42): **83.3% accuracy, 0.803 macro-F1**
+  (per-class recall: destructive **0.833**, risky 0.605, safe 0.947)
 - Feature extraction + rule check: **0.47 ms** mean (p95 0.64 ms)
 - Full pipeline: **56 ms** mean (p95 81 ms) on Windows dev box; faster on Linux
 - Regression suite: **28/28 tests passing**, ruff lint clean
-- Dataset: **1,149 commands** (568 safe / 374 risky / 207 destructive) with per-row
-  provenance (`bash-history`, `mitre-attack`, `gtfobins`, `synthetic`)
+- Dataset: **1,379 unique commands** (759 safe / 381 risky / 239 destructive) built by a
+  deterministic three-step pipeline — `generate_synthetic.py` → `auto_label_raw.py`
+  (300 real-world commands) → `dedupe_dataset.py` — with per-row provenance
+  (`bash-history` 358, `mitre-attack` 234, `gtfobins` 19, `synthetic` 768)
+- **Data-hygiene audit:** 666 duplicate rows were removed after the first regeneration
+  (they leaked identical commands into both train and test, inflating accuracy from an
+  honest ~80% CV to a misleading ~92%); the pipeline now removes duplicates at build time
 - **Model comparison** (identical 80/20 split, seed 42, run via `src/ml/compare.py`):
 
   | Model | Accuracy | Macro-F1 | Destructive recall | Risky recall | Safe recall |
   |---|---|---|---|---|---|
-  | **RandomForest (deployed)** | **0.922** | **0.915** | **0.902** | 0.987 | 0.886 |
-  | GradientBoosting | 0.948 | 0.940 | 0.878 | 0.973 | 0.956 |
-  | LogisticRegression | 0.917 | 0.908 | 0.805 | 0.933 | 0.947 |
+  | **GradientBoosting (deployed)** | **0.833** | **0.803** | **0.833** | 0.605 | 0.947 |
+  | RandomForest | 0.819 | 0.792 | 0.771 | 0.658 | 0.915 |
+  | LogisticRegression | 0.822 | 0.789 | 0.729 | 0.645 | 0.941 |
 
-  RandomForest is deployed even though GradientBoosting scores slightly higher overall
-  because its **destructive-class recall is highest (0.902 vs 0.878)** — for a blocker,
-  missing a destructive command is the worst failure mode, so safety-first wins.
+  GradientBoosting is deployed because on the deduplicated dataset it wins on **both**
+  macro-F1 (0.803) and destructive-class recall (0.833) — for a blocker, missing a
+  destructive command is the worst failure mode, and this is also the highest destructive
+  recall of the three models. (An earlier dataset carried duplicate rows that changed the
+  ranking; removing them made the comparison trustworthy.)
 
 ### Data provenance (reproducibility)
 
-Every row in `data/labeled/commands_labeled.csv` carries a `source` column:
+The dataset is rebuilt deterministically (seed 42) by a three-step pipeline:
+`data/synthetic/generate_synthetic.py` → `scripts/auto_label_raw.py` (labels the
+300-row raw corpus `data/raw/commands_raw.csv`) → `scripts/dedupe_dataset.py`
+(removes duplicate commands and resolves label conflicts toward the most severe
+class). Every row in `data/labeled/commands_labeled.csv` carries a `source` column:
 - **bash-history** — everyday benign commands sampled from real shell histories
   (safe + risky patterns like repeated `rm -rf` on project dirs).
 - **mitre-attack** — adversarial commands derived from MITRE ATT&CK techniques
@@ -178,19 +192,20 @@ escaped**, not naive substrings: `rm -rf build/` is WARN while `rm -rf /*` is BL
 proven by regression tests. (3) The output is **graded** (ALLOW / WARN / BLOCK), so risky
 work is confirmed, not prohibited; WARN is the signal, not the verdict.
 
-**Q: Why not a deep-learning model instead of RandomForest?**
-A: RandomForest on 20 hand-crafted features is deliberate. It trains on CPU in ~1 s, runs
-in ~0.1 ms, needs no GPU, and is fully explainable — judges and auditors can read exactly
-which features fired (e.g. `targets_root_fs`). We measured deep models offer no accuracy
-gain at this data scale, and they make the sovereign/offline story (runs on any office PC,
-BOSS OS) harder to sell.
+**Q: Why not a deep-learning model instead of GradientBoosting?**
+A: A shallow GradientBoosting classifier on 20 hand-crafted features is deliberate. It
+trains on CPU in ~1 s, runs in ~0.1 ms, needs no GPU, and is fully explainable — judges and
+auditors can read exactly which features fired (e.g. `targets_root_fs`). We measured deep
+models offer no accuracy gain at this data scale, and they make the sovereign/offline story
+(runs on any office PC, BOSS OS) harder to sell.
 
 **Q: How does the model generalise beyond its training set?**
 A: The feature space encodes *intent*, not syntax: flags, targets, redirections,
 obfuscation, sudo usage. A novel attack (say a new download-and-run trick) still trips
 `has_redirect` + `network_recon` + `is_pipe_to_shell` features even if the exact string was
 never seen. The comparison script proves the 3-class split (safe/risky/destructive)
-generalises to a held-out 20% with destructive recall 0.902.
+generalises to a held-out 20% with destructive recall 0.833, and 5-fold CV reports 0.834 ±
+0.031 accuracy (no single-split cherry-picking).
 
 **Q: What happens if the LLM is unavailable (no Ollama, no network)?**
 A: The LLM is optional by design. A 0.5 s TCP probe checks Ollama; on failure the engine

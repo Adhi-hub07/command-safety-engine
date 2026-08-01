@@ -21,7 +21,7 @@ What the installer does:
 2. Installs Ollama (if absent), pulls `qwen2.5:3b-instruct-q4_K_M`
 3. Creates an isolated venv at `~/.csengine/venv` (never touches BOSS OS
    system Python, which is tied to system services)
-4. Generates the labeled dataset and trains the RandomForest classifier
+4. Generates the labeled dataset and trains the GradientBoosting classifier
 5. Installs the `csengine` command and bash/zsh preexec hook
 
 ## Verify offline operation

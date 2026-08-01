@@ -20,6 +20,8 @@ jobs:
       - name: Regenerate dataset and train model
         run: |
           python data/synthetic/generate_synthetic.py
+          python scripts/auto_label_raw.py
+          python scripts/dedupe_dataset.py
           python src/ml/train.py
       - name: Run tests
         run: pytest tests -q

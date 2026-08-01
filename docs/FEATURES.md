@@ -1,7 +1,7 @@
 # Feature Dictionary
 
 20 numeric features extracted from every command. Booleans → 0/1; counts
-as integers. Used by the RandomForest classifier (`src/ml/train.py`).
+as integers. Used by the GradientBoosting classifier (`src/ml/train.py`).
 
 | # | Feature | Type | What it detects |
 |---|---|---|---|

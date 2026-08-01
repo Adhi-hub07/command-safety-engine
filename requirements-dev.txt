@@ -1,0 +1,4 @@
+# Development-only dependencies (notebooks, plotting). The production install
+# uses requirements.txt only - these are NOT needed for the shell hook / engine.
+matplotlib==3.8.4
+jupyter==1.0.0

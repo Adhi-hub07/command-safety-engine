@@ -8,10 +8,13 @@ Command → Rule Engine → ML Classifier → Local LLM (Qwen 2.5 3B) → Allow 
 ```
 
 - **100% offline** — no cloud APIs, aligned with India's sovereign OS (AtmaNirbhar) mission
-- **Hybrid AI** — deterministic rules + scikit-learn classifier + local LLM explanation
+- **Hybrid AI** — deterministic rules + scikit-learn GradientBoosting classifier + local LLM explanation
 - **<1ms** fast path for common commands (rules+ML, measured 0.47 ms); full pipeline ~56 ms; LLM only invoked for ambiguous cases
 - **Works on BOSS OS** (Indian government Linux) and standard Ubuntu/Debian
 - **Educates** — every warning explains why, maps to MITRE ATT&CK, and suggests a safer rewrite
+- **Honest ML numbers** — 5-fold CV 0.834 ± 0.031 accuracy (0.807 macro-F1) on a
+  deduplicated 1,379-command dataset; model comparison and confusion matrix in
+  `notebooks/model_experiments.ipynb`
 
 ## Quick start
 
@@ -32,7 +35,8 @@ bash install-boss-os.sh
 ```
 command-safety-engine/
 ├── config/            # rules.yaml, whitelist.yaml, config.yaml
-├── data/              # labeled command dataset + synthetic generator
+├── data/              # raw corpus + labeled dataset + synthetic generator
+├── notebooks/         # model experiments (5-fold CV comparison) — dev only
 ├── src/
 │   ├── parser/        # bashlex-based command tokenizer
 │   ├── features/      # 20 feature extractor
