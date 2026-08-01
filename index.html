@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Command Safety Engine — Offline AI Guard for the Linux Shell</title>
+<meta name="description" content="Command Safety Engine by Adhithya J — an offline AI guard for the Linux shell. Blocks dangerous commands before they run. C-DAC Secure OS Hackathon 2026." />
+<link rel="icon" type="image/png" href="assets/tux.png" />
+<style>
+  :root {
+    --bg: #0b1020;
+    --bg2: #10172e;
+    --card: #151d3a;
+    --line: #25305a;
+    --green: #3ddc84;
+    --green-dim: #1d9e56;
+    --amber: #f6c344;
+    --red: #ff5c57;
+    --cyan: #56d8ff;
+    --violet: #a78bfa;
+    --text: #e6ecff;
+    --muted: #8b96c9;
+    --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    --sans: "Inter", "Segoe UI", system-ui, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ---------- animated background ---------- */
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background-image:
+      linear-gradient(rgba(61,220,132,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(61,220,132,.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 100%);
+  }
+
+  .glow {
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    background:
+      radial-gradient(600px 400px at 15% 10%, rgba(61,220,132,.14), transparent 60%),
+      radial-gradient(700px 500px at 85% 20%, rgba(86,216,255,.10), transparent 60%),
+      radial-gradient(800px 600px at 50% 100%, rgba(167,139,250,.10), transparent 60%);
+  }
+
+  .matrix {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    opacity: .12;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--green);
+    pointer-events: none;
+    white-space: pre;
+  }
+
+  /* ---------- nav ---------- */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(12px);
+    background: rgba(11,16,32,.75);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+  }
+
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .5px; }
+  .brand img { width: 34px; height: 34px; }
+
+  .nav-links { display: flex; gap: 22px; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: color .2s; }
+  .nav-links a:hover { color: var(--green); }
+  .nav-badge {
+    background: linear-gradient(135deg, var(--green-dim), var(--green));
+    color: #04130a;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    text-decoration: none;
+    letter-spacing: .5px;
+  }
+
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+  }
+
+  /* ---------- hero ---------- */
+  header.hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 90px 24px 60px;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero-logo {
+    width: 130px;
+    height: 130px;
+    border-radius: 28px;
+    background: linear-gradient(160deg, #1d2a52, #0d1428);
+    border: 1px solid var(--line);
+    box-shadow: 0 0 0 8px rgba(61,220,132,.06), 0 30px 80px rgba(0,0,0,.5);
+    padding: 18px;
+    display: inline-block;
+    animation: float 5s ease-in-out infinite;
+  }
+  .hero-logo img { width: 100%; height: 100%; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .chip {
+    display: inline-block;
+    margin-top: 26px;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--green);
+    border: 1px solid rgba(61,220,132,.4);
+    background: rgba(61,220,132,.08);
+    padding: 6px 16px;
+    border-radius: 999px;
+    letter-spacing: 1px;
+  }
+
+  h1 {
+    font-size: clamp(38px, 6vw, 64px);
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin: 18px 0 10px;
+    background: linear-gradient(120deg, #fff 30%, var(--green) 60%, var(--cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .tagline {
+    font-size: clamp(17px, 2.4vw, 22px);
+    color: var(--muted);
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .hero-cta {
+    margin-top: 34px;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 14px 28px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--green-dim), var(--green));
+    color: #04130a;
+    box-shadow: 0 12px 34px rgba(61,220,132,.3);
+  }
+  .btn-ghost {
+    color: var(--text);
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.02);
+  }
+  .btn:hover { transform: translateY(-3px); }
+  .btn-primary:hover { box-shadow: 0 18px 44px rgba(61,220,132,.45); }
+
+  .hero-stats {
+    margin-top: 56px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    max-width: 900px;
+    margin-inline: auto;
+  }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 12px;
+  }
+  .stat b { font-size: 26px; font-family: var(--mono); color: var(--green); display: block; }
+  .stat span { font-size: 13px; color: var(--muted); }
+
+  /* ---------- terminal mock ---------- */
+  .terminal-wrap {
+    max-width: 860px;
+    margin: 60px auto 0;
+    text-align: left;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 40px 100px rgba(0,0,0,.55);
+  }
+  .term-bar {
+    background: #0e1530;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
+  .term-title { margin-left: 10px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .term-body { background: #080c1c; padding: 22px 24px; font-family: var(--mono); font-size: 14px; }
+  .term-body .line { margin-bottom: 8px; }
+  .term-body .cmd::before { content: "$ "; color: var(--green); font-weight: 700; }
+  .term-body .in { color: var(--text); }
+  .term-body .out { color: var(--muted); padding-left: 8px; white-space: pre-wrap; }
+  .ok { color: var(--green); } .warn { color: var(--amber); } .block { color: var(--red); }
+  .cursor {
+    display: inline-block; width: 8px; height: 16px; background: var(--green);
+    vertical-align: text-bottom; animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ---------- sections ---------- */
+  section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+  .sec-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--green);
+    text-transform: uppercase;
+  }
+  h2 {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    margin: 10px 0 14px;
+    letter-spacing: -.5px;
+  }
+  .sec-sub { color: var(--muted); max-width: 720px; }
+
+  /* verdicts */
+  .verdicts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-top: 40px; }
+  .verdict {
+    border-radius: 16px;
+    padding: 26px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    transition: transform .2s, border-color .2s;
+  }
+  .verdict:hover { transform: translateY(-6px); }
+  .verdict .tag { display: inline-block; font-family: var(--mono); font-weight: 800; padding: 4px 14px; border-radius: 8px; font-size: 13px; letter-spacing: 1px; }
+  .v-allow { border-top: 3px solid var(--green); }
+  .v-allow .tag { background: rgba(61,220,132,.15); color: var(--green); }
+  .v-warn { border-top: 3px solid var(--amber); }
+  .v-warn .tag { background: rgba(246,195,68,.15); color: var(--amber); }
+  .v-block { border-top: 3px solid var(--red); }
+  .v-block .tag { background: rgba(255,92,87,.15); color: var(--red); }
+  .verdict p { color: var(--muted); font-size: 14px; margin-top: 10px; }
+  .verdict .code { font-family: var(--mono); color: var(--text); font-size: 13px; margin-top: 12px; display: block; }
+
+  /* pipeline */
+  .pipeline { margin-top: 40px; display: flex; flex-direction: column; gap: 0; }
+  .pipe-step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    position: relative;
+    padding-bottom: 26px;
+  }
+  .pipe-step:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: 21px; top: 46px; bottom: 0;
+    width: 2px;
+    background: linear-gradient(var(--line), transparent);
+  }
+  .pipe-num {
+    flex-shrink: 0;
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-weight: 800;
+    background: #0e1530; border: 1px solid var(--line); color: var(--green);
+  }
+  .pipe-body h4 { font-size: 17px; }
+  .pipe-body p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .pipe-body code {
+    font-family: var(--mono); font-size: 12px; color: var(--cyan);
+    background: rgba(86,216,255,.08); padding: 2px 8px; border-radius: 6px;
+  }
+
+  /* cards grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; margin-top: 40px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 26px;
+    transition: transform .2s, border-color .2s;
+  }
+  .card:hover { transform: translateY(-6px); border-color: rgba(61,220,132,.5); }
+  .card .ico { font-size: 26px; }
+  .card h4 { margin: 12px 0 8px; font-size: 17px; }
+  .card p { color: var(--muted); font-size: 14px; }
+
+  /* numbers table */
+  .table-wrap { overflow-x: auto; margin-top: 36px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  th { font-family: var(--mono); color: var(--muted); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+  td { font-family: var(--mono); }
+  tr:hover td { background: rgba(255,255,255,.02); }
+  .highlight td { color: var(--green); font-weight: 700; }
+
+  /* code block */
+  .codeblock {
+    background: #080c1c;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    overflow-x: auto;
+    margin-top: 24px;
+    position: relative;
+  }
+  .codeblock .c { color: var(--muted); }
+  .codeblock .g { color: var(--green); }
+  .codeblock .a { color: var(--amber); }
+  .codeblock .w { color: #fff; }
+
+  /* steps */
+  .steps { margin-top: 40px; counter-reset: step; display: grid; gap: 14px; }
+  .step {
+    display: flex; gap: 18px; align-items: flex-start;
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px;
+  }
+  .step::before {
+    counter-increment: step;
+    content: counter(step);
+    font-family: var(--mono); font-weight: 800; color: var(--green);
+    background: rgba(61,220,132,.1); border: 1px solid rgba(61,220,132,.4);
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .step h4 { font-size: 16px; }
+  .step p { color: var(--muted); font-size: 14px; }
+  .step code {
+    font-family: var(--mono); font-size: 12.5px; color: var(--cyan);
+    background: rgba(86,216,255,.08); padding: 2px 8px; border-radius: 6px;
+    word-break: break-all;
+  }
+
+  /* footer */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 46px 24px 60px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  footer .big { font-weight: 800; color: var(--text); font-size: 16px; margin-bottom: 6px; }
+  footer a { color: var(--green); text-decoration: none; }
+
+  ::selection { background: rgba(61,220,132,.3); }
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 5px; }
+</style>
+</head>
+<body>
+
+<div class="glow"></div>
+<div class="bg-grid"></div>
+<canvas id="matrix" class="matrix"></canvas>
+
+<!-- ============ NAV ============ -->
+<nav>
+  <div class="nav-inner">
+    <a class="brand" href="#top"><img src="assets/tux.png" alt="Linux" /> COMMAND SAFETY ENGINE</a>
+    <ul class="nav-links">
+      <li><a href="#verdicts">Verdicts</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#numbers">Numbers</a></li>
+      <li><a href="#install">Install</a></li>
+    </ul>
+    <a class="nav-badge" href="https://github.com/Adhi-hub07/command-safety-engine" target="_blank">★ GitHub</a>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header class="hero" id="top">
+  <div class="hero-logo"><img src="assets/tux.png" alt="Linux logo" /></div>
+  <div class="chip">▮▮▮  C-DAC SECURE OS HACKATHON 2026 · TRACK 1  ▮▮▮</div>
+  <h1>COMMAND SAFETY ENGINE</h1>
+  <p class="tagline">An offline AI guard for the Linux shell. Every command is checked before it runs — dangerous ones are blocked, risky ones ask for confirmation, everything else passes in milliseconds.</p>
+  <div class="hero-cta">
+    <a class="btn btn-primary" href="#install">⚡ Get Started</a>
+    <a class="btn btn-ghost" href="#how">How it works ↓</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat"><b>0.34 ms</b><span>mean rule+ML check</span></div>
+    <div class="stat"><b>1,379</b><span>labeled commands</span></div>
+    <div class="stat"><b>3</b><span>layers of defence</span></div>
+    <div class="stat"><b>100%</b><span>offline · air-gap ready</span></div>
+    <div class="stat"><b>20</b><span>MITRE-mapped rule groups</span></div>
+  </div>
+
+  <!-- terminal mock -->
+  <div class="terminal-wrap">
+    <div class="term-bar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="term-title">adhithya@linux: ~/command-safety-engine</span>
+    </div>
+    <div class="term-body">
+      <div class="line"><span class="cmd"><span class="in">csengine check "rm -rf /"</span></span></div>
+      <div class="line"><span class="out block">⛔ BLOCK (exit 2)  Destructive: recursive force-delete on filesystem root</span></div>
+      <div class="line"><span class="out block">   rule R001 · MITRE T1485 · use: rm -rf /path/to/folder</span></div>
+      <div class="line"><span class="cmd"><span class="in">csengine check "chmod -R 777 /var/www"</span></span></div>
+      <div class="line"><span class="out warn">⚠️ WARN (exit 1)  Risky: broad recursive permission change</span></div>
+      <div class="line"><span class="cmd"><span class="in">csengine check "git status"</span></span></div>
+      <div class="line"><span class="out ok">✅ ALLOW (exit 0)  Safe — ran in 0.31 ms<span class="cursor"></span></span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ VERDICTS ============ -->
+<section id="verdicts">
+  <div class="sec-tag">// Decision output</div>
+  <h2>Three verdicts. Zero guesswork.</h2>
+  <p class="sec-sub">The engine sits between your keyboard and the kernel, inside bash and zsh. It inspects every command you type and answers in real time — then explains itself in plain English.</p>
+
+  <div class="verdicts">
+    <div class="verdict v-allow">
+      <span class="tag">ALLOW · exit 0</span>
+      <p>Safe, whitelisted or low risk. Runs instantly with zero added latency — your daily commands cost ~0 ms.</p>
+      <code class="code">git status &nbsp;→&nbsp; runs immediately</code>
+    </div>
+    <div class="verdict v-warn">
+      <span class="tag">WARN · exit 1</span>
+      <p>Risky. The hook keeps your line and waits — type the exact same command again to confirm you really meant it.</p>
+      <code class="code">chmod -R 777 /var/www &nbsp;→&nbsp; confirm to run</code>
+    </div>
+    <div class="verdict v-block">
+      <span class="tag">BLOCK · exit 2</span>
+      <p>Destructive. Refused outright — the line is cleared before anything executes. Explained with rule, MITRE mapping and a safer rewrite.</p>
+      <code class="code">rm -rf / &nbsp;→&nbsp; never executes</code>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how">
+  <div class="sec-tag">// Pipeline</div>
+  <h2>How it works</h2>
+  <p class="sec-sub">Hybrid AI — three layers of defence-in-depth working together, all on-device, all offline.</p>
+
+  <div class="pipeline">
+    <div class="pipe-step">
+      <div class="pipe-num">1</div>
+      <div class="pipe-body">
+        <h4>Preprocess &amp; tokenize</h4>
+        <p>Normalization, alias expansion, <code>$VAR</code> resolution, then a <code>bashlex</code> tokenizer parses words, pipes, redirects and substitutions.</p>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">2</div>
+      <div class="pipe-body">
+        <h4>Rule engine — deterministic</h4>
+        <p>20 MITRE-mapped rule groups (<code>R001–R020</code>) match instantly and can never be argued out of a block.</p>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">3</div>
+      <div class="pipe-body">
+        <h4>ML classifier</h4>
+        <p>scikit-learn <b>GradientBoosting</b> trained on 1,379 real + synthetic commands classifies safe / risky / destructive across 20 features.</p>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">4</div>
+      <div class="pipe-body">
+        <h4>Local LLM — Qwen 2.5 3B</h4>
+        <p>Invoked <i>only</i> for ambiguous or novel commands to write a plain-English explanation and a safer alternative. Runs on Ollama, fully offline.</p>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">5</div>
+      <div class="pipe-body">
+        <h4>Decision fusion</h4>
+        <p>Rules and ML are fused into a <code>0–100</code> risk score. A critical rule always blocks regardless of ML confidence — the model can never talk the system out of a block.</p>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">6</div>
+      <div class="pipe-body">
+        <h4>Output + audit</h4>
+        <p>Rich CLI or JSON verdict, plus a privacy-preserving audit log that stores only truncated SHA-256 hashes — never plaintext commands.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section id="features">
+  <div class="sec-tag">// Why it exists</div>
+  <h2>A terminal is the most powerful — and least protected — interface on Linux</h2>
+  <p class="sec-sub">One mistyped or copy-pasted command (<code>rm -rf /</code>, a fork bomb, a <code>curl | bash</code> chain) can destroy data or hand an attacker the machine. No mainstream OS ships a safety layer between the keyboard and the kernel — until now.</p>
+
+  <div class="grid">
+    <div class="card"><div class="ico">🔌</div><h4>100% offline</h4><p>No cloud APIs, no telemetry, no data egress. Aligned with India's sovereign OS (AtmaNirbhar) mission — fully functional on air-gapped government networks.</p></div>
+    <div class="card"><div class="ico">🧠</div><h4>Hybrid AI</h4><p>Deterministic rules + trained ML classifier + local LLM. Three independent layers that cross-check each other in milliseconds.</p></div>
+    <div class="card"><div class="ico">⚡</div><h4>Fast</h4><p>Rules + ML path ≈ 0.34 ms mean (p95 0.61 ms). Full pipeline ≈ 3 ms. Whitelisted daily commands cost ~0 ms.</p></div>
+    <div class="card"><div class="ico">🛡️</div><h4>Safety-first override</h4><p>A single critical rule match blocks regardless of ML confidence. The model can never talk the system out of a block.</p></div>
+    <div class="card"><div class="ico">📖</div><h4>Explains &amp; teaches</h4><p>Every warning shows the matched rule, its MITRE mapping, why it matters, and a safer rewrite like <code>rm -rf /path/to/folder</code>.</p></div>
+    <div class="card"><div class="ico">🔐</div><h4>Privacy-preserving audit</h4><p><code>~/.csengine/audit.log</code> stores only truncated SHA-256 hashes — incidents are correlatable, but commands can never be recovered.</p></div>
+    <div class="card"><div class="ico">🐧</div><h4>BOSS OS &amp; Ubuntu/Debian</h4><p>Works on the Indian government's GNU/Linux and standard distros, on both bash and zsh.</p></div>
+    <div class="card"><div class="ico">🎯</div><h4>Honest ML numbers</h4><p>5-fold cross-validation on deduplicated data — no cherry-picked single splits. See the real numbers below.</p></div>
+    <div class="card"><div class="ico">🧪</div><h4>Optional bubblewrap sandbox</h4><p>Dry-run untrusted downloads safely before anything touches the real filesystem.</p></div>
+  </div>
+</section>
+
+<!-- ============ NUMBERS ============ -->
+<section id="numbers">
+  <div class="sec-tag">// Performance &amp; ML honesty</div>
+  <h2>The real numbers</h2>
+  <p class="sec-sub">Measured via <code>scripts/benchmark_latency.py --n 1000</code>, regenerated in CI on every push. Model quality on <i>deduplicated</i> data with 5-fold cross-validation.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Path</th><th>Mean</th><th>p95</th></tr></thead>
+      <tbody>
+        <tr class="highlight"><td>Feature extraction + rule check</td><td>~0.34 ms</td><td>~0.61 ms</td></tr>
+        <tr><td>Full pipeline (no LLM resident)</td><td>~3 ms</td><td>~3.5 ms</td></tr>
+        <tr><td>Whitelisted daily command</td><td>~0 ms</td><td>~0 ms</td></tr>
+        <tr><td>With local Qwen pre-warmed</td><td>tens of ms</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Model</th><th>Accuracy</th><th>Macro-F1</th><th>Destructive recall</th></tr></thead>
+      <tbody>
+        <tr class="highlight"><td>GradientBoosting (deployed)</td><td>0.833</td><td>0.803</td><td>0.833</td></tr>
+        <tr><td>RandomForest</td><td>0.819</td><td>0.792</td><td>0.771</td></tr>
+        <tr><td>LogisticRegression</td><td>0.822</td><td>0.789</td><td>0.729</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="sec-sub" style="margin-top:20px">GradientBoosting is deployed because it wins on both macro-F1 <i>and</i> destructive-class recall — for a blocker, missing a destructive command is the worst failure mode. Data hygiene: the pipeline deduplicates at build time (an early bug leaked 666 duplicate rows and inflated accuracy to a misleading ~92% — these are the honest ~83% numbers).</p>
+</section>
+
+<!-- ============ INSTALL ============ -->
+<section id="install">
+  <div class="sec-tag">// Setup on Linux</div>
+  <h2>Install on Linux in 3 steps</h2>
+  <p class="sec-sub">Works on Ubuntu, Debian and BOSS OS. Python 3.8+, ~1 GB RAM (3 GB with the LLM).</p>
+
+  <div class="steps">
+    <div class="step">
+      <div><h4>Install prerequisites</h4>
+      <p style="margin-top:6px"><code>sudo apt-get update</code><br/>
+      <code>sudo apt-get install -y git python3 python3-venv python3-pip curl</code><br/>
+      <span style="color:var(--muted);font-size:13px">Optional (for LLM explanations): <code>curl -fsSL https://ollama.com/install.sh | sh</code> then <code>ollama pull qwen2.5:3b-instruct-q4_K_M</code></span></p></div>
+    </div>
+    <div class="step">
+      <div><h4>Clone &amp; install</h4>
+      <p style="margin-top:6px"><code>git clone https://github.com/Adhi-hub07/command-safety-engine.git</code><br/>
+      <code>cd command-safety-engine</code><br/>
+      <code>bash setup.sh</code> &nbsp;— venv + deps + model training + Ollama + shell hooks<br/>
+      <code>source ~/.bashrc</code></p></div>
+    </div>
+    <div class="step">
+      <div><h4>Verify</h4>
+      <p style="margin-top:6px"><code>csengine status</code> &nbsp;— rules, model, LLM availability<br/>
+      <code>csengine check "rm -rf /"</code> &nbsp;→ <span style="color:var(--red)">BLOCK (exit 2)</span><br/>
+      <code>csengine check "chmod -R 777 /var/www"</code> &nbsp;→ <span style="color:var(--amber)">WARN (exit 1)</span><br/>
+      <code>csengine check "git status"</code> &nbsp;→ <span style="color:var(--green)">ALLOW (exit 0)</span></p></div>
+    </div>
+  </div>
+
+  <div class="codeblock">
+<span class="c"># CLI reference</span>
+<span class="w">csengine</span> <span class="g">check</span> <span class="a">"&lt;command&gt;"</span>              <span class="c"># analyze one command</span>
+<span class="w">csengine</span> <span class="g">check</span> <span class="g">--json</span> <span class="a">"&lt;command&gt;"</span>       <span class="c"># analyze, print JSON</span>
+<span class="w">csengine</span> <span class="g">check</span> <span class="g">--audit</span> <span class="a">"&lt;command&gt;"</span>      <span class="c"># analyze + write audit log</span>
+<span class="w">csengine</span> <span class="g">install-hook</span> <span class="a">[bash|zsh]</span>         <span class="c"># install shell preexec hook</span>
+<span class="w">csengine</span> <span class="g">status</span>                             <span class="c"># model / LLM availability</span>
+<span class="w">csengine</span> <span class="g">--version</span>
+
+<span class="c"># kill-switch</span>
+<span class="w">export</span> <span class="a">CSENGINE_DISABLE=1</span>     <span class="c"># temporarily disable the hook</span>
+<span class="w">unset</span> <span class="a">CSENGINE_DISABLE</span>        <span class="c"># re-enable</span>
+  </div>
+
+  <p class="sec-sub" style="margin-top:24px">End-to-end verified with a real-PTY test that drives an interactive shell and proves a destructive <code>dd</code> never executes and a risky <code>chmod</code> requires confirmation: <code>python3 scripts/test_hook_pty.py</code> (bash + zsh, ALL PASS) and <code>bash scripts/verify_demo.sh</code> (17/17 checks).</p>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="big">🐧 COMMAND SAFETY ENGINE</div>
+  <p>Made by <b>Adhithya J</b> · C-DAC Secure OS Hackathon 2026 · Track 1 (AI @ Application Level)</p>
+  <p style="margin-top:8px">Offline AI guard for the Linux shell · <a href="https://github.com/Adhi-hub07/command-safety-engine" target="_blank">GitHub repository</a></p>
+  <p style="margin-top:16px;font-size:12px;opacity:.6">MIT License © 2026 Adhithya J</p>
+</footer>
+
+<script>
+  // subtle falling-binary matrix background
+  const c = document.getElementById("matrix");
+  const ctx = c.getContext("2d");
+  let cols, drops;
+  const FONT = 13;
+  const CHARS = "01<>|/\\$#@_~".split("");
+
+  function size() {
+    c.width = innerWidth; c.height = innerHeight;
+    cols = Math.floor(c.width / FONT);
+    drops = Array(cols).fill(1);
+  }
+  size(); addEventListener("resize", size);
+
+  setInterval(() => {
+    ctx.fillStyle = "rgba(11,16,32,0.08)";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.font = FONT + "px monospace";
+    for (let i = 0; i < cols; i++) {
+      const ch = CHARS[(Math.random() * CHARS.length) | 0];
+      ctx.fillStyle = "rgba(61,220,132,0.8)";
+      ctx.fillText(ch, i * FONT, drops[i] * FONT);
+      if (drops[i] * FONT > c.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }, 70);
+</script>
+
+</body>
+</html>
