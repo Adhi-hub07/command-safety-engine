@@ -160,6 +160,44 @@ csengine check "git status"          # ALLOW (exit 0, instant)
 
 ## Installation
 
+### Step-by-step setup on Linux (Ubuntu / Debian / BOSS OS)
+
+**1. Install prerequisites**
+
+```bash
+sudo apt-get update
+sudo apt-get install -y git python3 python3-venv python3-pip curl
+```
+
+(optional, for LLM explanations — works without it, rule+ML path only):
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull qwen2.5:3b-instruct-q4_K_M
+```
+
+**2. Clone and install**
+
+```bash
+git clone <repo-url>
+cd command-safety-engine
+bash setup.sh          # venv + deps + model training + Ollama + shell hooks
+source ~/.bashrc
+```
+
+**3. Verify it works**
+
+```bash
+csengine status                      # rules, model, LLM availability
+csengine check "rm -rf /"            # BLOCK (exit 2) — dangerous command refused
+csengine check "chmod -R 777 /var/www"  # WARN (exit 1) — confirm before running
+csengine check "git status"          # ALLOW (exit 0) — instant, zero false positive
+```
+
+That's it — the hook is now active in every new terminal: dangerous commands
+are blocked before they run, risky ones need a confirming Enter, everything
+else is untouched.
+
 ### One-shot installer
 
 `setup.sh` does everything: creates an isolated venv, installs dependencies,
