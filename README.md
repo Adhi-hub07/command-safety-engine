@@ -6,7 +6,7 @@
   <em>Offline AI guard for the Linux shell</em>
 </p>
 
-> **C-DAC Secure OS Hackathon 2026 · Track 1 (AI @ Application Level)**
+> **Made by Adhithya J** · C-DAC Secure OS Hackathon 2026 · Track 1 (AI @ Application Level)
 
 Every command you type is checked **before it runs**. Dangerous commands are
 **blocked**, risky ones ask for **confirmation**, and everything else passes
@@ -430,4 +430,4 @@ the hashed audit log, and prove everything works with the network switched off.
 
 ## License
 
-[MIT](LICENSE) © 2026 Command Safety Engine Team
+[MIT](LICENSE) © 2026 Adhithya J
