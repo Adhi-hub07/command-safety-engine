@@ -10,5 +10,5 @@ logs/
 .env
 .DS_Store
 .ipynb_checkpoints/
-data/raw/
+data/raw/*.bin
 *.gguf

