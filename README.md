@@ -9,7 +9,7 @@ Command → Rule Engine → ML Classifier → Local LLM (Qwen 2.5 3B) → Allow 
 
 - **100% offline** — no cloud APIs, aligned with India's sovereign OS (AtmaNirbhar) mission
 - **Hybrid AI** — deterministic rules + scikit-learn GradientBoosting classifier + local LLM explanation
-- **<1ms** fast path for common commands (rules+ML, measured 0.47 ms); full pipeline ~56 ms; LLM only invoked for ambiguous cases
+- **<1ms** fast path for common commands (rules+ML, measured ~0.34 ms, p95 0.61 ms); full pipeline ~3 ms without the LLM; LLM only invoked for ambiguous cases
 - **Works on BOSS OS** (Indian government Linux) and standard Ubuntu/Debian
 - **Educates** — every warning explains why, maps to MITRE ATT&CK, and suggests a safer rewrite
 - **Honest ML numbers** — 5-fold CV 0.834 ± 0.031 accuracy (0.807 macro-F1) on a

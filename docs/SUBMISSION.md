@@ -29,7 +29,8 @@ writing natural-language explanations in the user's language. Every decision is
 audited to a hashed, privacy-preserving log.
 
 Everything runs 100% offline on commodity hardware. Rule+ML checks complete in
-under 1 ms; the full pipeline averages 56 ms. The engine installs in minutes on
+well under 1 ms; the full pipeline averages ~3 ms with no LLM resident (measured on
+Windows via `scripts/benchmark_latency.py`). The engine installs in minutes on
 Ubuntu or BOSS OS via a single script, hooks into bash and zsh, and works with a
 one-click optional bubblewrap sandbox for untrusted downloads. By making the
 terminal defend itself, csengine brings practical, sovereign, atma-nirbhar AI
@@ -69,8 +70,10 @@ commands skip analysis entirely (zero false positives for daily workflows).
 - Deployed model (GradientBoosting): **5-fold CV 0.834 ± 0.031 acc, 0.807 ± 0.040 macro-F1**
 - Held-out test (80/20, seed 42): **83.3% accuracy, 0.803 macro-F1**
   (per-class recall: destructive **0.833**, risky 0.605, safe 0.947)
-- Feature extraction + rule check: **0.47 ms** mean (p95 0.64 ms)
-- Full pipeline: **56 ms** mean (p95 81 ms) on Windows dev box; faster on Linux
+- Feature extraction + rule check: **~0.34 ms** mean (p95 0.61 ms)
+- Full pipeline: **~3 ms** mean (p95 ~3.5 ms) with no LLM resident; tens of ms with
+  local Qwen pre-warmed — measured via `scripts/benchmark_latency.py --n 1000` on the
+  Windows dev box; faster on Linux
 - Regression suite: **28/28 tests passing**, ruff lint clean
 - Dataset: **1,379 unique commands** (759 safe / 381 risky / 239 destructive) built by a
   deterministic three-step pipeline — `generate_synthetic.py` → `auto_label_raw.py`
@@ -248,7 +251,8 @@ rule edit can never ship broken. Data sources (MITRE ATT&CK, GTFOBins) are cited
 in the dataset for traceability.
 
 **Q: What is the measured performance?**
-A: Feature+rule: 0.47 ms mean (p95 0.64 ms). Full pipeline with ML: ~56 ms mean. Whitelist
+A: Feature+rule: ~0.34 ms mean (p95 0.61 ms). Full pipeline: ~3 ms mean with no LLM
+resident, tens of ms with the local Qwen pre-warmed. Whitelist
 happy path: effectively 0. On the demo machine the overhead is invisible to typing.
 
 **Q: Why is this better than existing OS safeguards (sudo, SELinux, chroot)?**

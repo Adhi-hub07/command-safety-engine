@@ -30,7 +30,7 @@ What the installer does:
 nmcli radio all off          # or: sudo ip link set <iface> down
 csengine status              # LLM available, all layers loaded
 csengine check "rm -rf /"    # BLOCK — works with zero network
-csengine check "git status"  # ALLOW — <50ms
+csengine check "git status"  # ALLOW — instant (whitelisted)
 nmcli radio all on
 ```
 
