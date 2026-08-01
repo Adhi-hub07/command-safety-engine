@@ -16,7 +16,9 @@ VERDICT_ORDER = {"ALLOW": 0, "WARN": 1, "BLOCK": 2}
 
 
 class CommandSafetyEngine:
-    def __init__(self, config_path="config/config.yaml", project_root="."):
+    def __init__(self, config_path=None, project_root="."):
+        if config_path is None:
+            config_path = os.path.join(project_root, "config", "config.yaml")
         with open(config_path, "r", encoding="utf-8") as f:
             self.config = yaml.safe_load(f)
         self.project_root = project_root

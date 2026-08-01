@@ -53,6 +53,14 @@ exec "$VENV_DIR/bin/python" "$REPO_DIR/src/main.py" "\$@"
 EOF
 chmod +x "$HOME/.csengine/bin/csengine"
 
+echo "[csengine] adding ~/.csengine/bin to PATH in ~/.bashrc"
+if [[ ! -f "$HOME/.bashrc" ]]; then
+  touch "$HOME/.bashrc"
+fi
+if ! grep -q '.csengine/bin' "$HOME/.bashrc" 2>/dev/null; then
+  printf '\n# Command Safety Engine\nexport PATH="$HOME/.csengine/bin:$PATH"\n' >> "$HOME/.bashrc"
+fi
+
 cat <<'DONE'
 
 Command Safety Engine installed.
@@ -61,8 +69,9 @@ Usage:
   csengine check "rm -rf /"      analyze a command (exit 2 = block, 1 = warn)
   csengine status                show engine status
 
-Add to your PATH:
-  export PATH="$HOME/.csengine/bin:$PATH"
+The shell hook and csengine command are active in new terminals
+(~/.csengine/bin is now on PATH in ~/.bashrc).
+Run now: source ~/.bashrc
 
 To disable the shell hook anytime: export CSENGINE_DISABLE=1
 DONE
