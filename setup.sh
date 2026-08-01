@@ -33,6 +33,14 @@ else
   ollama pull "$OLLAMA_MODEL" || echo "[csengine] model pull failed - rule+ML path still works"
 fi
 
+echo "[csengine] pre-warming LLM (first demo explanation will be instant)"
+if command -v ollama >/dev/null 2>&1 && ollama list 2>/dev/null | grep -q "qwen2.5:3b"; then
+  timeout 120 ollama run "$OLLAMA_MODEL" "ok" >/dev/null 2>&1 || true
+  echo "[csengine] LLM pre-warmed and resident in memory"
+else
+  echo "[csengine] LLM not present - rule+ML path only (full offline mode)"
+fi
+
 echo "[csengine] training the ML classifier"
 "$VENV_DIR/bin/python" "$REPO_DIR/data/synthetic/generate_synthetic.py"
 "$VENV_DIR/bin/python" -m src.ml.train || "$VENV_DIR/bin/python" "$REPO_DIR/src/ml/train.py"

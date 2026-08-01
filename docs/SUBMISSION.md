@@ -183,6 +183,19 @@ repo automates scenes 2-6.
 - Containment: auto-sandbox risky-but-required commands via bubblewrap
 - IDE/sudo integration and Docker alias hooking
 
+## 9. Risk Mitigation
+
+Residual risks, assessed honestly with the mitigation built into the engine:
+
+| # | Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|---|
+| 1 | **Adversarial bypass** via encoded/obfuscated payloads (`base64 -d`, hex, `$()` nesting) | Medium | High | Feature extractor decodes base64/hex, rule R008 flags shell metachar obfuscation, obfuscation/redirect/pipe features feed ML; any decision is audit-logged |
+| 2 | **LLM unavailable** at demo time (no Ollama, no network) | Medium | Medium | LLM is optional by design: 0.5 s TCP probe, rule+ML path always answers in <60 ms; `csengine status` surfaces availability up front |
+| 3 | **False positives** on legitimate workflows | Medium | Medium | Whitelist short-circuits daily commands; rules are anchored/escaped (`rm -rf build/` ≠ `rm -rf /*`); WARN is confirmable, override is audit-logged |
+| 4 | **Model drift** / silent performance loss | Low | Medium | `train.py` prints 5-fold CV at every run; CI regenerates data, retrains, and runs pytest on every push |
+| 5 | **User override abused** to disable safety | Low | High | Overrides recorded with SHA-256 hashes; repeat overrides of BLOCK verdicts are detectable in audit |
+| 6 | **Privacy leak** of typed commands | Low | High | Only truncated SHA-256 hashes stored; no network egress — fully offline by design |
+
 ## 10. Judge Preparation — Anticipated Q&A
 
 **Q: How do you handle false positives — the classic complaint against safety tools?**

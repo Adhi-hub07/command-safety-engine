@@ -59,3 +59,49 @@ def test_ml_only_destructive_blocks():
     """A destructive command not covered by rules is still blocked via ML at high confidence."""
     result = make_engine().analyze("wipefs -a /dev/sda")
     assert result["final_decision"]["verdict"] == "BLOCK"
+
+
+class _FakeLLM:
+    def __init__(self):
+        self.calls = 0
+
+    def is_available(self):
+        return True
+
+    def explain(self, command, rule_matches=None):
+        self.calls += 1
+        return {"summary": "explained", "alternative": "safer alternative"}
+
+
+def _explain_with(engine, confidence):
+    fake = _FakeLLM()
+    engine.llm = fake
+    engine._explain(
+        "dummy cmd",
+        "dummy cmd",
+        [],
+        {"confidence": confidence, "predicted_label": "risky"},
+        {"whitelist_match": False},
+    )
+    return fake
+
+
+def test_llm_called_when_ambiguous():
+    """LLM is consulted when ML confidence is below the ambiguity threshold."""
+    engine = make_engine()
+    fake = _explain_with(engine, confidence=0.5)
+    assert fake.calls == 1
+
+
+def test_llm_not_called_when_confident():
+    """LLM is skipped when the ML model is confident."""
+    engine = make_engine()
+    fake = _explain_with(engine, confidence=0.95)
+    assert fake.calls == 0
+
+
+def test_llm_demo_command_is_ambiguous():
+    """The demo scene-10 command must actually reach the LLM path (no rule, low confidence)."""
+    result = make_engine().analyze("xxd -r -p <<< '77686f616d69'")
+    assert not result["rule_engine"]["matched"]
+    assert result["ml_classifier"]["confidence"] < 0.65

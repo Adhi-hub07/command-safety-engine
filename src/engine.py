@@ -140,7 +140,7 @@ class CommandSafetyEngine:
                 "suggested_alternative": rule.get("alternative"),
             }
         llm_cfg = self.config["llm"]
-        ambiguous = ml_result.get("confidence", 0) < llm_cfg.get("ambiguity_threshold", 0.35)
+        ambiguous = ml_result.get("confidence", 0) < llm_cfg.get("ambiguity_threshold", 0.65)
         use_for_ambiguous = llm_cfg.get("use_for_ambiguous_only", True)
         if use_for_ambiguous and not ambiguous:
             return result

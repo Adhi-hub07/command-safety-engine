@@ -10,7 +10,7 @@ llm:
   enabled: true
   timeout_seconds: 8
   use_for_ambiguous_only: true
-  ambiguity_threshold: 0.35
+  ambiguity_threshold: 0.65
 
 ml:
   enabled: true
