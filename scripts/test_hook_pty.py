@@ -36,6 +36,23 @@ if not ENGINE:
     print("FAIL: no csengine binary found")
     sys.exit(1)
 
+
+def make_isolated_home(home_dir):
+    """Create a fresh HOME with a working `csengine` wrapper in
+    ~/.csengine/bin (setup.sh normally creates this). Keeps the test
+    independent of the user's real installation so it passes on any
+    distro (Ubuntu, Kali, ...)."""
+    os.makedirs(os.path.join(home_dir, ".csengine", "bin"), exist_ok=True)
+    wrapper = os.path.join(home_dir, ".csengine", "bin", "csengine")
+    if ENGINE.endswith(".py"):
+        launcher = f'exec {sys.executable} {ENGINE} "$@"'
+    else:
+        launcher = f'exec {ENGINE} "$@"'
+    with open(wrapper, "w") as f:
+        f.write("#!/usr/bin/env bash\n" + launcher + "\n")
+    os.chmod(wrapper, 0o755)
+    return wrapper
+
 DANGEROUS = "dd if=/dev/zero of=/dev/sda bs=512 count=1"  # BLOCK verdict
 
 
@@ -85,7 +102,7 @@ def run_pty(shell_args, cmds, env_extra, setup=None):
     return buf.decode("utf-8", "replace")
 
 
-def test_shell(name, shell_args, env_extra, zdotdir=None):
+def test_shell(name, shell_args, env_extra, rcfile=None, zdotdir=None):
     # WARN command: first attempt is blocked, second confirms (bash: retype;
     # zsh: bare Enter confirms the still-buffered line). It targets a missing
     # file so a confirmed run proves itself with a chmod error message.
@@ -93,12 +110,19 @@ def test_shell(name, shell_args, env_extra, zdotdir=None):
     confirm = warn_cmd if name == "bash" else "\r"
 
     def setup():
+        hook = os.path.join(ROOT, "hooks", "csengine." + name)
+        lines = ["export PATH=\"$HOME/.csengine/bin:$PATH\"\n", f"source {hook}\n"]
+        if rcfile:
+            os.makedirs(os.path.dirname(rcfile), exist_ok=True)
+            with open(rcfile, "w") as f:
+                f.writelines(lines)
         if zdotdir:
             os.makedirs(zdotdir, exist_ok=True)
-            hook = os.path.join(ROOT, "hooks", "csengine." + name)
             with open(os.path.join(zdotdir, ".zshrc"), "w") as f:
-                f.write(f"source {hook}\n")
-                f.write("export PATH=\"$HOME/.csengine/bin:$PATH\"\n")
+                f.writelines(lines)
+    if rcfile:
+        env_extra = dict(env_extra)
+        env_extra["BASH_ENV"] = rcfile
     if zdotdir:
         env_extra = dict(env_extra)
         env_extra["ZDOTDIR"] = zdotdir
@@ -130,13 +154,18 @@ def test_shell(name, shell_args, env_extra, zdotdir=None):
 def main():
     print(f"engine: {ENGINE}")
     fails = 0
-    env_common = {"CSENGINE_BIN": ENGINE}
     if shutil.which("bash") and not os.environ.get("CSENGINE_SKIP_BASH"):
-        fails += test_shell("bash", ["bash", "-i"], env_common)
+        bash_home = "/tmp/csengine_home_bash"
+        os.environ["HOME"] = bash_home
+        wrapper = make_isolated_home(bash_home)
+        fails += test_shell("bash", ["bash", "-i"], {"CSENGINE_BIN": wrapper}, rcfile=bash_home + "/.bashrc")
     else:
         print("skip bash")
     if shutil.which("zsh"):
-        fails += test_shell("zsh", ["zsh", "-i"], env_common, zdotdir="/tmp/csengine_zsh_test")
+        zsh_home = "/tmp/csengine_home_zsh"
+        os.environ["HOME"] = zsh_home
+        wrapper = make_isolated_home(zsh_home)
+        fails += test_shell("zsh", ["zsh", "-i"], {"CSENGINE_BIN": wrapper}, zdotdir="/tmp/csengine_zsh_test")
     else:
         print("skip zsh (not installed)")
     print("RESULT:", "ALL PASS" if fails == 0 else f"{fails} FAILURES")

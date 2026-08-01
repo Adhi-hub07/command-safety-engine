@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Command Safety Engine CLI entrypoint.
 
 Usage:

@@ -462,11 +462,11 @@ __bp_hook_preexec_into_ps0() {
     __bp_adjust_histcontrol
 }
 
-if (( BASH_VERSINFO[0] > 5 || (BASH_VERSINFO[0] == 5 && BASH_VERSINFO[1] >= 3) )); then
-    __bp_hook_preexec_proc=__bp_hook_preexec_into_ps0
-else
-    __bp_hook_preexec_proc=__bp_hook_preexec_into_debug
-fi
+# Force the DEBUG-trap path on ALL bash versions (including 5.3+, where
+# upstream bash-preexec falls back to the PS0 hook). PS0 preexec cannot
+# return a non-zero status to block a command; the DEBUG trap with
+# `shopt -s extdebug` can — which csengine's blocking hook depends on.
+__bp_hook_preexec_proc=__bp_hook_preexec_into_debug
 
 __bp_install() {
     local lastexit=$? lastarg=$_
