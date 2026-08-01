@@ -394,6 +394,19 @@
   }
   footer .big { font-weight: 800; color: var(--text); font-size: 16px; margin-bottom: 6px; }
   footer a { color: var(--green); text-decoration: none; }
+  .kali-wrap {
+    margin: 0 auto 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    padding: 18px 34px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: var(--card);
+  }
+  .kali-wrap img { filter: drop-shadow(0 8px 24px rgba(0,0,0,.5)); transition: transform .2s; }
+  .kali-wrap:hover img { transform: scale(1.05); }
 
   ::selection { background: rgba(61,220,132,.3); }
   ::-webkit-scrollbar { width: 10px; }
@@ -635,6 +648,7 @@
 
 <!-- ============ FOOTER ============ -->
 <footer>
+  <div class="kali-wrap"><img src="assets/kali-logo.svg" alt="Kali Linux logo" width="180" /></div>
   <div class="big">🐧 COMMAND SAFETY ENGINE</div>
   <p>Made by <b>Adhithya J</b> · C-DAC Secure OS Hackathon 2026 · Track 1 (AI @ Application Level)</p>
   <p style="margin-top:8px">Offline AI guard for the Linux shell · <a href="https://github.com/Adhi-hub07/command-safety-engine" target="_blank">GitHub repository</a></p>
