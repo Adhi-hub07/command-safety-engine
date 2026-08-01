@@ -2,7 +2,7 @@
 
 **Track:** AI @ Application Level (sub-problem: Command Safety)
 **Target OS:** Ubuntu 22.04/24.04, BOSS Linux
-**Status:** code complete — all 28 tests passing, model trained, demo-ready
+**Status:** code complete — all 31 tests passing, model trained, demo-ready
 
 ---
 
@@ -74,7 +74,7 @@ commands skip analysis entirely (zero false positives for daily workflows).
 - Full pipeline: **~3 ms** mean (p95 ~3.5 ms) with no LLM resident; tens of ms with
   local Qwen pre-warmed — measured via `scripts/benchmark_latency.py --n 1000` on the
   Windows dev box; faster on Linux
-- Regression suite: **28/28 tests passing**, ruff lint clean
+- Regression suite: **31/31 tests passing**, ruff lint clean, real-pty hook tests pass on Ubuntu **and Kali Linux** (bash + zsh)
 - Dataset: **1,379 unique commands** (759 safe / 381 risky / 239 destructive) built by a
   deterministic three-step pipeline — `generate_synthetic.py` → `auto_label_raw.py`
   (300 real-world commands) → `dedupe_dataset.py` — with per-row provenance
@@ -270,7 +270,7 @@ features), and an LLM explanation appears in plain language, fully offline.
 ## 11. Submission Checklist
 
 - [ ] Register on **ssm.cdac.in** before **04 Aug 2026** (team of 1-5)
-- [ ] Push repo to GitHub (public)
+- [ ] Push repo to GitHub (private is fine for the hackathon; make public only if you want the Pages site live — site currently deployed as a static `index.html` in-repo)
 - [ ] Record demo video per Section 7 (~4 min)
 - [ ] Submit final on portal before **25 Aug 2026** (portal also lists idea submission 28 Aug — submit early)
 - [ ] Keep solution fully offline and open-source (no cloud AI in the demo)
