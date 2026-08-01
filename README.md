@@ -8,6 +8,8 @@
 
 > **Made by Adhithya J** · C-DAC Secure OS Hackathon 2026 · Track 1 (AI @ Application Level)
 
+> 🌐 **Live website:** <https://adhi-hub07.github.io/command-safety-engine/>
+
 Every command you type is checked **before it runs**. Dangerous commands are
 **blocked**, risky ones ask for **confirmation**, and everything else passes
 through in milliseconds — fully offline, fully open-source, on a normal laptop.
@@ -141,6 +143,8 @@ else                              → ALLOW
 ```
 
 ## Quick start
+
+See it live first: **<https://adhi-hub07.github.io/command-safety-engine/>** (interactive demo terminal)
 
 ```bash
 git clone <repo-url>
