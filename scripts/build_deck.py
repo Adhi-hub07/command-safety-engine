@@ -94,7 +94,7 @@ def header(draw, num, title, subtitle=None):
     draw.line(48, 46, PAGE_W - 48, 46)
     draw.setFillColor(MUTED)
     draw.setFont(SANS, 9)
-    draw.drawString(48, 30, "csengine · Adhithya J · Track 1: AI @ Application Level")
+    draw.drawString(48, 30, "csengine · Adhithya J · Track 2: AI @ Application Level")
     draw.drawRightString(PAGE_W - 48, 30, "fully offline · open-source (MIT)")
 
 
@@ -120,7 +120,7 @@ def slide_title(draw):
     draw.drawString(72, PAGE_H - 172, "An offline AI guard for the Linux shell")
     draw.setFillColor(MUTED)
     draw.setFont(SANS, 13)
-    draw.drawString(72, PAGE_H - 200, "C-DAC Secure OS Hackathon 2026 · Track 1 (AI @ Application Level)")
+    draw.drawString(72, PAGE_H - 200, "C-DAC Secure OS Hackathon 2026 · Track 2 (AI @ Application Level)")
     draw.setFillColor(BODY)
     draw.setFont(SANS, 13)
     draw.drawString(72, 170, "Adhithya J")
@@ -184,9 +184,9 @@ def slide_problem(draw):
     draw.drawString(px + 16, py - 24, "Challenge (verbatim)")
     draw.setFillColor(BODY)
     draw.setFont(SANS, 12)
-    challenge = ("Design an intelligent command analysis layer that evaluates Linux commands before "
-                 "execution, understands user intent, identifies potential risks, and recommends safer "
-                 "alternatives while preserving user control and system security.")
+    challenge = ("Create an intelligent safety layer that understands the intent behind Linux commands "
+                 "before they execute. The system should detect risky operations, explain their potential "
+                 "impact, and suggest safer alternatives to prevent accidental system damage.")
     yy = py - 50
     for ln in wrap(draw, challenge, SANS, 12, 285):
         draw.drawString(px + 16, yy, ln)

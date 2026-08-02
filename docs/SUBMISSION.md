@@ -1,6 +1,6 @@
 # Command Safety Engine — C-DAC Secure OS Hackathon 2026 Submission
 
-**Track:** AI @ Application Level (sub-problem: Command Safety)
+**Track:** 2 · AI at Application Level (Problem Statement 3: AI-Based System Intent Engine for Safe Linux Command Execution)
 **Target OS:** Ubuntu 22.04/24.04, BOSS Linux
 **Status:** code complete — all 44 tests passing, model trained, demo-ready
 

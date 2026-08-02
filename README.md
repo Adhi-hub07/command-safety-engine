@@ -6,7 +6,7 @@
   <em>Offline AI guard for the Linux shell</em>
 </p>
 
-> **Made by Adhithya J** · C-DAC Secure OS Hackathon 2026 · Track 1 (AI @ Application Level)
+> **Made by Adhithya J** · C-DAC Secure OS Hackathon 2026 · Track 2 (AI @ Application Level)
 
 > 🌐 **Live website:** <https://adhi-hub07.github.io/command-safety-engine/>
 

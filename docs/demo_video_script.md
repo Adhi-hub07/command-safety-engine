@@ -183,7 +183,7 @@ the device."
 ### Scene 10 — Close (3:50–4:00)
 
 **Narration (10 s):** "Command Safety Engine: your terminal defends itself."
-End card: repo URL, "Made for C-DAC Secure OS Hackathon 2026 · Track 1".
+End card: repo URL, "Made for C-DAC Secure OS Hackathon 2026 · Track 2".
 
 ---
 

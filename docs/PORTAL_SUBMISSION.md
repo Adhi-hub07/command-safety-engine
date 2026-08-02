@@ -26,14 +26,14 @@ air-gapped systems such as BOSS OS.
 
 ## 3. Problem Statement Addressed
 
-*Quoted verbatim from the hackathon problem statement:*
+*Quoted verbatim from the hackathon portal (Track 2 · Problem Statement 3):*
 
-> Design an intelligent command analysis layer that evaluates Linux commands
-> before execution, understands user intent, identifies potential risks, and
-> recommends safer alternatives while preserving user control and system
-> security.
+> Create an intelligent safety layer that understands the intent behind Linux
+> commands before they execute. The system should detect risky operations,
+> explain their potential impact, and suggest safer alternatives to prevent
+> accidental system damage.
 
-Our system is a direct, deployable answer to Problem Statement 3.
+Our system is a direct, deployable answer to this problem statement.
 
 ---
 
