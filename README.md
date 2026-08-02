@@ -74,7 +74,7 @@ recorded in a privacy-preserving audit log (hashes only — never plaintext).
      + synthetic commands, 3 classes (safe / risky / destructive)
   3. **Local LLM** — Qwen 2.5 3B via Ollama, invoked *only* for ambiguous or
      novel commands to write natural-language explanations
-- **Fast** — rules + ML path ≈ 0.30 ms mean (p95 0.52 ms); full pipeline ≈ 2.9 ms.
+ - **Fast** — rules + ML path ≈ 0.3 ms mean (p95 ≈ 0.5 ms); full pipeline ≈ 2.7 ms.
   Whitelisted daily commands cost ~0 ms.
 - **Safety-first override** — a single critical rule match blocks regardless of
   ML confidence. The model can never talk the system out of a block.
@@ -322,8 +322,8 @@ Measured on the dev box via `scripts/benchmark_latency.py --n 1000`
 
 | Path | Mean | p95 |
 |---|---|---|
-| Feature extraction + rule check | ~0.30 ms | ~0.52 ms |
-| Full pipeline (no LLM resident) | ~2.9 ms | ~3.5 ms |
+| Feature extraction + rule check | ~0.3 ms | ~0.5 ms |
+| Full pipeline (no LLM resident) | ~2.7 ms | ~3 ms |
 | Whitelisted daily command | ~0 ms | ~0 ms |
 | With local Qwen pre-warmed | tens of ms | — |
 
@@ -414,13 +414,18 @@ command-safety-engine/
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md) — data flow, design principles, decision fusion
+- [Architecture diagram](docs/architecture.png) — submission-ready image (SVG: `docs/architecture.svg`)
 - [Feature dictionary](docs/FEATURES.md) — all 20 ML features with examples
 - [BOSS OS integration](docs/BOSS_OS_INTEGRATION.md) — install, offline verification, .deb packaging
 - [Submission](docs/SUBMISSION.md) — abstract, demo script, Q&A prep for judges
+- [Portal fields](docs/PORTAL_SUBMISSION.md) — copy-paste answers for all 13 submission fields
+- [Demo video script](docs/demo_video_script.md) — 4-minute one-take recording script
+- [Presentation deck](docs/presentation.pdf) — 12-slide rubric-mapped deck (`scripts/build_deck.py` regenerates it)
 
 ## Demo
 
-A ~4-minute demo script is in [docs/SUBMISSION.md §7](docs/SUBMISSION.md#7-demo-video-script-4-minutes-one-take)
+A ~4-minute demo script is in [docs/demo_video_script.md](docs/demo_video_script.md)
+(also summarised in [docs/SUBMISSION.md §7](docs/SUBMISSION.md#7-demo-video-script-4-minutes-one-take))
 with `scripts/demo_seed_commands.sh` automating the scenes: block a fork bomb,
 warn on `chmod -R 777`, catch a novel base64-obfuscated attack with ML, show
 the hashed audit log, and prove everything works with the network switched off.

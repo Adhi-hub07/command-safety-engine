@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" font-family="DejaVu Sans, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#0b1220"/>
+    </linearGradient>
+    <linearGradient id="layer1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1e3a8a"/>
+      <stop offset="1" stop-color="#172554"/>
+    </linearGradient>
+    <linearGradient id="layer2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7c3aed"/>
+      <stop offset="1" stop-color="#5b21b6"/>
+    </linearGradient>
+    <linearGradient id="layer3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d9488"/>
+      <stop offset="1" stop-color="#115e59"/>
+    </linearGradient>
+    <linearGradient id="fuse" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0f766e"/>
+      <stop offset="0.5" stop-color="#15803d"/>
+      <stop offset="1" stop-color="#b91c1c"/>
+    </linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <text x="800" y="52" text-anchor="middle" font-size="30" font-weight="bold" fill="#f8fafc">Command Safety Engine — Architecture (offline, on-device)</text>
+  <text x="800" y="80" text-anchor="middle" font-size="16" fill="#94a3b8">Deterministic rules + gradient-boosted ML + local LLM, fused into a graded verdict with a privacy-preserving audit trail</text>
+
+  <!-- ===== USER INPUT ===== -->
+  <rect x="40" y="140" width="300" height="120" rx="14" fill="#334155" stroke="#475569" stroke-width="2"/>
+  <text x="190" y="185" text-anchor="middle" font-size="18" font-weight="bold" fill="#e2e8f0">User terminal</text>
+  <text x="190" y="215" text-anchor="middle" font-size="14" fill="#cbd5e1">types / pastes a command</text>
+  <text x="190" y="240" text-anchor="middle" font-size="13" fill="#94a3b8">interactive · script · SSH</text>
+
+  <!-- ===== SHELL HOOK ===== -->
+  <rect x="40" y="360" width="300" height="140" rx="14" fill="#0c4a6e" stroke="#0ea5e9" stroke-width="2"/>
+  <text x="190" y="395" text-anchor="middle" font-size="17" font-weight="bold" fill="#e0f2fe">Shell hook</text>
+  <text x="190" y="420" text-anchor="middle" font-size="14" fill="#bae6fd">bash preexec / zsh preexec</text>
+  <text x="190" y="444" text-anchor="middle" font-size="13" fill="#7dd3fc">whitelist short-circuit (~0 ms)</text>
+  <text x="190" y="468" text-anchor="middle" font-size="13" fill="#7dd3fc">alias expansion · $VAR resolution</text>
+
+  <path d="M 190 260 L 190 360" stroke="#f8fafc" stroke-width="3" fill="none" marker-end="url(#arw)"/>
+  <defs><marker id="arw" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L12,4 L0,8 z" fill="#f8fafc"/></marker></defs>
+
+  <!-- ===== ENGINE BOX ===== -->
+  <rect x="420" y="120" width="760" height="680" rx="18" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="800" y="150" text-anchor="middle" font-size="17" font-weight="bold" fill="#cbd5e1">Command Safety Engine</text>
+
+  <!-- Layer 1 -->
+  <rect x="450" y="180" width="700" height="150" rx="12" fill="url(#layer1)" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="470" y="210" font-size="15" font-weight="bold" fill="#dbeafe">Layer 1 · Rule Engine</text>
+  <text x="470" y="234" font-size="13" fill="#bfdbfe">27 MITRE ATT&amp;CK-aligned rule groups (R001–R027)</text>
+  <text x="470" y="256" font-size="13" fill="#bfdbfe">deterministic · regex + path-normalisation</text>
+  <text x="470" y="278" font-size="13" fill="#bfdbfe">severity 0–100 · safe-alternative suggestions</text>
+  <text x="470" y="300" font-size="13" fill="#93c5fd">runtime: &lt;0.5 ms · critical rule always BLOCKs</text>
+
+  <!-- Layer 2 -->
+  <rect x="450" y="360" width="700" height="150" rx="12" fill="url(#layer2)" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="470" y="390" font-size="15" font-weight="bold" fill="#ede9fe">Layer 2 · ML Classifier</text>
+  <text x="470" y="414" font-size="13" fill="#ddd6fe">scikit-learn GradientBoosting · 3 classes (safe / risky / destructive)</text>
+  <text x="470" y="436" font-size="13" fill="#ddd6fe">20 hand-crafted intent features (flags · targets · pipes · obfuscation)</text>
+  <text x="470" y="458" font-size="13" fill="#ddd6fe">trained on 1,379 deduplicated commands · CV 0.811 acc / 0.771 macro-F1</text>
+  <text x="470" y="480" font-size="13" fill="#c4b5fd">runtime: ~0.1 ms · catches novel attacks no rule lists</text>
+
+  <!-- Layer 3 -->
+  <rect x="450" y="540" width="700" height="120" rx="12" fill="url(#layer3)" stroke="#2dd4bf" stroke-width="1.5"/>
+  <text x="470" y="570" font-size="15" font-weight="bold" fill="#ccfbf1">Layer 3 · LLM Explainer (on demand only)</text>
+  <text x="470" y="594" font-size="13" fill="#99f6e4">Qwen 2.5 3B via Ollama · 100% offline</text>
+  <text x="470" y="616" font-size="13" fill="#99f6e4">plain-English explanation + safer alternative</text>
+  <text x="470" y="638" font-size="13" fill="#5eead4">invoked only for ambiguous / flagged commands · graceful fallback if absent</text>
+
+  <path d="M 800 330 L 800 360" stroke="#93c5fd" stroke-width="2.5" fill="none" marker-end="url(#arwB)"/>
+  <path d="M 800 510 L 800 540" stroke="#c4b5fd" stroke-width="2.5" fill="none" marker-end="url(#arwB)"/>
+  <defs><marker id="arwB" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0,0 L10,3.5 L0,7 z" fill="#e2e8f0"/></marker></defs>
+
+  <!-- Decision fusion -->
+  <rect x="450" y="690" width="700" height="80" rx="12" fill="url(#fuse)" stroke="#f8fafc" stroke-width="1.5"/>
+  <text x="800" y="722" text-anchor="middle" font-size="16" font-weight="bold" fill="#fefce8">Decision fusion</text>
+  <text x="800" y="748" text-anchor="middle" font-size="13" fill="#fef9c3">risk_score 0–100 → ALLOW (&lt;45) · WARN (45–79) · BLOCK (≥80)</text>
+
+  <path d="M 800 660 L 800 690" stroke="#f8fafc" stroke-width="2.5" fill="none" marker-end="url(#arwB)"/>
+  <path d="M 340 430 L 420 430 L 420 300 L 450 300" stroke="#0ea5e9" stroke-width="2.5" fill="none"/>
+  <path d="M 340 430 L 420 430 L 420 435 L 450 435" stroke="#a855f7" stroke-width="2.5" fill="none"/>
+  <path d="M 340 430 L 420 430 L 420 600 L 450 600" stroke="#2dd4bf" stroke-width="2.5" fill="none"/>
+
+  <!-- ===== OUTPUTS ===== -->
+  <rect x="1260" y="150" width="300" height="130" rx="12" fill="#14532d" stroke="#22c55e" stroke-width="2"/>
+  <text x="1410" y="190" text-anchor="middle" font-size="16" font-weight="bold" fill="#bbf7d0">ALLOW</text>
+  <text x="1410" y="215" text-anchor="middle" font-size="13" fill="#86efac">command executes instantly</text>
+
+  <rect x="1260" y="310" width="300" height="130" rx="12" fill="#78350f" stroke="#f59e0b" stroke-width="2"/>
+  <text x="1410" y="350" text-anchor="middle" font-size="16" font-weight="bold" fill="#fde68a">WARN</text>
+  <text x="1410" y="375" text-anchor="middle" font-size="13" fill="#fcd34d">asks to confirm, or retype</text>
+
+  <rect x="1260" y="470" width="300" height="130" rx="12" fill="#7f1d1d" stroke="#ef4444" stroke-width="2"/>
+  <text x="1410" y="510" text-anchor="middle" font-size="16" font-weight="bold" fill="#fecaca">BLOCK</text>
+  <text x="1410" y="535" text-anchor="middle" font-size="13" fill="#fca5a5">refuses to execute · exit 2</text>
+
+  <rect x="1260" y="640" width="300" height="80" rx="12" fill="#1e293b" stroke="#64748b" stroke-width="2"/>
+  <text x="1410" y="672" text-anchor="middle" font-size="14" font-weight="bold" fill="#e2e8f0">Audit log</text>
+  <text x="1410" y="698" text-anchor="middle" font-size="12" fill="#94a3b8">SHA-256 hashed, offline JSONL</text>
+
+  <path d="M 1150 215 L 1260 215" stroke="#22c55e" stroke-width="3" fill="none" marker-end="url(#arwG)"/>
+  <path d="M 1150 375 L 1260 375" stroke="#f59e0b" stroke-width="3" fill="none" marker-end="url(#arwO)"/>
+  <path d="M 1150 535 L 1260 535" stroke="#ef4444" stroke-width="3" fill="none" marker-end="url(#arwR)"/>
+  <path d="M 1150 680 L 1260 680" stroke="#64748b" stroke-width="3" fill="none" marker-end="url(#arwS)"/>
+  <defs>
+    <marker id="arwG" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L12,4 L0,8 z" fill="#22c55e"/></marker>
+    <marker id="arwO" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L12,4 L0,8 z" fill="#f59e0b"/></marker>
+    <marker id="arwR" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L12,4 L0,8 z" fill="#ef4444"/></marker>
+    <marker id="arwS" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto"><path d="M0,0 L12,4 L0,8 z" fill="#64748b"/></marker>
+  </defs>
+
+  <!-- ===== DEPLOYMENT ===== -->
+  <rect x="1260" y="760" width="300" height="90" rx="12" fill="#111827" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="1410" y="795" text-anchor="middle" font-size="14" font-weight="bold" fill="#a7f3d0">Deployment targets</text>
+  <text x="1410" y="820" text-anchor="middle" font-size="13" fill="#86efac">Ubuntu 22.04/24.04 · BOSS OS</text>
+  <text x="1410" y="840" text-anchor="middle" font-size="12" fill="#4ade80">bash + zsh · optional bubblewrap sandbox</text>
+  <text x="1250" y="835" font-size="13" font-weight="bold" fill="#86efac" opacity="0.85">↘</text>
+
+  <text x="40" y="830" font-size="13" fill="#64748b">No cloud · no telemetry · no data leaves the machine · fully open-source (MIT)</text>
+  <text x="40" y="852" font-size="13" fill="#64748b">Made by Adhithya J · C-DAC Secure OS Hackathon 2026 · Track 1 (AI @ Application Level)</text>
+</svg>

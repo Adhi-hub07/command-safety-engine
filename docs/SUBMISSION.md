@@ -29,7 +29,7 @@ writing natural-language explanations in the user's language. Every decision is
 audited to a hashed, privacy-preserving log.
 
 Everything runs 100% offline on commodity hardware. Rule+ML checks complete in
-~0.30 ms mean (p95 0.52 ms); the full pipeline averages ~2.9 ms with no LLM resident (measured on
+~0.3 ms mean (p95 ~0.5 ms); the full pipeline averages ~2.7 ms with no LLM resident (measured on
 Linux via `scripts/benchmark_latency.py`). The engine installs in minutes on
 Ubuntu or BOSS OS via a single script, hooks into bash and zsh, and works with a
 one-click optional bubblewrap sandbox for untrusted downloads. By making the
@@ -70,8 +70,8 @@ commands skip analysis entirely (zero false positives for daily workflows).
 - Deployed model (GradientBoosting): **5-fold CV 0.811 ± 0.033 acc, 0.771 ± 0.048 macro-F1**
 - Held-out test (80/20, seed 42): **82.2% accuracy, 0.791 macro-F1**
   (per-class recall: destructive **0.771**, risky 0.632, safe 0.934)
-- Feature extraction + rule check: **~0.30 ms** mean (p95 0.52 ms)
-- Full pipeline: **~2.9 ms** mean (p95 ~3.5 ms) with no LLM resident; tens of ms with
+- Feature extraction + rule check: **~0.3 ms** mean (p95 ~0.5 ms)
+- Full pipeline: **~2.7 ms** mean (p95 ~3 ms) with no LLM resident; tens of ms with
   local Qwen pre-warmed — measured via `scripts/benchmark_latency.py --n 1000`
 - Regression suite: **44/44 tests passing**, ruff lint clean, real-pty hook tests pass on Ubuntu **and Kali Linux** (bash + zsh)
 - Dataset: **1,379 unique commands** (759 safe / 381 risky / 239 destructive) built by a
@@ -250,7 +250,7 @@ rule edit can never ship broken. Data sources (MITRE ATT&CK, GTFOBins) are cited
 in the dataset for traceability.
 
 **Q: What is the measured performance?**
-A: Feature+rule: ~0.30 ms mean (p95 0.52 ms). Full pipeline: ~2.9 ms mean with no LLM
+A: Feature+rule: ~0.3 ms mean (p95 ~0.5 ms). Full pipeline: ~2.7 ms mean with no LLM
 resident, tens of ms with the local Qwen pre-warmed. Whitelist
 happy path: effectively 0. On the demo machine the overhead is invisible to typing.
 
@@ -268,8 +268,13 @@ features), and an LLM explanation appears in plain language, fully offline.
 
 ## 11. Submission Checklist
 
-- [ ] Register on **ssm.cdac.in** before **04 Aug 2026** (team of 1-5)
-- [ ] Push repo to GitHub (private is fine for the hackathon; make public only if you want the Pages site live — site currently deployed as a static `index.html` in-repo)
-- [ ] Record demo video per Section 7 (~4 min)
+- [x] Register on **ssm.cdac.in** before **04 Aug 2026** (team of 1-5)
+- [x] Push repo to GitHub and verify CI is green on the latest commit
+- [x] Architecture image: `docs/architecture.png` (portal field 6)
+- [x] Presentation deck: `docs/presentation.pdf` (12 slides, rubric-mapped; regenerate with `python scripts/build_deck.py`)
+- [x] Portal fields drafted: `docs/PORTAL_SUBMISSION.md` (all 13 fields, copy-paste ready)
+- [x] Demo script: `docs/demo_video_script.md` (~4 min, exact commands + real outputs)
+- [ ] Record demo video per the script (~4 min)
+- [ ] Add official account `ssm-hackathon` as collaborator (repo private before deadline — currently public for the live Pages site; set private + add collaborator right before submission)
 - [ ] Submit final on portal before **25 Aug 2026** (portal also lists idea submission 28 Aug — submit early)
 - [ ] Keep solution fully offline and open-source (no cloud AI in the demo)
