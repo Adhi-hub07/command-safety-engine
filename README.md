@@ -69,7 +69,7 @@ recorded in a privacy-preserving audit log (hashes only — never plaintext).
   India's sovereign OS (AtmaNirbhar) mission and fully functional on air-gapped
   networks.
 - **Hybrid AI, three layers of defence-in-depth**
-  1. **Rule engine** — 22 deterministic MITRE-mapped rule groups (R001–R022)
+  1. **Rule engine** — 27 deterministic MITRE-mapped rule groups (R001–R027)
   2. **ML classifier** — scikit-learn GradientBoosting, trained on 1,379 real
      + synthetic commands, 3 classes (safe / risky / destructive)
   3. **Local LLM** — Qwen 2.5 3B via Ollama, invoked *only* for ambiguous or
@@ -103,7 +103,7 @@ recorded in a privacy-preserving audit log (hashes only — never plaintext).
                     │     words · pipes · redirects · substitutions        │
                     │        │                                             │
                     │        ▼                                             │
-                    │  3. Rule Engine (rules.yaml, 22 rule groups)         │
+                    │  3. Rule Engine (rules.yaml, 27 rule groups)         │
                     │     fast deterministic match  ──┐                    │
                     │        │                        │ severity+MITRE    │
                     │        ▼                        ▼                   │
@@ -330,20 +330,20 @@ Measured on the dev box via `scripts/benchmark_latency.py --n 1000`
 **Model quality** — honest numbers on *deduplicated* data with 5-fold
 cross-validation (no cherry-picked single split):
 
-- 5-fold CV: **0.807 ± 0.026 accuracy**, **0.767 ± 0.033 macro-F1**
-- Held-out test (80/20, seed 42): **82.6% accuracy**, 0.795 macro-F1
-- Per-class recall (held-out): destructive **0.771**, risky 0.632, safe 0.941
+- 5-fold CV: **0.811 ± 0.033 accuracy**, **0.771 ± 0.048 macro-F1**
+- Held-out test (80/20, seed 42): **82.2% accuracy**, 0.791 macro-F1
+- Per-class recall (held-out): destructive **0.771**, risky 0.632, safe 0.934
 
 Model comparison on the identical split (`src/ml/compare.py`):
 
 | Model | Accuracy | Macro-F1 | Destructive recall |
 |---|---|---|---|
-| **GradientBoosting (deployed)** | **0.822** | **0.792** | 0.771 |
-| RandomForest | 0.790 | 0.769 | **0.792** |
-| LogisticRegression | 0.812 | 0.775 | 0.688 |
+| **GradientBoosting (deployed)** | **0.822** | **0.791** | 0.771 |
+| RandomForest | 0.794 | 0.772 | **0.771** |
+| LogisticRegression | 0.815 | 0.777 | 0.688 |
 
 > GradientBoosting is deployed because it wins on macro-F1 while keeping
-> destructive-class recall competitive — and the 22-rule engine already
+> destructive-class recall competitive — and the 27-rule engine already
 > hard-blocks destructive patterns deterministically, so the model can never
 > be talked out of a critical block.
 
@@ -379,7 +379,7 @@ regression suite proves `rm -rf build/` is **WARN**, never BLOCK, while
 
 ```
 command-safety-engine/
-├── config/            # rules.yaml (22 rule groups), whitelist.yaml, config.yaml
+├── config/            # rules.yaml (27 rule groups), whitelist.yaml, config.yaml
 ├── data/
 │   ├── raw/           # real-world command corpus (300 rows)
 │   ├── labeled/       # deduplicated labeled dataset (1,379 rows)
@@ -388,7 +388,7 @@ command-safety-engine/
 ├── src/
 │   ├── parser/        # bashlex-based command tokenizer
 │   ├── features/      # 20-feature extractor
-│   ├── rules/         # deterministic rule engine (R001–R022)
+│   ├── rules/         # deterministic rule engine (R001–R027)
 │   ├── ml/            # training, evaluation, comparison
 │   ├── llm/           # local Ollama explanation layer (Qwen 2.5 3B)
 │   ├── sandbox/       # optional bubblewrap dry-run
@@ -405,7 +405,7 @@ command-safety-engine/
 │   ├── benchmark_latency.py
 │   ├── label_data.py / auto_label_raw.py / dedupe_dataset.py
 │   └── demo_seed_commands.sh
-├── tests/             # pytest regression suite (31 tests)
+├── tests/             # pytest regression suite (44 tests)
 ├── docs/              # architecture, features, BOSS OS, submission
 ├── setup.sh           # one-shot installer
 └── install-boss-os.sh # BOSS OS / .deb installer

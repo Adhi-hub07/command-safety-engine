@@ -16,6 +16,8 @@ rules:
       - "rm -rf /lib"
       - "find / -delete"
       - "find / -exec rm"
+      - "rm -rf [^ |;&]*/\\.\\./(etc|boot|bin|usr|lib|sbin|var|root)(/|\\s|$)"
+      - "rm -fr [^ |;&]*/\\.\\./(etc|boot|bin|usr|lib|sbin|var|root)(/|\\s|$)"
     explanation: "Recursively deletes the root filesystem (or a critical system directory). This is irreversible and will destroy the OS."
     alternative: "rm -rf /path/to/specific/folder  (never target / or system dirs)"
 
@@ -286,7 +288,7 @@ rules:
     category: Destructive File Deletion
     mitre: T1485
     patterns:
-      - "rm\\s+-[a-z]*r[a-z]*\\s+\\$[A-Za-z_]+"
+      - "rm\\s+-[a-z]*r[a-z]*\\s+[\"']?\\$\\{?[A-Za-z_][A-Za-z0-9_]*\\}?[\"']?(/|\\s|$)"
     explanation: "Recursive delete on a shell-variable target. The path is only resolved at runtime and may point to / or your home directory."
     alternative: "Type the full explicit path and double-check with 'echo $VAR' first"
 
@@ -299,3 +301,57 @@ rules:
       - "(cat|less|more|head|tail|strings)\\s+[^|&;]*\\s?(/root/\\S*)?\\.ssh/id_rsa"
     explanation: "Reads password hashes or a private SSH key. This is a credential-access technique."
     alternative: "Use 'sudo' only when required and never print secret material to the terminal"
+
+  - id: R023_SYSTEM_FILE_TAMPER
+    severity: critical
+    category: System File Tampering
+    mitre: T1485
+    patterns:
+      - "\\b(tee|echo|printf|cat)\\s+(-[a-z]+\\s+)?[^|&;]*\\s*(>>|>|2>)\\s*/etc/(passwd|shadow|gshadow|sudoers|group|fstab|crontab)"
+      - "\\btee\\s+(-[a-z]+\\s+)?/etc/(passwd|shadow|gshadow|sudoers|group|fstab|crontab)"
+      - "\\bsed\\s+-i[^\\s]*\\s+[^|&;]*\\s*/etc/(passwd|shadow|gshadow|sudoers|group|fstab|crontab)"
+      - "\\bln\\s+(-[a-z]*s[a-z]*\\s+)?/dev/null\\s+/etc/(shadow|passwd|gshadow)"
+      - "\\bmv\\s+/etc/(passwd|shadow|gshadow|sudoers|group)\\s"
+      - "\\brm\\s+(-[a-z]+\\s+)?/etc/(shadow|passwd|gshadow|sudoers)"
+      - "\\bchattr\\s+.*\\+[ia]\\s*/etc/(shadow|passwd|gshadow|sudoers)"
+    explanation: "Writes, overwrites, relocates or locks a critical system file (password database, sudoers, scheduler config). Compromises authentication or the boot process."
+    alternative: "Edit system configs with the distro tool (visudo, usermod, systemctl) and verify with a backup first"
+
+  - id: R024_BLOCK_DEVICE_WRITE
+    severity: critical
+    category: Disk Destruction
+    mitre: T1485
+    patterns:
+      - "(cp|tee)\\s+[^|&;]*?\\s+/dev/(sd|hd|vd)[a-z][0-9]*\\s*$"
+      - "(cp|tee)\\s+[^|&;]*?\\s+/dev/(nvme[0-9]+n[0-9]+|mmcblk[0-9]+|dm-[0-9]+)(p[0-9]+)?\\s*$"
+      - "(>>|>)\\s*/dev/(sd|hd|vd)[a-z][0-9]*"
+      - "(>>|>)\\s*/dev/(nvme[0-9]+n[0-9]+|mmcblk[0-9]+|dm-[0-9]+)"
+    explanation: "Writes directly to a raw block device (e.g. cp /dev/zero /dev/sda). This permanently destroys the disk contents and can brick the system."
+    alternative: "Target a mounted partition path, verify with lsblk, and never write to a whole device node"
+
+  - id: R025_TAR_REMOVE_FILES
+    severity: high
+    category: Destructive File Deletion
+    mitre: T1485
+    patterns:
+      - "tar\\s+[^|&;]*--remove-files"
+    explanation: "Archives and then deletes the source files in one pass. A mistake in the pattern erases data that was never verified in the archive."
+    alternative: "Create the archive first, verify with 'tar -tf', then delete sources explicitly"
+
+  - id: R026_GIT_CLEAN_FDX
+    severity: medium
+    category: Destructive File Deletion
+    mitre: T1485
+    patterns:
+      - "git\\s+clean\\s+.*(f.*d.*x|d.*f.*x|x.*d.*f|x.*f.*d)"
+    explanation: "git clean -fdx deletes every untracked AND ignored file — including editor backups, local configs and downloaded artifacts — with no recovery."
+    alternative: "Run 'git clean -ndx' first (dry run) and review the list before deleting"
+
+  - id: R027_NO_PRESERVE_ROOT
+    severity: critical
+    category: Destructive File Deletion
+    mitre: T1485
+    patterns:
+      - "rm\\s+.*--no-preserve-root"
+    explanation: "rm --no-preserve-root allows deletion of the root filesystem. This is irreversible and destroys the OS."
+    alternative: "Never pass --no-preserve-root; target the specific path and double-check with pwd"

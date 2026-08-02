@@ -3,6 +3,7 @@
 import hashlib
 import json
 import os
+import re
 import time
 from datetime import datetime, timezone
 
@@ -13,6 +14,8 @@ from src.parser import tokenizer
 from src.rules.rule_engine import RuleEngine, load_whitelist
 
 VERDICT_ORDER = {"ALLOW": 0, "WARN": 1, "BLOCK": 2}
+WRAPPER_RE = re.compile(r'^\s*(?:sudo\s+)?(?:bash|sh|zsh|dash|ksh)\s+-[a-z]*c[a-z]*\s+(["\'])(.*?)\1\s*$', re.DOTALL)
+MAX_UNWRAP_DEPTH = 2
 
 
 class CommandSafetyEngine:
@@ -62,7 +65,7 @@ class CommandSafetyEngine:
         except ImportError:
             self.llm = None
 
-    def analyze(self, command, aliases=None):
+    def analyze(self, command, aliases=None, _depth=0):
         """Full pipeline analysis. Returns the decision JSON."""
         start = time.perf_counter()
         original = command
@@ -79,10 +82,30 @@ class CommandSafetyEngine:
         risk_score = self._blend_risk(rule_score, ml_result)
         verdict = self._decide(risk_score, rule_matches, ml_result)
 
+        # Unwrap one level of bash -c '...' / sh -c "..." so a destructive payload
+        # hidden behind a wrapper (bash -c 'rm -rf /') is still caught.
+        payload = self._unwrap_payload(normalized)
+        if payload and _depth < MAX_UNWRAP_DEPTH:
+            inner = self.analyze(payload, aliases=aliases, _depth=_depth + 1)
+            inner_decision = inner["final_decision"]
+            inner_rules = inner["rule_engine"]["rules"]
+            seen = {r["rule_id"] for r in rule_matches}
+            rule_matches = rule_matches + [r for r in inner_rules if r["rule_id"] not in seen]
+            risk_score = max(risk_score, inner_decision["risk_score"])
+            if inner_decision["verdict"] == "BLOCK":
+                verdict = {"verdict": "BLOCK", "risk_score": risk_score, "requires_confirmation": True}
+            elif verdict["verdict"] == "ALLOW" and inner_decision["verdict"] == "WARN":
+                verdict = {"verdict": "WARN", "risk_score": risk_score, "requires_confirmation": True}
+
         latency_ms = (time.perf_counter() - start) * 1000
         return self._build_output(
             original, expanded, rule_matches, ml_result, llm_explanation, risk_score, verdict, latency_ms
         )
+
+    def _unwrap_payload(self, command):
+        """Return the quoted payload of `bash -c '...'`/`sh -c "..."`, or None."""
+        m = WRAPPER_RE.match(command)
+        return m.group(2) if m else None
 
     def _classify(self, normalized, features):
         if self.model is None or self.vectorizer is None:

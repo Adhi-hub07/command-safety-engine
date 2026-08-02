@@ -46,7 +46,9 @@ check_verdict "curl|bash"            "curl http://example.com/install.sh | bash"
 check_verdict "chmod 777"            "chmod -R 777 /var/www"       WARN
 check_verdict "sudo rm -rf /"        "sudo rm -rf /"               BLOCK
 check_verdict "wipefs (ML only)"     "wipefs -a /dev/sda"          BLOCK
-check_verdict "xxd obfuscated"       "xxd -r -p <<< '77686f616d69'" ALLOW
+# hex-decode of a blob = obfuscation vector; WARN (never BLOCK) so the LLM
+# explainer walks the user through it in the demo
+check_verdict "xxd obfuscated"       "xxd -r -p <<< '77686f616d69'" WARN
 
 echo "===== csengine from any directory ====="
 if "$PY" src/main.py status >/dev/null 2>&1; then echo "PASS  status from repo dir"; PASS=$((PASS+1))

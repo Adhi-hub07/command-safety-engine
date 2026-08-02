@@ -708,7 +708,7 @@
     <div class="stat"><b>1,379</b><span>labeled commands</span></div>
     <div class="stat"><b>3</b><span>layers of defence</span></div>
     <div class="stat"><b>100%</b><span>offline · air-gap ready</span></div>
-    <div class="stat"><b>22</b><span>MITRE-mapped rule groups</span></div>
+    <div class="stat"><b>27</b><span>MITRE-mapped rule groups</span></div>
   </div>
 
   <!-- interactive terminal -->
@@ -780,7 +780,7 @@
       <div class="pipe-num">2</div>
       <div class="pipe-body">
         <h4>Rule engine — deterministic</h4>
-        <p>22 MITRE-mapped rule groups (<code>R001–R022</code>) match instantly and can never be argued out of a block.</p>
+        <p>27 MITRE-mapped rule groups (<code>R001–R027</code>) match instantly and can never be argued out of a block.</p>
       </div>
     </div>
     <div class="pipe-step reveal">
@@ -855,14 +855,14 @@
     <table>
       <thead><tr><th>Model</th><th>Accuracy</th><th>Macro-F1</th><th>Destructive recall</th></tr></thead>
       <tbody>
-        <tr class="highlight"><td>GradientBoosting (deployed)</td><td>0.822</td><td>0.792</td><td>0.771</td></tr>
-        <tr><td>RandomForest</td><td>0.790</td><td>0.769</td><td>0.792</td></tr>
-        <tr><td>LogisticRegression</td><td>0.812</td><td>0.775</td><td>0.688</td></tr>
+        <tr class="highlight"><td>GradientBoosting (deployed)</td><td>0.822</td><td>0.791</td><td>0.771</td></tr>
+        <tr><td>RandomForest</td><td>0.794</td><td>0.772</td><td>0.771</td></tr>
+        <tr><td>LogisticRegression</td><td>0.815</td><td>0.777</td><td>0.688</td></tr>
       </tbody>
     </table>
   </div>
 
-  <p class="sec-sub reveal" style="margin-top:20px">GradientBoosting is deployed because it wins on macro-F1 while keeping destructive-class recall competitive — and the 22-rule engine already hard-blocks destructive patterns deterministically. Data hygiene: the pipeline deduplicates at build time (an early bug leaked 666 duplicate rows and inflated accuracy to a misleading ~92% — these are the honest ~81% numbers).</p>
+  <p class="sec-sub reveal" style="margin-top:20px">GradientBoosting is deployed because it wins on macro-F1 while keeping destructive-class recall competitive — and the 27-rule engine already hard-blocks destructive patterns deterministically. Data hygiene: the pipeline deduplicates at build time (an early bug leaked 666 duplicate rows and inflated accuracy to a misleading ~92% — these are the honest ~81% numbers).</p>
 </section>
 
 <!-- ============ INSTALL ============ -->

@@ -14,7 +14,7 @@
                     │     words · pipes · redirects · substitutions        │
                     │        │                                             │
                     │        ▼                                             │
-                    │  3. Rule Engine (rules.yaml, 22 rule groups)         │
+                    │  3. Rule Engine (rules.yaml, 27 rule groups)         │
                     │     fast deterministic match  ──┐                    │
                     │        │                        │ severity+MITRE    │
                     │        ▼                        ▼                   │

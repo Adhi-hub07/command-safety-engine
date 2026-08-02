@@ -1,5 +1,6 @@
 """Feature extraction: turn a command string into the 20-feature vector."""
 
+import posixpath
 import re
 
 from src.parser import tokenizer
@@ -40,6 +41,8 @@ SAFE_WILDCARD_BASES = {
     "sort", "uniq", "xargs", "for",
 }
 ROOT_PATHS = ("/", "/etc", "/boot", "/bin", "/usr", "/lib", "/sbin", "/var", "/root", "/dev", "/proc", "/sys")
+DESTRUCTIVE_BASES = {"rm", "dd", "mkfs", "mkfs.ext4", "mkfs.xfs", "wipefs", "shred", "fdisk", "parted", "wipe", "blkdiscard", "chmod"}
+SYSTEM_DIRS = ("/etc", "/boot", "/bin", "/usr", "/lib", "/sbin", "/var", "/root", "/proc", "/sys")
 FORK_BOMB_PATTERN = re.compile(r":\(\)\{.*:&\s*\};.*|:\{\(.*:&.*\}|\{.*\|.*&\s*\};|while\s+true\s*(;|do)|for\s*\(.*\).*\{.*\}.*&")
 ENV_MANIP_PATTERN = re.compile(r"(LD_PRELOAD|LD_LIBRARY_PATH|PATH\s*=|PYTHONPATH|IFS\s*=)")
 IP_OR_URL_PATTERN = re.compile(
@@ -47,6 +50,23 @@ IP_OR_URL_PATTERN = re.compile(
 )
 PIPE_TO_SHELL_PATTERN = re.compile(r"\|[^;|&]*\b(bash|sh|zsh|dash|fish|ksh)(\s|$)|<\s*(bash|sh|zsh)")
 CHMOD_777_PATTERN = re.compile(r"chmod\s+[^ ]*777|chmod\s+-R\s+[^ ]*777")
+
+
+def _targets_root_fs(cmd, base):
+    """True when a destructive base command targets a root/system path.
+
+    Path tokens are normalized first so traversal forms like `/tmp/../etc`
+    (which resolves to `/etc`) are caught, not just literal system paths.
+    """
+    if base not in DESTRUCTIVE_BASES:
+        return False
+    for tok in re.findall(r"/[^\s|&;>'\"$`()\[\]{}]*", cmd):
+        norm = posixpath.normpath(tok)
+        if norm == "/":
+            return True
+        if norm in SYSTEM_DIRS or norm.startswith(tuple(d + "/" for d in SYSTEM_DIRS)):
+            return True
+    return False
 
 
 def extract_features(command, whitelist=None):
@@ -64,10 +84,7 @@ def extract_features(command, whitelist=None):
         "token_count": len(words),
         "destructive_flag_count": len(FLAG_PATTERN.findall(cmd)),
         "has_wildcard": int(bool(WILDCARD_PATTERN.search(cmd)) and base not in SAFE_WILDCARD_BASES),
-        "targets_root_fs": int(
-            base in {"rm", "dd", "mkfs", "mkfs.ext4", "mkfs.xfs", "wipefs", "shred", "fdisk", "parted", "wipe", "blkdiscard", "chmod"}
-            and bool(re.search(r"\s/(\s|$|etc\b|boot\b|usr\b|bin\b|var\b|root\b)", cmd))
-        ),
+        "targets_root_fs": int(_targets_root_fs(cmd, base)),
         "has_network_call": int(base in NETWORK_COMMANDS),
         "pipes_to_shell": int(bool(PIPE_TO_SHELL_PATTERN.search(cmd))),
         "has_chmod_777": int(bool(CHMOD_777_PATTERN.search(cmd))),
