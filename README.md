@@ -69,12 +69,12 @@ recorded in a privacy-preserving audit log (hashes only — never plaintext).
   India's sovereign OS (AtmaNirbhar) mission and fully functional on air-gapped
   networks.
 - **Hybrid AI, three layers of defence-in-depth**
-  1. **Rule engine** — 20 deterministic MITRE-mapped rule groups (R001–R020)
+  1. **Rule engine** — 22 deterministic MITRE-mapped rule groups (R001–R022)
   2. **ML classifier** — scikit-learn GradientBoosting, trained on 1,379 real
      + synthetic commands, 3 classes (safe / risky / destructive)
   3. **Local LLM** — Qwen 2.5 3B via Ollama, invoked *only* for ambiguous or
      novel commands to write natural-language explanations
-- **Fast** — rules + ML path ≈ 0.34 ms mean (p95 0.61 ms); full pipeline ≈ 3 ms.
+- **Fast** — rules + ML path ≈ 0.30 ms mean (p95 0.52 ms); full pipeline ≈ 2.9 ms.
   Whitelisted daily commands cost ~0 ms.
 - **Safety-first override** — a single critical rule match blocks regardless of
   ML confidence. The model can never talk the system out of a block.
@@ -103,7 +103,7 @@ recorded in a privacy-preserving audit log (hashes only — never plaintext).
                     │     words · pipes · redirects · substitutions        │
                     │        │                                             │
                     │        ▼                                             │
-                    │  3. Rule Engine (rules.yaml, 20 rule groups)         │
+                    │  3. Rule Engine (rules.yaml, 22 rule groups)         │
                     │     fast deterministic match  ──┐                    │
                     │        │                        │ severity+MITRE    │
                     │        ▼                        ▼                   │
@@ -322,34 +322,35 @@ Measured on the dev box via `scripts/benchmark_latency.py --n 1000`
 
 | Path | Mean | p95 |
 |---|---|---|
-| Feature extraction + rule check | ~0.34 ms | ~0.61 ms |
-| Full pipeline (no LLM resident) | ~3 ms | ~3.5 ms |
+| Feature extraction + rule check | ~0.30 ms | ~0.52 ms |
+| Full pipeline (no LLM resident) | ~2.9 ms | ~3.5 ms |
 | Whitelisted daily command | ~0 ms | ~0 ms |
 | With local Qwen pre-warmed | tens of ms | — |
 
 **Model quality** — honest numbers on *deduplicated* data with 5-fold
 cross-validation (no cherry-picked single split):
 
-- 5-fold CV: **0.834 ± 0.031 accuracy**, **0.807 ± 0.040 macro-F1**
-- Held-out test (80/20, seed 42): **83.3% accuracy**, 0.803 macro-F1
-- Per-class recall (held-out): destructive **0.833**, risky 0.605, safe 0.947
+- 5-fold CV: **0.807 ± 0.026 accuracy**, **0.767 ± 0.033 macro-F1**
+- Held-out test (80/20, seed 42): **82.6% accuracy**, 0.795 macro-F1
+- Per-class recall (held-out): destructive **0.771**, risky 0.632, safe 0.941
 
 Model comparison on the identical split (`src/ml/compare.py`):
 
 | Model | Accuracy | Macro-F1 | Destructive recall |
 |---|---|---|---|
-| **GradientBoosting (deployed)** | **0.833** | **0.803** | **0.833** |
-| RandomForest | 0.819 | 0.792 | 0.771 |
-| LogisticRegression | 0.822 | 0.789 | 0.729 |
+| **GradientBoosting (deployed)** | **0.822** | **0.792** | 0.771 |
+| RandomForest | 0.790 | 0.769 | **0.792** |
+| LogisticRegression | 0.812 | 0.775 | 0.688 |
 
-> GradientBoosting is deployed because it wins on both macro-F1 *and* the
-> destructive-class recall — for a blocker, missing a destructive command is
-> the worst failure mode.
+> GradientBoosting is deployed because it wins on macro-F1 while keeping
+> destructive-class recall competitive — and the 22-rule engine already
+> hard-blocks destructive patterns deterministically, so the model can never
+> be talked out of a critical block.
 
 **Data-hygiene note:** an early regeneration carried 666 duplicate rows that
 leaked identical commands into both train and test (inflating the number to a
 misleading ~92%). The pipeline now deduplicates at build time — these are the
-honest ~83% numbers.
+honest ~81% numbers.
 
 ## Dataset provenance
 
@@ -378,7 +379,7 @@ regression suite proves `rm -rf build/` is **WARN**, never BLOCK, while
 
 ```
 command-safety-engine/
-├── config/            # rules.yaml (20 rule groups), whitelist.yaml, config.yaml
+├── config/            # rules.yaml (22 rule groups), whitelist.yaml, config.yaml
 ├── data/
 │   ├── raw/           # real-world command corpus (300 rows)
 │   ├── labeled/       # deduplicated labeled dataset (1,379 rows)
@@ -387,7 +388,7 @@ command-safety-engine/
 ├── src/
 │   ├── parser/        # bashlex-based command tokenizer
 │   ├── features/      # 20-feature extractor
-│   ├── rules/         # deterministic rule engine (R001–R020)
+│   ├── rules/         # deterministic rule engine (R001–R022)
 │   ├── ml/            # training, evaluation, comparison
 │   ├── llm/           # local Ollama explanation layer (Qwen 2.5 3B)
 │   ├── sandbox/       # optional bubblewrap dry-run

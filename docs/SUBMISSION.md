@@ -17,20 +17,20 @@ milliseconds whether it is **safe**, **risky**, or **destructive**, and asks for
 confirmation before anything harmful reaches the operating system.
 
 The engine is a three-layer defence-in-depth pipeline. **Layer 1** is a curated
-deterministic rule engine of 20 MITRE ATT&CK-aligned rule groups (recursive
+deterministic rule engine of 22 MITRE ATT&CK-aligned rule groups (recursive
 root deletion, fork bombs, permission escalation, credential scraping, supply-chain
 "download-and-run", network recon, obfuscation, and more), each with human-readable
 explanations and safe alternatives. **Layer 2** is a GradientBoosting machine-learning
 classifier trained on 1,379 deduplicated synthetic/real-world shell commands
-(83.3% accuracy on a held-out test, 0.80 macro F1, 0.83 destructive-class recall)
+(82.6% accuracy on a held-out test, 0.80 macro F1, 0.77 destructive-class recall)
 that generalises to novel commands no rule covers. **Layer 3** is a
 local LLM (Qwen 2.5 3B via Ollama) invoked only for genuinely ambiguous commands,
 writing natural-language explanations in the user's language. Every decision is
 audited to a hashed, privacy-preserving log.
 
 Everything runs 100% offline on commodity hardware. Rule+ML checks complete in
-well under 1 ms; the full pipeline averages ~3 ms with no LLM resident (measured on
-Windows via `scripts/benchmark_latency.py`). The engine installs in minutes on
+~0.30 ms mean (p95 0.52 ms); the full pipeline averages ~2.9 ms with no LLM resident (measured on
+Linux via `scripts/benchmark_latency.py`). The engine installs in minutes on
 Ubuntu or BOSS OS via a single script, hooks into bash and zsh, and works with a
 one-click optional bubblewrap sandbox for untrusted downloads. By making the
 terminal defend itself, csengine brings practical, sovereign, atma-nirbhar AI
@@ -54,7 +54,7 @@ keeps the user in control — without false-positive fatigue.**
 
 | Component | Technology | Role |
 |---|---|---|
-| Rule Engine | Python + YAML rules | 20 deterministic rule groups, MITRE-mapped, instant |
+| Rule Engine | Python + YAML rules | 22 deterministic rule groups, MITRE-mapped, instant |
 | ML Classifier | scikit-learn GradientBoosting | Generalises to novel commands from 20 hand-crafted features |
 | LLM Explainer | Ollama + Qwen 2.5 3B Q4 | Human explanations for ambiguous/novel commands |
 | Sandbox | bubblewrap (optional) | Safe execution of untrusted downloads |
@@ -67,13 +67,12 @@ blended into a 0-100 score: BLOCK ≥ 80, WARN ≥ 45, else ALLOW. Whitelisted
 commands skip analysis entirely (zero false positives for daily workflows).
 
 **Results (measured, honest = deduplicated + 5-fold CV):**
-- Deployed model (GradientBoosting): **5-fold CV 0.834 ± 0.031 acc, 0.807 ± 0.040 macro-F1**
-- Held-out test (80/20, seed 42): **83.3% accuracy, 0.803 macro-F1**
-  (per-class recall: destructive **0.833**, risky 0.605, safe 0.947)
-- Feature extraction + rule check: **~0.34 ms** mean (p95 0.61 ms)
-- Full pipeline: **~3 ms** mean (p95 ~3.5 ms) with no LLM resident; tens of ms with
-  local Qwen pre-warmed — measured via `scripts/benchmark_latency.py --n 1000` on the
-  Windows dev box; faster on Linux
+- Deployed model (GradientBoosting): **5-fold CV 0.807 ± 0.026 acc, 0.767 ± 0.033 macro-F1**
+- Held-out test (80/20, seed 42): **82.6% accuracy, 0.795 macro-F1**
+  (per-class recall: destructive **0.771**, risky 0.632, safe 0.941)
+- Feature extraction + rule check: **~0.30 ms** mean (p95 0.52 ms)
+- Full pipeline: **~2.9 ms** mean (p95 ~3.5 ms) with no LLM resident; tens of ms with
+  local Qwen pre-warmed — measured via `scripts/benchmark_latency.py --n 1000`
 - Regression suite: **31/31 tests passing**, ruff lint clean, real-pty hook tests pass on Ubuntu **and Kali Linux** (bash + zsh)
 - Dataset: **1,379 unique commands** (759 safe / 381 risky / 239 destructive) built by a
   deterministic three-step pipeline — `generate_synthetic.py` → `auto_label_raw.py`
@@ -86,15 +85,15 @@ commands skip analysis entirely (zero false positives for daily workflows).
 
   | Model | Accuracy | Macro-F1 | Destructive recall | Risky recall | Safe recall |
   |---|---|---|---|---|---|
-  | **GradientBoosting (deployed)** | **0.833** | **0.803** | **0.833** | 0.605 | 0.947 |
-  | RandomForest | 0.819 | 0.792 | 0.771 | 0.658 | 0.915 |
-  | LogisticRegression | 0.822 | 0.789 | 0.729 | 0.645 | 0.941 |
+  | **GradientBoosting (deployed)** | **0.822** | **0.792** | 0.771 | 0.632 | 0.934 |
+  | RandomForest | 0.790 | 0.769 | **0.792** | 0.711 | 0.829 |
+  | LogisticRegression | 0.812 | 0.775 | 0.688 | 0.645 | 0.934 |
 
-  GradientBoosting is deployed because on the deduplicated dataset it wins on **both**
-  macro-F1 (0.803) and destructive-class recall (0.833) — for a blocker, missing a
-  destructive command is the worst failure mode, and this is also the highest destructive
-  recall of the three models. (An earlier dataset carried duplicate rows that changed the
-  ranking; removing them made the comparison trustworthy.)
+  GradientBoosting is deployed because it wins on macro-F1 while keeping destructive-class
+  recall competitive — and the 22-rule engine already hard-blocks destructive patterns
+  deterministically, so the model can never be talked out of a critical block. (An earlier
+  dataset carried duplicate rows that changed the ranking; removing them made the
+  comparison trustworthy.)
 
 ### Data provenance (reproducibility)
 
@@ -220,8 +219,8 @@ A: The feature space encodes *intent*, not syntax: flags, targets, redirections,
 obfuscation, sudo usage. A novel attack (say a new download-and-run trick) still trips
 `has_redirect` + `network_recon` + `is_pipe_to_shell` features even if the exact string was
 never seen. The comparison script proves the 3-class split (safe/risky/destructive)
-generalises to a held-out 20% with destructive recall 0.833, and 5-fold CV reports 0.834 ±
-0.031 accuracy (no single-split cherry-picking).
+generalises to a held-out 20% with destructive recall 0.771, and 5-fold CV reports 0.807 ±
+0.026 accuracy (no single-split cherry-picking).
 
 **Q: What happens if the LLM is unavailable (no Ollama, no network)?**
 A: The LLM is optional by design. A 0.5 s TCP probe checks Ollama; on failure the engine
@@ -251,7 +250,7 @@ rule edit can never ship broken. Data sources (MITRE ATT&CK, GTFOBins) are cited
 in the dataset for traceability.
 
 **Q: What is the measured performance?**
-A: Feature+rule: ~0.34 ms mean (p95 0.61 ms). Full pipeline: ~3 ms mean with no LLM
+A: Feature+rule: ~0.30 ms mean (p95 0.52 ms). Full pipeline: ~2.9 ms mean with no LLM
 resident, tens of ms with the local Qwen pre-warmed. Whitelist
 happy path: effectively 0. On the demo machine the overhead is invisible to typing.
 

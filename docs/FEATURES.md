@@ -11,8 +11,8 @@ as integers. Used by the GradientBoosting classifier (`src/ml/train.py`).
 | 4 | `command_length` | int | length of normalized command |
 | 5 | `token_count` | int | number of shell words |
 | 6 | `destructive_flag_count` | int | `-rf`, `-f`, `--force`, `-y`, `-q`… |
-| 7 | `has_wildcard` | bool | `*`, `?`, `[..]` globs |
-| 8 | `targets_root_fs` | bool | `/`, `/etc`, `/boot`, `/usr`, `of=/dev`… |
+| 7 | `has_wildcard` | bool | `*`, `?`, `[..]` globs on destructive tools (`rm -rf *`); search globs (`find -name '*.py'`) excluded |
+| 8 | `targets_root_fs` | bool | destructive base (`rm`/`dd`/`mkfs`/`wipefs`/`chmod`…) targeting `/`, `/etc`, `/var`, `/boot`… |
 | 9 | `has_network_call` | bool | `curl`, `wget`, `nc`, `socat`, `ssh`, `scp`… |
 | 10 | `pipes_to_shell` | bool | `\| bash`, `\| sh`, `< script.sh` |
 | 11 | `has_chmod_777` | bool | `chmod 777` / `-R 777` |

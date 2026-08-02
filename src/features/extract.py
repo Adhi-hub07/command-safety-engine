@@ -29,9 +29,16 @@ FEATURE_NAMES = [
 
 NETWORK_COMMANDS = {"curl", "wget", "nc", "ncat", "socat", "ssh", "scp", "ftp", "telnet", "rsync", "ping"}
 DISK_COMMANDS = {"dd", "mkfs", "mkfs.ext4", "mkfs.xfs", "fdisk", "parted", "wipefs", "blkdiscard", "shred", "wipe"}
-FLAG_PATTERN = re.compile(r"(-[a-zA-Z]*[fry][a-zA-Z]*|--force|--recursive|--yes|-y|-q)")
+FLAG_PATTERN = re.compile(r"-(?:[a-zA-Z]*[fry][a-zA-Z]*|y|q)(?!\d)|--(?:force|recursive|yes)")
 SUDO_PATTERN = re.compile(r"(^|\s)(sudo|doas|pkexec)(\s|$)")
 WILDCARD_PATTERN = re.compile(r"(\*|\?|\[.*?\])")
+# wildcards are benign in search/read/list context (find -name '*.py', ls *.log,
+# grep '*.conf'); they only signal risk on destructive/overwrite tools.
+SAFE_WILDCARD_BASES = {
+    "ls", "find", "grep", "rg", "locate", "tree", "du", "echo", "printf", "cat",
+    "head", "tail", "less", "more", "cp", "mv", "mkdir", "touch", "sed", "awk",
+    "sort", "uniq", "xargs", "for",
+}
 ROOT_PATHS = ("/", "/etc", "/boot", "/bin", "/usr", "/lib", "/sbin", "/var", "/root", "/dev", "/proc", "/sys")
 FORK_BOMB_PATTERN = re.compile(r":\(\)\{.*:&\s*\};.*|:\{\(.*:&.*\}|\{.*\|.*&\s*\};|while\s+true\s*(;|do)|for\s*\(.*\).*\{.*\}.*&")
 ENV_MANIP_PATTERN = re.compile(r"(LD_PRELOAD|LD_LIBRARY_PATH|PATH\s*=|PYTHONPATH|IFS\s*=)")
@@ -56,9 +63,11 @@ def extract_features(command, whitelist=None):
         "command_length": len(cmd),
         "token_count": len(words),
         "destructive_flag_count": len(FLAG_PATTERN.findall(cmd)),
-        "has_wildcard": int(bool(WILDCARD_PATTERN.search(cmd))),
-        "targets_root_fs": int(any(p in cmd for p in ("rm -rf /", "find / ", "mkfs", "of=/dev/", "of=/dev")))
-        | int(bool(re.search(r"\s/(\s|$|etc\b|boot\b|usr\b|bin\b|var\b|root\b)", cmd))),
+        "has_wildcard": int(bool(WILDCARD_PATTERN.search(cmd)) and base not in SAFE_WILDCARD_BASES),
+        "targets_root_fs": int(
+            base in {"rm", "dd", "mkfs", "mkfs.ext4", "mkfs.xfs", "wipefs", "shred", "fdisk", "parted", "wipe", "blkdiscard", "chmod"}
+            and bool(re.search(r"\s/(\s|$|etc\b|boot\b|usr\b|bin\b|var\b|root\b)", cmd))
+        ),
         "has_network_call": int(base in NETWORK_COMMANDS),
         "pipes_to_shell": int(bool(PIPE_TO_SHELL_PATTERN.search(cmd))),
         "has_chmod_777": int(bool(CHMOD_777_PATTERN.search(cmd))),

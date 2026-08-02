@@ -268,7 +268,7 @@ rules:
     alternative: "Restrict volumes to specific host paths and drop --privileged"
 
   - id: R020_SHUTDOWN_ABUSE
-    severity: low
+    severity: medium
     category: Availability
     mitre: T1499
     patterns:
@@ -280,3 +280,22 @@ rules:
       - ":\\|:&"
     explanation: "Immediate shutdown, forced reboot, or killing critical PIDs. Disrupts running services."
     alternative: "Use 'systemctl reboot' or graceful 'shutdown' with a delay"
+
+  - id: R021_VAR_DELETE
+    severity: high
+    category: Destructive File Deletion
+    mitre: T1485
+    patterns:
+      - "rm\\s+-[a-z]*r[a-z]*\\s+\\$[A-Za-z_]+"
+    explanation: "Recursive delete on a shell-variable target. The path is only resolved at runtime and may point to / or your home directory."
+    alternative: "Type the full explicit path and double-check with 'echo $VAR' first"
+
+  - id: R022_SENSITIVE_FILE_READ
+    severity: high
+    category: Credential Access
+    mitre: T1005
+    patterns:
+      - "(cat|less|more|head|tail|strings|grep)\\s+[^|&;]*\\s?/etc/(shadow|gshadow|sudoers)"
+      - "(cat|less|more|head|tail|strings)\\s+[^|&;]*\\s?(/root/\\S*)?\\.ssh/id_rsa"
+    explanation: "Reads password hashes or a private SSH key. This is a credential-access technique."
+    alternative: "Use 'sudo' only when required and never print secret material to the terminal"

@@ -128,18 +128,18 @@ class CommandSafetyEngine:
         result = {"model": None, "summary": None, "suggested_alternative": None}
         if self.llm is None:
             return result
-        if features.get("whitelist_match"):
-            return {
-                "model": "whitelist",
-                "summary": "This command matches a known-safe whitelist pattern.",
-                "suggested_alternative": None,
-            }
         if rule_matches:
             rule = rule_matches[0]
             return {
                 "model": "rule",
                 "summary": rule["explanation"],
                 "suggested_alternative": rule.get("alternative"),
+            }
+        if features.get("whitelist_match"):
+            return {
+                "model": "whitelist",
+                "summary": "This command matches a known-safe whitelist pattern.",
+                "suggested_alternative": None,
             }
         llm_cfg = self.config["llm"]
         ambiguous = ml_result.get("confidence", 0) < llm_cfg.get("ambiguity_threshold", 0.65)
@@ -166,7 +166,9 @@ class CommandSafetyEngine:
             return min(100, round(label_risk * (0.4 + 0.6 * min(1.0, confidence))))
         ml_weight = 0.35 if confidence > 0.6 else 0.15
         blended = rule_score * (1 - ml_weight) + label_risk * ml_weight
-        return min(100, round(blended))
+        # a matched rule always counts: never let ML confidence dilute a rule match
+        # below the rule's own severity weight (prevents low rules from ALLOWing).
+        return min(100, max(rule_score, round(blended)))
 
     def _decide(self, risk_score, rule_matches, ml_result):
         cfg = self.config["engine"]

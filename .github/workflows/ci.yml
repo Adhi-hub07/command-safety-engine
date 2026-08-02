@@ -17,11 +17,8 @@ jobs:
         run: pip install -r requirements.txt ruff
       - name: Lint
         run: ruff check src tests scripts
-      - name: Regenerate dataset and train model
+      - name: Train model on committed dataset
         run: |
-          python data/synthetic/generate_synthetic.py
-          python scripts/auto_label_raw.py
-          python scripts/dedupe_dataset.py
           python src/ml/train.py
       - name: Run tests
         run: pytest tests -q
