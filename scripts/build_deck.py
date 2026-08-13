@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Build the 12-slide hackathon deck (16:9 PDF) with reportlab.
+"""Build the 13-slide hackathon deck (16:9 PDF) with reportlab.
 
 Usage: python scripts/build_deck.py   ->  docs/presentation.pdf
 Requires: reportlab, pillow, cairosvg (pip install -r requirements-dev.txt)
@@ -94,7 +94,7 @@ def header(draw, num, title, subtitle=None):
     draw.line(48, 46, PAGE_W - 48, 46)
     draw.setFillColor(MUTED)
     draw.setFont(SANS, 9)
-    draw.drawString(48, 30, "SafeShell csengine · Adhithya J · Trusted Computing & Embedded Security Track")
+    draw.drawString(48, 30, "SafeShell csengine · Adhithya J · Track 2: AI at Application Level")
     draw.drawRightString(PAGE_W - 48, 30, "fully offline · open-source (MIT)")
 
 
@@ -114,13 +114,13 @@ def footer_page(draw, n):
 def slide_title(draw):
     draw.setFillColor(TITLE)
     draw.setFont(SANS_B, 34)
-    draw.drawString(72, PAGE_H - 140, "COMMAND SAFETY ENGINE")
+    draw.drawString(72, PAGE_H - 140, "SAFESHELL · COMMAND SAFETY ENGINE")
     draw.setFillColor(TEAL)
     draw.setFont(SANS_B, 20)
-    draw.drawString(72, PAGE_H - 172, "An offline AI guard for the Linux shell")
+    draw.drawString(72, PAGE_H - 172, "Transactional execution with AI-generated undo plans")
     draw.setFillColor(MUTED)
     draw.setFont(SANS, 13)
-    draw.drawString(72, PAGE_H - 200, "C-DAC Secure OS Hackathon 2026 · Trusted Computing & Embedded Security Track")
+    draw.drawString(72, PAGE_H - 200, "C-DAC Secure OS Hackathon 2026 · Track 2: AI at Application Level")
     draw.setFillColor(BODY)
     draw.setFont(SANS, 13)
     draw.drawString(72, 170, "Adhithya J")
@@ -128,7 +128,7 @@ def slide_title(draw):
     draw.setFont(SANS, 12)
     draw.drawString(72, 150, "github.com/Adhi-hub07/command-safety-engine")
     draw.setFont(SANS, 12)
-    draw.drawString(72, 128, "Demo:  csengine check \"rm -rf /\"  →  BLOCK")
+    draw.drawString(72, 128, "Demo:  csengine run \"rm -rf projects\"  →  csengine undo last")
     # terminal mock
     panel(draw, 420, 120, 360, 230, fill=HexColor("#0b1220"), line=HexColor("#1f2937"))
     ty = 320
@@ -184,9 +184,9 @@ def slide_problem(draw):
     draw.drawString(px + 16, py - 24, "Challenge (verbatim)")
     draw.setFillColor(BODY)
     draw.setFont(SANS, 12)
-    challenge = ("Create an intelligent safety layer that understands the intent behind Linux commands "
-                 "before they execute. The system should detect risky operations, explain their potential "
-                 "impact, and suggest safer alternatives to prevent accidental system damage.")
+    challenge = ("SafeShell: design a secure command execution framework that generates "
+                 "AI-based rollback plans, simulates command execution, and provides recovery "
+                 "mechanisms to safely execute system operations.")
     yy = py - 50
     for ln in wrap(draw, challenge, SANS, 12, 285):
         draw.drawString(px + 16, yy, ln)
@@ -197,8 +197,8 @@ def slide_problem(draw):
     draw.setFillColor(BODY)
     draw.setFont(SANS, 12)
     yy = yy - 44
-    for ln in wrap(draw, "A fast, accurate, fully offline safety layer that catches dangerous commands "
-                          "in real time, explains why, offers a safe alternative, and keeps the user in control.", SANS, 12, 285):
+    for ln in wrap(draw, "Detect intent before execution — then make it reversible: snapshot every target, "
+                          "simulate the command, and undo any damage with one command.", SANS, 12, 285):
         draw.drawString(px + 16, yy, ln)
         yy -= 17
 
@@ -207,24 +207,25 @@ def slide_overview(draw):
     draw.setFillColor(BODY)
     draw.setFont(SANS, 13)
     x, y = 72, PAGE_H - 120
-    y = bullet(draw, x, y, "Defence in depth: three independent layers, any layer can only push toward more caution.", 14, gap=10)
+    y = bullet(draw, x, y, "Defence in depth: four independent layers, any layer can only push toward more caution.", 14, gap=10)
     layers = [
         ("Layer 1 · Rule Engine", BLUE, "27 MITRE ATT&CK-aligned rule groups (R001–R027), deterministic, <0.5 ms. Critical rule always BLOCKs."),
         ("Layer 2 · ML Classifier", PURPLE, "GradientBoosting on 20 intent features, 3 classes (safe / risky / destructive), ~0.1 ms."),
         ("Layer 3 · LLM Explainer", TEAL, "Qwen 2.5 3B via Ollama, 100% offline, only for ambiguous commands. Graceful fallback."),
+        ("Layer 4 · Transaction & Recovery", GREEN, "snapshot targets · simulate in bwrap sandbox · AI undo plans · csengine undo restores."),
     ]
     yy = y - 18
     for name, col, desc in layers:
-        panel(draw, x, yy - 64, 380, 74, fill=PANEL, line=col)
+        panel(draw, x, yy - 58, 380, 64, fill=PANEL, line=col)
         draw.setFillColor(col)
-        draw.setFont(SANS_B, 13)
-        draw.drawString(x + 14, yy - 20, name)
+        draw.setFont(SANS_B, 12)
+        draw.drawString(x + 14, yy - 18, name)
         draw.setFillColor(BODY)
-        draw.setFont(SANS, 11)
-        for ln in wrap(draw, desc, SANS, 11, 350):
-            draw.drawString(x + 14, yy - 40, ln)
-            yy -= 15
-        yy -= 20
+        draw.setFont(SANS, 10)
+        for ln in wrap(draw, desc, SANS, 10, 350):
+            draw.drawString(x + 14, yy - 36, ln)
+            yy -= 14
+        yy -= 14
     px = 520
     py = PAGE_H - 130
     panel(draw, px, py - 260, 320, 250, fill=PANEL, line=GREEN)
@@ -404,19 +405,52 @@ def slide_llm(draw):
     draw.drawString(px + 16, yy - 8, "forensics without storing plaintext")
 
 
+def slide_safeshell(draw):
+    x, y = 72, PAGE_H - 130
+    draw.setFillColor(BODY)
+    draw.setFont(SANS, 13)
+    y = bullet(draw, x, y, "Blocking is not enough — confirmed risky commands must be reversible. SafeShell wraps them in a transaction.", 14, gap=8)
+    steps = [
+        ("1 · Path extraction", BLUE, "parses rm / mv / cp / chmod / chown / dd / touch / tee + redirect targets from the AST"),
+        ("2 · Undo plan", TEAL, "deterministic offline steps (restore / move-back / chmod-back) merged with LLM recovery steps"),
+        ("3 · Snapshot", GREEN, "every target saved with content, mode, owner, symlink under ~/.csengine/tx/[tx-id]/"),
+        ("4 · Simulation", PURPLE, "bwrap sandbox dry-run on directory copies → exact deleted / modified / created diff"),
+        ("5 · Recover", RED, "csengine undo restores everything byte-for-byte — a fatal rm -rf becomes an inconvenience"),
+    ]
+    yy = y - 16
+    for name, col, desc in steps:
+        panel(draw, x, yy - 46, 600, 46, fill=HexColor("#0b1220"), line=col)
+        draw.setFillColor(col)
+        draw.setFont(SANS_B, 12)
+        draw.drawString(x + 14, yy - 20, name)
+        draw.setFillColor(BODY)
+        draw.setFont(SANS, 10)
+        for ln in wrap(draw, desc, SANS, 10, 470):
+            draw.drawString(x + 150, yy - 18, ln)
+            yy -= 13
+        yy -= 14
+    panel(draw, 72, PAGE_H - 500, 600, 60, fill=PANEL, line=GREEN)
+    draw.setFillColor(GREEN)
+    draw.setFont(SANS_B, 12)
+    draw.drawString(86, PAGE_H - 478, "Demo:  csengine run \"rm -rf projects\"  →  undo plan + simulated diff  →  csengine undo last  →  file back")
+    draw.setFillColor(MUTED)
+    draw.setFont(SANS, 10)
+    draw.drawString(86, PAGE_H - 494, "auto-snapshot in bash/zsh hooks when a WARN command is re-typed to confirm (CSENGINE_TX=0 disables)")
+
+
 def slide_integration(draw):
     x, y = 72, PAGE_H - 130
     draw.setFillColor(BODY)
     draw.setFont(SANS, 13)
     y = bullet(draw, x, y, "Installs in minutes on Ubuntu / BOSS OS via a single script (setup.sh).", 14, gap=8)
     y = bullet(draw, x, y, "Hooks into bash and zsh (preexec) — every command is judged before it runs.", 14, gap=8)
-    y = bullet(draw, x, y, "Rich CLI:  csengine check <cmd>   ·   csengine status   ·   csengine install-hook", 14, gap=8)
-    y = bullet(draw, x, y, "Optional bubblewrap sandbox for untrusted downloads.", 14, gap=8)
+    y = bullet(draw, x, y, "Rich CLI:  csengine check <cmd>   ·   csengine run   ·   csengine undo   ·   csengine tx", 14, gap=8)
+    y = bullet(draw, x, y, "WARN commands auto-snapshot on confirmation; CSENGINE_TX=0 disables.", 14, gap=8)
     # verdict cards
     vy = PAGE_H - 300
     cards = [
         ("ALLOW", GREEN, "daily commands execute instantly", "whitelist or score < 45"),
-        ("WARN", AMBER, "asks to confirm / retype", "score 45–79"),
+        ("WARN", AMBER, "asks to confirm / retype + snapshot", "score 45–79"),
         ("BLOCK", RED, "refuses execution · exit 2", "score ≥ 80 or critical rule"),
     ]
     for i, (name, col, line1, line2) in enumerate(cards):
@@ -435,7 +469,7 @@ def slide_integration(draw):
     draw.setFillColor(BLUE)
     draw.setFont(SANS_B, 13)
     draw.drawString(536, PAGE_H - 322, "Exit codes & scripting")
-    lines = ["exit 0 → ALLOW (executed)", "exit 3 → WARN (user confirmed)", "exit 2 → BLOCK (refused)", "JSON output for automation"]
+    lines = ["exit 0 → ALLOW (executed)", "exit 1 → WARN (confirmed to run)", "exit 2 → BLOCK (refused)", "JSON output for automation"]
     yy = PAGE_H - 350
     for ln in lines:
         draw.setFillColor(BODY)
@@ -454,6 +488,7 @@ def slide_perf(draw):
         ("feature extraction + rule check", "~0.3 ms mean · ~0.5 ms p95", GREEN),
         ("full pipeline (no LLM resident)", "~2.7 ms mean · ~3 ms p95", GREEN),
         ("full pipeline (LLM pre-warmed)", "tens of ms", AMBER),
+        ("simulation of a risky command", "~0.07 s (small target trees)", AMBER),
     ]
     yy = y - 24
     for name, val, col in rows:
@@ -544,12 +579,12 @@ def slide_innovation(draw):
     draw.setFillColor(BODY)
     draw.setFont(SANS, 13)
     items = [
-        ("Fusion of rules + ML + LLM", "LLM invoked only on demand — near-zero latency and power draw with plain-language explanations."),
+        ("Transactional command execution", "risky commands become reversible — snapshotted before run, restored byte-for-byte by csengine undo."),
+        ("Simulation-based safety guarantees", "the exact deleted / modified / created diff is computed in a bwrap sandbox and shown before anything runs."),
+        ("AI-generated undo plans", "deterministic offline recovery steps merged with LLM recovery steps; recovery never depends on a model."),
         ("Safety-first critical override", "one critical rule match blocks regardless of ML confidence."),
         ("Fully offline, sovereign-first", "no cloud, no egress; deployable on BOSS OS, aligned with India's AtmaNirbhar mission."),
         ("Zero overhead happy path", "whitelist short-circuit removes the false-positive fatigue that kills other tools."),
-        ("Privacy-preserving audit", "commands stored only as truncated SHA-256 hashes."),
-        ("Safe-alternative suggestions", "every rule carries a constructive \u201Cdo this instead\u201D — teaches secure habits."),
     ]
     yy = y - 10
     for name, desc in items:
@@ -580,7 +615,7 @@ def slide_roadmap(draw):
         ("BOSS OS packaging", ".deb / .rpm for Indian distributions"),
         ("Hindi-first UI", "explanations in more languages"),
         ("Personal allowlists", "per-user adaptive trust"),
-        ("Auto-sandbox", "bubblewrap containment for risky-but-required commands"),
+        ("Transaction lifecycle", "auto-expiry + cleanup of stale snapshots"),
         ("Deep integration", "sudo, Docker, IDE terminal hooks"),
     ]
     yy = y - 10
@@ -598,7 +633,7 @@ def slide_roadmap(draw):
     draw.drawString(x + 14, PAGE_H - 308, "Status")
     draw.setFillColor(BODY)
     draw.setFont(SANS, 11)
-    draw.drawString(x + 14, PAGE_H - 326, "code complete · 65/65 tests · 17/17 demo checks · bash+zsh pty hooks pass")
+    draw.drawString(x + 14, PAGE_H - 326, "code complete · 66/66 tests · 17/17 demo checks · bash+zsh pty hooks pass")
     draw.setFillColor(TITLE)
     draw.setFont(SANS_B, 26)
     draw.drawString(72, 180, "Thank you")
@@ -612,7 +647,7 @@ def slide_roadmap(draw):
 
 def main():
     c = canvas.Canvas(OUT, pagesize=(PAGE_W, PAGE_H))
-    c.setTitle("Command Safety Engine — C-DAC Secure OS Hackathon 2026")
+    c.setTitle("SafeShell / Command Safety Engine — C-DAC Secure OS Hackathon 2026")
     c.setAuthor("Adhithya J")
 
     slide_title(c)
@@ -624,12 +659,12 @@ def main():
     footer_page(c, 2)
     c.showPage()
 
-    header(c, 2, "Solution overview", "three-layer defence-in-depth pipeline")
+    header(c, 2, "Solution overview", "four-layer defence-in-depth pipeline")
     slide_overview(c)
     footer_page(c, 3)
     c.showPage()
 
-    header(c, 3, "Architecture", "offline, on-device, graded control")
+    header(c, 3, "Architecture", "offline, on-device, transactional")
     slide_arch(c)
     footer_page(c, 4)
     c.showPage()
@@ -649,29 +684,34 @@ def main():
     footer_page(c, 7)
     c.showPage()
 
-    header(c, 7, "Shell integration & user control", "the hook, the verdicts, the exits")
-    slide_integration(c)
+    header(c, 7, "SafeShell — transactional execution & recovery", "snapshot · simulate · undo plan · recover")
+    slide_safeshell(c)
     footer_page(c, 8)
     c.showPage()
 
-    header(c, 8, "Performance & feasibility", "measured, not promised")
-    slide_perf(c)
+    header(c, 8, "Shell integration & user control", "the hook, the verdicts, the exits")
+    slide_integration(c)
     footer_page(c, 9)
     c.showPage()
 
-    header(c, 9, "Risks & mitigations", "honest assessment, engineered in")
-    slide_risks(c)
+    header(c, 9, "Performance & feasibility", "measured, not promised")
+    slide_perf(c)
     footer_page(c, 10)
     c.showPage()
 
-    header(c, 10, "Innovation & mission alignment", "why this is different")
-    slide_innovation(c)
+    header(c, 10, "Risks & mitigations", "honest assessment, engineered in")
+    slide_risks(c)
     footer_page(c, 11)
     c.showPage()
 
-    header(c, 11, "Roadmap & status", "from prototype to sovereign default")
-    slide_roadmap(c)
+    header(c, 11, "Innovation & mission alignment", "why this is different")
+    slide_innovation(c)
     footer_page(c, 12)
+    c.showPage()
+
+    header(c, 12, "Roadmap & status", "from prototype to sovereign default")
+    slide_roadmap(c)
+    footer_page(c, 13)
     c.showPage()
 
     c.save()
