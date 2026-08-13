@@ -1,174 +1,190 @@
-# Demo Video Script — Command Safety Engine (~4 minutes, one take)
+# Demo Video Script — SafeShell (Command Safety Engine) — ~4 min, one take
 
-> Record with OBS or `asciinema` on a clean **Ubuntu 24.04 or BOSS OS VM**
-> (4 GB RAM, 2 vCPU). Maximise one terminal, dark theme, 1080p. No cuts needed —
-> but if you flub a line, pause 2 s and re-take from the start of the scene.
-> Optional end card with the repo URL.
+> Record on a clean **Ubuntu 24.04 or BOSS OS VM** (4 GB RAM, 2 vCPU). Maximise
+> one terminal, dark theme, 1080p. No cuts needed. If you flub a line, pause 2 s
+> and re-take from the start of that scene.
 >
-> All commands below show the **actual** engine output (captured from a Kali VM,
-> same code that is pushed). Do not fake output — judges run `verify_demo.sh`.
+> **The output blocks below are the REAL engine output — copy them from here so
+> what you type matches what you see.** Do not fake output.
+>
+> End card: repo URL + "SafeShell · Made for C-DAC Secure OS Hackathon 2026 · Track 2: AI at Application Level".
 
 ---
 
-## 0. Pre-flight checklist (before recording)
+## Before recording (5 min, not on camera)
 
 ```bash
-git clone <repo-url> && cd command-safety-engine
-bash setup.sh                 # venv + deps + model training + Ollama + hooks
-source ~/.bashrc
-csengine status               # MUST show: 27 rules, ML model loaded
-# if LLM line says "server down", start it:
-ollama serve &   # then: ollama pull qwen2.5:3b-instruct-q4_K_M
+git clone https://github.com/Adhi-hub07/command-safety-engine
+cd command-safety-engine
+bash setup.sh && source ~/.bashrc
+csengine status        # 27 rules loaded, ML model loaded
+bash scripts/verify_demo.sh   # 17 passed
 ```
 
-Sanity check before rolling:
-
-```bash
-bash scripts/verify_demo.sh   # expect: RESULT: 17 passed, 0 failed
-```
+Sanity tip: run each command below once **before** recording so you know the
+exact output. Keep this cheat sheet open next to the camera.
 
 ---
 
-## 1. Timing map (total 4:00)
+## Scene 1 — Watch every command silently (0:00–0:25)
 
-| # | Scene | Duration | Video time |
-|---|-------|----------|------------|
-| 1 | Hook-in-action (silent watch) | 20 s | 0:00–0:20 |
-| 2 | Daily commands pass instantly | 25 s | 0:20–0:45 |
-| 3 | Destructive block: `rm -rf /` | 30 s | 0:45–1:15 |
-| 4 | Fork bomb block | 20 s | 1:15–1:35 |
-| 5 | Risky warn: `chmod -R 777` | 25 s | 1:35–2:00 |
-| 6 | ML generalisation: base64 payload | 30 s | 2:00–2:30 |
-| 7 | LLM explanation (Ollama on) | 35 s | 2:30–3:05 |
-| 8 | Audit log, hashed | 25 s | 3:05–3:30 |
-| 9 | Status: all offline | 20 s | 3:30–3:50 |
-| 10 | Close / end card | 10 s | 3:50–4:00 |
+**TYPE**
+```bash
+echo hello
+```
+
+**YOU WILL SEE** (looks like nothing — that's the point)
+
+**SAY**
+> "This is SafeShell — the Command Safety Engine. It watches every command you
+> type, silently, before it ever reaches the operating system."
 
 ---
 
-## 2. Scene-by-scene
+## Scene 2 — Everyday commands cost nothing (0:25–0:45)
 
-### Scene 1 — Hook-in-action (0:00–0:20)
-
-Type (nothing visibly happens — that's the point):
-
+**TYPE**
 ```bash
-$ echo hello
-hello
+git status
+ls -la
+cd ~
 ```
 
-**Narration (15 s):** "This is the Command Safety Engine. It watches every
-command you type, silently, before that command ever reaches the operating
-system."
+**YOU WILL SEE** normal output, instant, no warnings.
 
-### Scene 2 — Daily commands pass instantly (0:20–0:45)
+**SAY**
+> "Everyday commands pass instantly — they're whitelisted, zero false
+> positives, zero latency. A safety tool you'll actually use."
 
+---
+
+## Scene 3 — Block: `rm -rf /` (0:45–1:15)
+
+**TYPE**
 ```bash
-$ git status
-On branch main
-nothing to commit, working tree clean
-$ ls -la
-total 72
-drwxr-xr-x 13 kali kali  4096 ...
-$ cd ~
+csengine check "rm -rf /"
 ```
 
-**Narration (15 s):** "Everyday commands cost you nothing. They're whitelisted,
-so they skip analysis entirely — zero false positives, zero latency. This is
-what makes a safety tool actually usable."
-
-### Scene 3 — Destructive block: `rm -rf /` (0:45–1:15)
-
-```bash
-$ rm -rf /
-[BLOCKED] recursive delete of system root   (R001, MITRE T1485)
-  Risk: 100/100
-  Suggested safe alternative:  rm -rf /path/to/folder
+**YOU WILL SEE**
+```
+Verdict            BLOCK
+Risk score         100/100
+Matched rule       R001_ROOT_DELETE
+MITRE              T1485
+Safer alternative  rm -rf /path/to/specific/folder
 ```
 
-**Expected real output:** verdict BLOCK, risk 100, rule R001_ROOT_DELETE.
-Exit code 2 (type `echo $?` → `2`).
+**SAY**
+> "Recursive deletion of the system root — blocked instantly, with the MITRE
+> technique named and a safe alternative suggested. The machine stays alive."
 
-**Narration (20 s):** "Now a recursive deletion of the system root. The rule
-engine blocks it instantly, shows why, names the MITRE technique, and — this is
-important — suggests a safe alternative. The user stays in control; the system
-stays alive."
+---
 
-### Scene 4 — Fork bomb (1:15–1:35)
+## Scene 4 — Block: fork bomb (1:15–1:35)
 
+**TYPE**
 ```bash
-$ :(){ :|:& };:
-[BLOCKED] fork bomb detected   (R008, MITRE T1498)
-  Risk: 100/100
+csengine check ":(){ :|:& };:"
 ```
 
-**Narration (15 s):** "A fork bomb that would otherwise freeze the machine in
-seconds. Recognised by rule and model together. Critical rules always win — the
-machine can't be talked out of a block."
-
-### Scene 5 — Risky warn: `chmod -R 777` (1:35–2:00)
-
-```bash
-$ chmod -R 777 /var/www
-[WARN] world-writable permissions   (R007)
-  Risk: 60/100
-  Continue? [y/N]
+**YOU WILL SEE**
+```
+Verdict            BLOCK
+Risk score         100/100
+Matched rule       R008_FORK_BOMB
 ```
 
-Type `n`.
+**SAY**
+> "A fork bomb that would freeze the machine in seconds. Rule and model agree —
+> critical rules always win."
 
-**Narration (15 s):** "Riskier commands aren't hard-blocked — they warn and ask
-for confirmation. Graded control: allow, warn, block. The user always has the
-final say, but now the say is an *informed* one."
+---
 
-### Scene 6 — ML generalisation: base64 payload (2:00–2:30)
+## Scene 5 — Warn, don't block: `chmod -R 777` (1:35–2:00)
 
+**TYPE**
 ```bash
-$ base64 -d <<< cHJpbnRmIGhhY2tlZCA+IC9ldGMvcGFzc3dkIHwgYmFzaA==
-[WARN] obfuscated payload decoded to a write-to-/etc/passwd pipe   (ML)
-  Risk: 60/100   (matched rule: none — flagged by ML)
+csengine check "chmod -R 777 /var/www"
 ```
 
-**Narration (15 s):** "This is the attack no blocklist string can match — a
-base64-encoded payload that, once decoded, writes to /etc/passwd and pipes to
-bash. No rule in our file matches it. The machine-learning layer generalises:
-obfuscation plus redirection plus a shell pipe — it's risky, and it's flagged,
-fully offline."
-
-### Scene 7 — LLM explanation (2:30–3:05)
-
-Make sure Ollama is running and `csengine status` shows LLM available. Type an
-ambiguous-but-harmless command that triggers the LLM path:
-
-```bash
-$ xxd -r -p <<< '77686f616d69'
-[WARN] this decodes hex text "whoami" — a read-only command
-  Explanation (local Qwen 2.5 3B): this command reverses a hex-encoded
-  string. It is obfuscation, which is how malware hides, but the payload
-  itself only runs `whoami`. Proceed with care.
+**YOU WILL SEE**
+```
+Verdict            WARN
+Risk score         60/100
+Matched rule       R007_PERMISSIONS_777
 ```
 
-**Narration (20 s):** "When a command is genuinely confusing, a local Qwen 2.5
-model — running entirely on this laptop — writes a plain-language explanation.
-No cloud. No network. The judgement never depends on a server that might be
-down."
+**SAY**
+> "Riskier commands aren't hard-blocked — they warn. Graded control:
+> allow, warn, block. The user keeps the final say, but it's an informed one."
 
-### Scene 8 — Audit log, hashed (3:05–3:30)
+---
 
+## Scene 6 — THE STAR: transactional undo (2:00–2:50)
+
+> This is the headline of our problem statement. Make it count.
+
+**TYPE** (this creates 3 fake files, deletes them safely, then restores them)
 ```bash
-$ cat ~/.csengine/audit.log
-{..., "cmd_sha256": "a3f2...", "verdict": "BLOCK", "rule": "R001"}
-{..., "cmd_sha256": "9b1c...", "verdict": "WARN",  "rule": "R007"}
+mkdir -p demo && echo A > demo/1.txt && echo B > demo/2.txt && echo C > demo/3.txt
+csengine run "rm -rf demo"
 ```
 
-**Narration (15 s):** "Every decision is written to an audit log. Commands are
-stored only as hashes, so an administrator can reconstruct what happened without
-storing your plaintext commands — privacy and forensics at the same time."
+**YOU WILL SEE**
+```
+Verdict        WARN
+Undo plan      restore .../demo from snapshot
+Simulation     4 deleted · 1 modified · 0 created
+Run `rm -rf demo` with an automatic undo snapshot? [y/N]
+```
 
-### Scene 9 — Status: all offline (3:30–3:50)
+**TYPE** `y` and press Enter. The files are deleted.
 
+**TYPE**
 ```bash
-$ csengine status
+csengine undo last
+```
+
+**YOU WILL SEE** the files back.
+
+**SAY**
+> "Now the part that makes this different. Before a risky command runs,
+> SafeShell snapshots everything it touches and simulates it — '4 deleted,
+> 1 modified'. If the result is bad, one command undoes it. The files come
+> back, byte for byte."
+
+---
+
+## Scene 7 — ML generalisation: base64 payload (2:50–3:15)
+
+**TYPE**
+```bash
+csengine check 'base64 -d <<< cHJpbnRmIGhhY2tlZCA+IC9ldGMvcGFzc3dkIHwgYmFzaA=='
+```
+
+**YOU WILL SEE**
+```
+Verdict            WARN
+Risk score         60/100
+ML prediction      risky
+```
+
+**SAY**
+> "No blocklist can match this — a base64 payload that decodes to a write to
+> /etc/passwd piped to bash. The ML layer generalises: obfuscation plus
+> redirection plus a shell pipe, flagged fully offline."
+
+---
+
+## Scene 8 — All offline (3:15–3:40)
+
+**TYPE**
+```bash
+csengine status
+```
+
+**YOU WILL SEE**
+```
 csengine 1.1.0
 Rule engine  : 27 rules loaded
 ML model     : loaded
@@ -176,29 +192,34 @@ LLM (Ollama) : running (qwen2.5:3b)
 Whitelist    : 87 safe patterns
 ```
 
-**Narration (15 s):** "Everything you've seen runs on this machine — on BOSS OS,
-on Ubuntu, on any office laptop. Open-source, offline, sovereign. No data leaves
-the device."
-
-### Scene 10 — Close (3:50–4:00)
-
-**Narration (10 s):** "Command Safety Engine: your terminal defends itself."
-End card: repo URL, "Made for C-DAC Secure OS Hackathon 2026 · SafeShell · Trusted Computing & Embedded Security Track".
+**SAY**
+> "Everything you saw runs on this machine — on BOSS OS, on Ubuntu, on any
+> office laptop. Open-source, offline, sovereign. No data leaves the device."
 
 ---
 
-## 3. Failure fallbacks (if something misbehaves on camera)
+## Scene 9 — Close (3:40–3:55)
 
-| Symptom | Fix |
+**SAY**
+> "SafeShell: your terminal defends itself — and when it doesn't, it undoes."
+
+**SHOW** end card: `github.com/Adhi-hub07/command-safety-engine` ·
+"Made for C-DAC Secure OS Hackathon 2026 · Track 2: AI at Application Level".
+
+---
+
+## On-camera failure cheat sheet
+
+| If you see | Just do |
 |---|---|
-| `status` says ML not loaded | model trains in `setup.sh`; if missing run `python src/ml/train.py` |
-| LLM line says server down | LLM is optional; re-take scene 7 after `ollama serve` or cut scene 7 |
-| A safe command WARNs on camera | it's honest behaviour — keep it, the narration covers grading |
-| `verify_demo.sh` not 17/17 | do not record until it is |
+| `csengine: command not found` | `source ~/.bashrc` and re-type the command |
+| ML line missing in `status` | `python src/ml/train.py` first |
+| LLM says "server down" | LLM is optional — cut scene 7's explanation line or skip it |
+| `undo last` says nothing to undo | the demo files were deleted by an earlier take — re-run the `mkdir` line |
+| `verify_demo.sh` not 17 passed | **do not record** until it passes |
 
-## 4. What the judge will check (so do not script over these)
+## What the judge will check
 
-- `git ls-remote` matches the submitted commit (repo frozen at Stage-1 deadline)
 - `bash scripts/verify_demo.sh` → 17 passed
 - `csengine status` → 27 rules, model loaded
-- repo private + `ssm-hackathon` collaborator present before submission
+- repo private + `ssm-hackathon` collaborator before submission
