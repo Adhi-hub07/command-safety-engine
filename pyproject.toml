@@ -4,7 +4,7 @@ line-length = 120
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
- 
+
 [tool.ruff.lint]
 # BLE001/S110: the engine intentionally falls back silently on any failure —
 # a crash in the safety layer must never block the user's shell.
