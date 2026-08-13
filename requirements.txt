@@ -2,7 +2,7 @@
 # on any Python (3.12+ tested on Ubuntu, 3.13+ tested on Kali).
 scikit-learn>=1.5.2
 pandas>=2.2.3
-numpy>=2.1.0
+numpy>=2.1.0 
 bashlex>=0.18
 rich>=13.7.1
 ollama>=0.2.1
