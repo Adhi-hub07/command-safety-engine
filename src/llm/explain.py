@@ -7,6 +7,10 @@ SYSTEM_PROMPT = """You are a Linux command safety analyst. Given a shell command
 {"risk": "safe"|"risky"|"destructive", "summary": "...", "alternative": "..."}
 Never explain yourself outside the JSON. Keep summary under 40 words."""
 
+UNDO_PROMPT = """You are a filesystem recovery planner. Given a shell command, list concrete actions a user could take to undo its effects. Always return STRICT JSON only:
+{"steps": [{"action": "restore"|"move"|"delete"|"chmod", "target": "/abs/path", "description": "..."}]}
+Use absolute paths. Max 5 steps. If undo is impossible, return {"steps": []}. No text outside the JSON."""
+
 
 class LLMExplainer:
     def __init__(self, model="qwen2.5:3b-instruct-q4_K_M", base_url="http://localhost:11434", timeout_seconds=4):
@@ -80,3 +84,26 @@ class LLMExplainer:
             "alternative": data.get("alternative", ""),
             "risk": data.get("risk", ""),
         }
+
+    def undo_plan(self, command):
+        """Return a list of suggested recovery step dicts, or [] on failure."""
+        client = self._ensure_client()
+        if not client:
+            return []
+        try:
+            response = client.chat(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": UNDO_PROMPT},
+                    {"role": "user", "content": f"Command: {command}\nReturn JSON."},
+                ],
+                format="json",
+            )
+            content = response.get("message", {}).get("content", "")
+            data = json.loads(content) if content.strip() else {}
+            steps = data.get("steps", [])
+            if isinstance(steps, list):
+                return [s for s in steps if isinstance(s, dict) and s.get("target")]
+            return []
+        except Exception:
+            return []

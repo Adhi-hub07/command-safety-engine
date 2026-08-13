@@ -169,7 +169,7 @@ storing your plaintext commands — privacy and forensics at the same time."
 
 ```bash
 $ csengine status
-csengine 1.0.0
+csengine 1.1.0
 Rule engine  : 27 rules loaded
 ML model     : loaded
 LLM (Ollama) : running (qwen2.5:3b)
@@ -183,7 +183,7 @@ the device."
 ### Scene 10 — Close (3:50–4:00)
 
 **Narration (10 s):** "Command Safety Engine: your terminal defends itself."
-End card: repo URL, "Made for C-DAC Secure OS Hackathon 2026 · Track 2".
+End card: repo URL, "Made for C-DAC Secure OS Hackathon 2026 · SafeShell · Trusted Computing & Embedded Security Track".
 
 ---
 

@@ -1,12 +1,15 @@
 <p align="center">
   <img src="assets/tux.png" alt="Linux logo" width="120" />
   <br />
-  <strong style="font-size: 34px;">COMMAND SAFETY ENGINE</strong>
+  <strong style="font-size: 34px;">SafeShell / COMMAND SAFETY ENGINE</strong>
   <br />
-  <em>Offline AI guard for the Linux shell</em>
+  <em>Offline AI guard for the Linux shell — transactional execution with undo plans</em>
 </p>
 
-> **Made by Adhithya J** · C-DAC Secure OS Hackathon 2026 · Track 2 (AI @ Application Level)
+> **Made by Adhithya J** · C-DAC Secure OS Hackathon 2026
+> · Problem Statement: **SafeShell — A Transactional Command Execution Framework
+> with AI-Generated Undo Plans and Simulation-Based Safety Guarantees**
+> · Trusted Computing & Embedded Security Track
 
 > 🌐 **Live website:** <https://adhi-hub07.github.io/command-safety-engine/>
 
@@ -14,8 +17,18 @@ Every command you type is checked **before it runs**. Dangerous commands are
 **blocked**, risky ones ask for **confirmation**, and everything else passes
 through in milliseconds — fully offline, fully open-source, on a normal laptop.
 
+SafeShell goes one step further than blocking: when a risky command is
+confirmed, its target files are **snapshotted into a transaction** before it
+executes, the command is **simulated in a sandbox** so the exact impact is
+shown in advance, and an **AI-generated undo plan** lets you reverse any damage
+with a single `csengine undo`:
+
 ```
 Command → Rule Engine → ML Classifier → Local LLM (Qwen 2.5 3B) → Allow / Warn / Block
+                                                                        │
+                              snapshot targets → simulate in sandbox → AI undo plan
+                                                                        │
+                                                    execute → `csengine undo` rolls back
 ```
 
 ---
@@ -88,6 +101,21 @@ recorded in a privacy-preserving audit log (hashes only — never plaintext).
 - **Optional bubblewrap sandbox** — dry-run untrusted downloads safely.
 - **Honest ML numbers** — 5-fold cross-validation, deduplicated data, no
   cherry-picked single splits (see [Performance](#performance--ml-honesty)).
+- **Transactional execution (SafeShell)** — when a risky command is confirmed,
+  every file it may touch is snapshotted into `~/.csengine/tx/<id>/` *before*
+  it runs (`src/transaction/`). The command executes normally; the snapshot
+  stays open so damage can be reversed.
+- **AI-generated undo plans** — each risky command gets a structured undo plan:
+  a deterministic static plan (restore / move-back / chmod-back) always works
+  offline, and the local LLM contributes recovery steps when it is available
+  (`src/transaction/plan.py`).
+- **Simulation-based safety guarantees** — risky commands are dry-run inside a
+  bubblewrap sandbox against *copies* of their target directories. The
+  before/after filesystem diff reports exactly what the command **would**
+  delete, modify, or create — on the real machine, nothing is touched
+  (`src/simulation/`).
+- **One-command recovery** — `csengine undo <tx>` restores every snapshotted
+  file (content, permissions, ownership, symlinks) and re-runs `mv` reversals.
 
 ## How it works
 
@@ -116,17 +144,22 @@ recorded in a privacy-preserving audit log (hashes only — never plaintext).
                     │        ▼                                             │
                     │  6. LLM (Qwen 2.5 3B via Ollama, offline)            │
                     │     plain-English explanation + safer alternative     │
-                    │     (only for ambiguous / flagged commands)          │
+                    │     + AI undo-plan steps (only for risky commands)   │
                     │        │                                             │
                     │        ▼                                             │
                     │  7. Decision fusion                                  │
                     │     risk_score 0-100 → ALLOW / WARN / BLOCK          │
                     │        │                                             │
                     │        ▼                                             │
-                    │  8. Output (rich CLI / JSON) + audit log             │
+                    │  8. SafeShell layers (non-ALLOW commands)            │
+                    │     extract target paths → static + LLM undo plan    │
+                    │     → simulate in bwrap sandbox → impact diff        │
+                    │        │                                             │
+                    │        ▼                                             │
+                    │  9. Output (rich CLI / JSON) + audit log             │
                     └──────────────┬───────────────────────────────────────┘
                                    ▼
-                         shell hook (bash/zsh preexec)
+              shell hook (bash/zsh): BLOCK refuses · WARN snapshots then runs
 ```
 
 ### Decision fusion
@@ -161,6 +194,18 @@ csengine check "rm -rf /"            # BLOCK (exit 2)
 csengine check "chmod -R 777 /var/www"  # WARN (exit 1)
 csengine check "git status"          # ALLOW (exit 0, instant)
 ```
+
+Now the **SafeShell** workflow — simulate first, then run with undo protection:
+
+```bash
+csengine check "rm -rf build/"            # WARN + undo plan + simulated impact diff
+csengine run "rm -rf build/"              # confirm → snapshot → execute → undo-ready
+csengine tx list                          # show open transactions
+csengine undo last                        # restore everything, one command
+```
+
+The `run` command asks before executing, snapshots every target file, runs the
+command, and leaves the transaction open until you `undo` (or `tx commit`).
 
 ## Installation
 
@@ -223,7 +268,7 @@ bash setup.sh
 bash install-boss-os.sh                 # quick path
 # or build a .deb:
 CSENGINE_BUILD_DEB=1 bash install-boss-os.sh
-sudo dpkg -i ~/.csengine/deb/command-safety-engine_1.0_amd64.deb
+sudo dpkg -i ~/.csengine/deb/command-safety-engine_1.1_amd64.deb
 ```
 
 Verify offline operation (core demo point — government systems often run on
@@ -260,10 +305,22 @@ Ubuntu/Debian/BOSS OS machine.
 csengine check "<command>"              analyze one command
 csengine check --json "<command>"       analyze, print JSON
 csengine check --audit "<command>"      analyze and write to the audit log
+csengine check --tx "<command>"         analyze + snapshot targets into an open transaction
+csengine run "<command>"                analyze + simulate, confirm, then run under a snapshot
+csengine tx list                        list open transactions
+csengine tx commit <id>                 keep changes, close the transaction
+csengine tx rollback <id>               restore snapshots, close the transaction
+csengine undo [id|last]                 rollback and close (alias for tx rollback)
 csengine install-hook [bash|zsh]        install the shell preexec hook
 csengine status                         show model / LLM availability
 csengine --version
 ```
+
+> **How transactions work (hooks):** when the hook gets a WARN command and you
+> re-type it to confirm, the hook first opens a transaction with
+> `check --tx --json --audit` (snapshotting every target file), then runs the
+> command. `~/.csengine/tx/<id>/snapshot/` holds the originals until you run
+> `csengine undo`. Set `export CSENGINE_TX=0` to disable auto-snapshots.
 
 ### Exit codes
 
@@ -392,12 +449,14 @@ command-safety-engine/
 │   ├── ml/            # training, evaluation, comparison
 │   ├── llm/           # local Ollama explanation layer (Qwen 2.5 3B)
 │   ├── sandbox/       # optional bubblewrap dry-run
+│   ├── transaction/   # SafeShell: path extraction, undo plans, transaction manager
+│   ├── simulation/    # SafeShell: bwrap sandbox + filesystem before/after diff
 │   ├── output/        # JSON + rich CLI formatting
-│   ├── engine.py      # orchestrator + decision fusion + audit
+│   ├── engine.py      # orchestrator + decision fusion + audit + tx layers
 │   └── main.py        # CLI entrypoint
 ├── hooks/
-│   ├── csengine.bash  # bash preexec hook
-│   ├── csengine.zsh   # zsh accept-line widget hook
+│   ├── csengine.bash  # bash preexec hook (auto-snapshot on WARN confirm)
+│   ├── csengine.zsh   # zsh accept-line widget hook (auto-snapshot on confirm)
 │   └── bash-preexec.sh
 ├── scripts/
 │   ├── verify_demo.sh      # Linux smoke test (17/17 checks)
@@ -405,7 +464,7 @@ command-safety-engine/
 │   ├── benchmark_latency.py
 │   ├── label_data.py / auto_label_raw.py / dedupe_dataset.py
 │   └── demo_seed_commands.sh
-├── tests/             # pytest regression suite (44 tests)
+├── tests/             # pytest regression suite (65 tests)
 ├── docs/              # architecture, features, BOSS OS, submission
 ├── setup.sh           # one-shot installer
 └── install-boss-os.sh # BOSS OS / .deb installer
@@ -430,13 +489,24 @@ with `scripts/demo_seed_commands.sh` automating the scenes: block a fork bomb,
 warn on `chmod -R 777`, catch a novel base64-obfuscated attack with ML, show
 the hashed audit log, and prove everything works with the network switched off.
 
+**SafeShell demo scene** (the hackathon problem-statement feature):
+
+```bash
+echo "PRECIOUS" > projects/data.txt
+csengine run "rm -rf projects"         # shows undo plan + simulated diff → confirm
+cat projects/data.txt                  # gone (Error)
+csengine undo last                     # restore
+cat projects/data.txt                  # "PRECIOUS" — recovered
+```
+
 ## Roadmap
 
 - BOSS OS `.deb` polish + RPM for other Indian distributions
 - Hindi-first explanations for the LLM layer
 - Personal time-based allowlists that adapt per user
-- Auto-sandbox of risky-but-required commands via bubblewrap
+- Transaction expiry/cleanup policy (auto-prune stale snapshots)
 - IDE / sudo integration and Docker alias hooking
+- Cross-device sync of undo plans via the audit log
 
 ## License
 

@@ -94,7 +94,7 @@ def header(draw, num, title, subtitle=None):
     draw.line(48, 46, PAGE_W - 48, 46)
     draw.setFillColor(MUTED)
     draw.setFont(SANS, 9)
-    draw.drawString(48, 30, "csengine · Adhithya J · Track 2: AI @ Application Level")
+    draw.drawString(48, 30, "SafeShell csengine · Adhithya J · Trusted Computing & Embedded Security Track")
     draw.drawRightString(PAGE_W - 48, 30, "fully offline · open-source (MIT)")
 
 
@@ -120,7 +120,7 @@ def slide_title(draw):
     draw.drawString(72, PAGE_H - 172, "An offline AI guard for the Linux shell")
     draw.setFillColor(MUTED)
     draw.setFont(SANS, 13)
-    draw.drawString(72, PAGE_H - 200, "C-DAC Secure OS Hackathon 2026 · Track 2 (AI @ Application Level)")
+    draw.drawString(72, PAGE_H - 200, "C-DAC Secure OS Hackathon 2026 · Trusted Computing & Embedded Security Track")
     draw.setFillColor(BODY)
     draw.setFont(SANS, 13)
     draw.drawString(72, 170, "Adhithya J")
@@ -598,7 +598,7 @@ def slide_roadmap(draw):
     draw.drawString(x + 14, PAGE_H - 308, "Status")
     draw.setFillColor(BODY)
     draw.setFont(SANS, 11)
-    draw.drawString(x + 14, PAGE_H - 326, "code complete · 44/44 tests · 17/17 demo checks · bash+zsh pty hooks pass")
+    draw.drawString(x + 14, PAGE_H - 326, "code complete · 65/65 tests · 17/17 demo checks · bash+zsh pty hooks pass")
     draw.setFillColor(TITLE)
     draw.setFont(SANS_B, 26)
     draw.drawString(72, 180, "Thank you")

@@ -105,3 +105,55 @@ def test_llm_demo_command_is_ambiguous():
     result = make_engine().analyze("xxd -r -p <<< '77686f616d69'")
     assert not result["rule_engine"]["matched"]
     assert result["ml_classifier"]["confidence"] < 0.65
+
+
+def test_transaction_layers_present():
+    """SafeShell layers: snapshot paths + undo plan + simulation on every result."""
+    result = make_engine().analyze("rm -rf build/")
+    assert "transaction" in result
+    assert isinstance(result["transaction"]["snapshot_paths"], list)
+    assert "steps" in result["transaction"]["undo_plan"]
+    assert "simulation" in result
+
+
+def test_simulation_only_for_risky():
+    """ALLOW commands must skip simulation to keep the fast path fast."""
+    result = make_engine().analyze("git status")
+    assert result["final_decision"]["verdict"] == "ALLOW"
+    assert result["simulation"]["enabled"] is False
+
+
+def test_begin_and_rollback_transaction(tmp_path):
+    """End-to-end: snapshot a risky command, delete the file, roll back, verify content."""
+    engine = make_engine()
+    target = tmp_path / "important.txt"
+    target.write_text("precious")
+    result = engine.analyze(f"rm {target}")
+    result["transaction"]["snapshot_paths"] = [str(target)]
+    engine.config.setdefault("transaction", {})["storage_path"] = str(tmp_path / "tx")
+    tx_id = engine.begin_transaction(result, command=f"rm {target}")
+    os.remove(target)
+    assert not target.exists()
+    restored = engine.rollback_transaction(tx_id)
+    assert str(target) in restored
+    assert target.read_text() == "precious"
+
+
+def test_begin_and_commit_transaction(tmp_path):
+    engine = make_engine()
+    target = tmp_path / "keep.txt"
+    target.write_text("x")
+    result = engine.analyze(f"touch {target}")
+    result["transaction"]["snapshot_paths"] = [str(target)]
+    engine.config["transaction"]["storage_path"] = str(tmp_path / "tx")
+    tx_id = engine.begin_transaction(result, command=f"touch {target}")
+    engine.commit_transaction(tx_id)
+    assert engine.list_transactions() == []
+
+
+def test_blocked_fork_bomb_is_never_simulated():
+    engine = make_engine()
+    result = engine.analyze(":(){ :|:& };:")
+    assert result["final_decision"]["verdict"] == "BLOCK"
+    assert result["transaction"]["snapshot_paths"] == []
+    assert result["simulation"]["enabled"] is False

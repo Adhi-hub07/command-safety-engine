@@ -85,9 +85,12 @@ def _tokenize_bashlex(command):
         elif kind == "operator":
             tokens.append(CommandToken(word or node.op, "pipe" if word in ("|", "||") else "redirect"))
         elif kind == "redirect":
-            tokens.append(CommandToken(getattr(node, "op", ">"), "redirect"))
-            if getattr(node, "word", None):
-                tokens.append(CommandToken(node.word, "target"))
+            op = getattr(node, "type", None) or getattr(node, "op", ">")
+            tokens.append(CommandToken(op, "redirect"))
+            output = getattr(node, "output", None)
+            word = getattr(output, "word", None) or getattr(node, "word", None)
+            if word:
+                tokens.append(CommandToken(word, "target"))
         elif kind == "word" and word:
             tokens.append(CommandToken(word, "word"))
         else:

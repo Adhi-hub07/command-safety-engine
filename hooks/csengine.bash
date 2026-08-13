@@ -33,6 +33,10 @@ if [[ -z "${CSENGINE_DISABLE:-}" ]]; then
     # retype-to-confirm: a previously-WARNed identical command is allowed
     if [[ -n "$_csengine_warned" && "$_csengine_warned" == "$1" ]]; then
       _csengine_warned=""
+      # snapshot the risky command before it actually runs, so it can be undone
+      if [[ -z "${CSENGINE_TX:-}" || "${CSENGINE_TX:-}" != "0" ]]; then
+        "$_csengine_bin" check --json --tx --audit "$1" > /tmp/csengine_last.json
+      fi
       return 0
     fi
     _csengine_warned=""

@@ -42,6 +42,9 @@ if [[ -z "${CSENGINE_DISABLE:-}" ]]; then
     if [[ "$_csengine_armed" == 1 && "$cmd" == "$_csengine_pending" ]]; then
       _csengine_armed=0
       _csengine_pending=""
+      if [[ -z "${CSENGINE_TX:-}" || "${CSENGINE_TX:-}" != "0" ]]; then
+        "$_csengine_bin" check --json --tx --audit "$cmd" >/dev/null
+      fi
       zle accept-line
       return
     fi

@@ -43,6 +43,18 @@ def render_rich(result, color=True):
         table.add_row("Explanation", result["llm_explanation"]["summary"])
     if result["llm_explanation"].get("suggested_alternative"):
         table.add_row("Safer alternative", result["llm_explanation"]["suggested_alternative"])
+    plan = result.get("transaction", {}).get("undo_plan", {})
+    steps = plan.get("steps", [])
+    if steps:
+        table.add_row("Undo plan", "; ".join(s.get("description", "") for s in steps[:3]))
+    sim = result.get("simulation", {})
+    if sim.get("enabled"):
+        impact = sim.get("impact", {})
+        if impact:
+            table.add_row(
+                "Simulation",
+                f"{len(impact['deleted'])} deleted · {len(impact['modified'])} modified · {len(impact['created'])} created",
+            )
     table.add_row("Latency", f"{decision['latency_ms']} ms")
 
     console.print(Panel(table, title="Command Safety Engine", border_style=verdict_color))

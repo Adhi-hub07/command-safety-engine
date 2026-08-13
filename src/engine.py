@@ -7,15 +7,28 @@ import re
 import time
 from datetime import datetime, timezone
 
+import joblib
 import yaml
 
 from src.features.extract import FEATURE_NAMES, extract_features, feature_vector
 from src.parser import tokenizer
 from src.rules.rule_engine import RuleEngine, load_whitelist
+from src.simulation.run import simulate
+from src.transaction.paths import extract_paths
+from src.transaction.plan import plan_with_llm, static_undo_plan
+from src.transaction.tx import TransactionManager
 
 VERDICT_ORDER = {"ALLOW": 0, "WARN": 1, "BLOCK": 2}
 WRAPPER_RE = re.compile(r'^\s*(?:sudo\s+)?(?:bash|sh|zsh|dash|ksh)\s+-[a-z]*c[a-z]*\s+(["\'])(.*?)\1\s*$', re.DOTALL)
 MAX_UNWRAP_DEPTH = 2
+
+_MODEL_CACHE = {}
+
+
+def _load_joblib(path):
+    if path not in _MODEL_CACHE:
+        _MODEL_CACHE[path] = joblib.load(path)
+    return _MODEL_CACHE[path]
 
 
 class CommandSafetyEngine:
@@ -32,19 +45,21 @@ class CommandSafetyEngine:
         self.label_encoder = None
         self._load_ml()
         self._load_llm()
+        simulation_cfg = self.config.get("simulation", {})
+        self.sim_enabled = simulation_cfg.get("enabled", False)
+        self.sim_timeout = simulation_cfg.get("timeout_seconds", 5)
 
     def _load_ml(self):
         if not self.config.get("ml", {}).get("enabled", True):
             return
         try:
-            import joblib
             model_path = os.path.join(self.project_root, self.config["model"]["path"])
             vectorizer_path = os.path.join(self.project_root, self.config["model"]["vectorizer_path"])
             labels_path = os.path.join(self.project_root, self.config["model"]["label_encoder_path"])
             if os.path.exists(model_path) and os.path.exists(vectorizer_path) and os.path.exists(labels_path):
-                self.model = joblib.load(model_path)
-                self.vectorizer = joblib.load(vectorizer_path)
-                self.label_encoder = joblib.load(labels_path)
+                self.model = _load_joblib(model_path)
+                self.vectorizer = _load_joblib(vectorizer_path)
+                self.label_encoder = _load_joblib(labels_path)
             else:
                 self._model_notice = f"ML model not found at {model_path}; run `python -m src.ml.train`"
         except ImportError:
@@ -98,9 +113,12 @@ class CommandSafetyEngine:
                 verdict = {"verdict": "WARN", "risk_score": risk_score, "requires_confirmation": True}
 
         latency_ms = (time.perf_counter() - start) * 1000
-        return self._build_output(
+        result = self._build_output(
             original, expanded, rule_matches, ml_result, llm_explanation, risk_score, verdict, latency_ms
         )
+        if _depth == 0:
+            self._attach_transaction_layers(result, normalized, verdict)
+        return result
 
     def _unwrap_payload(self, command):
         """Return the quoted payload of `bash -c '...'`/`sh -c "..."`, or None."""
@@ -197,7 +215,8 @@ class CommandSafetyEngine:
         cfg = self.config["engine"]
         critical_rule = any(m["severity"] == "critical" for m in rule_matches)
         destructive_ml = ml_result.get("predicted_label") == "destructive"
-        if critical_rule or destructive_ml and ml_result.get("confidence", 0) >= cfg.get("ml_block_confidence", 0.8) or risk_score >= cfg["block_risk_score"]:
+        ml_confident = ml_result.get("confidence", 0) >= cfg.get("ml_block_confidence", 0.8)
+        if critical_rule or (destructive_ml and ml_confident) or risk_score >= cfg["block_risk_score"]:
             verdict = "BLOCK"
         elif risk_score >= cfg["warn_risk_score"]:
             verdict = "WARN"
@@ -205,6 +224,58 @@ class CommandSafetyEngine:
             verdict = "ALLOW"
         requires_confirmation = verdict in ("BLOCK", "WARN")
         return {"verdict": verdict, "risk_score": risk_score, "requires_confirmation": requires_confirmation}
+
+    def _attach_transaction_layers(self, result, normalized, verdict):
+        """Attach the SafeShell layers: target paths, undo plan, simulation."""
+        paths = extract_paths(normalized)
+        plan = static_undo_plan(normalized, paths)
+        if self.llm is not None and self.llm.is_available():
+            try:
+                plan = plan_with_llm(self.llm, normalized, plan)
+            except Exception:
+                pass
+        result["transaction"] = {"snapshot_paths": paths, "undo_plan": plan}
+        if (
+            verdict["verdict"] == "WARN"
+            and self.sim_enabled
+            and paths
+        ):
+            result["simulation"] = simulate(normalized, paths, timeout_seconds=self.sim_timeout)
+        else:
+            result["simulation"] = {
+                "enabled": False,
+                "reason": "simulation only for WARN commands with sandbox enabled",
+            }
+
+    def tx_manager(self):
+        cfg = self.config.get("transaction", {})
+        return TransactionManager(
+            storage_path=cfg.get("storage_path", "~/.csengine/tx"),
+            max_open=cfg.get("max_open", 20),
+        )
+
+    def begin_transaction(self, result, command=None):
+        """Snapshot a risky command's target paths. Returns the transaction id."""
+        tx = result.get("transaction", {})
+        tx_id = self.tx_manager().begin(
+            command=command or result.get("command", ""),
+            verdict=result["final_decision"].get("verdict", "ALLOW"),
+            risk_score=result["final_decision"].get("risk_score", 0),
+            paths=tx.get("snapshot_paths", []),
+            undo_plan=tx.get("undo_plan", {}),
+            simulation=result.get("simulation", {}),
+        )
+        result.setdefault("transaction", {})["tx_id"] = tx_id
+        return tx_id
+
+    def rollback_transaction(self, tx_id):
+        return self.tx_manager().rollback(tx_id)
+
+    def commit_transaction(self, tx_id):
+        self.tx_manager().commit(tx_id)
+
+    def list_transactions(self):
+        return self.tx_manager().list_open()
 
     def _build_output(self, original, expanded, rule_matches, ml_result, llm_explanation, risk_score, verdict, latency_ms):
         return {
@@ -217,7 +288,6 @@ class CommandSafetyEngine:
             },
             "ml_classifier": ml_result,
             "llm_explanation": llm_explanation,
-            "sandbox_check": {"enabled": False, "result": None},
             "final_decision": {
                 "verdict": verdict["verdict"],
                 "risk_score": verdict["risk_score"],

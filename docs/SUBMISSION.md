@@ -1,8 +1,9 @@
-# Command Safety Engine — C-DAC Secure OS Hackathon 2026 Submission
+# SafeShell / Command Safety Engine — C-DAC Secure OS Hackathon 2026 Submission
 
-**Track:** 2 · AI at Application Level (Problem Statement 3: AI-Based System Intent Engine for Safe Linux Command Execution)
+**Track:** Trusted Computing & Embedded Security Track
+**Problem Statement:** SafeShell — A Transactional Command Execution Framework with AI-Generated Undo Plans and Simulation-Based Safety Guarantees
 **Target OS:** Ubuntu 22.04/24.04, BOSS Linux
-**Status:** code complete — all 44 tests passing, model trained, demo-ready
+**Status:** code complete — all 65 tests passing, model trained, demo-ready
 
 ---
 
@@ -37,6 +38,19 @@ terminal defend itself, csengine brings practical, sovereign, atma-nirbhar AI
 safety to every Indian government and enterprise desktop — no cloud, no vendor,
 no data leaves the machine.
 
+**The SafeShell layer answers the problem statement directly.** When a risky
+command is confirmed, the engine first *extracts every file it may touch*
+(rm/mv/cp/chmod/chown/truncate/dd/touch/tee targets plus redirections), opens a
+**transaction** and snapshots those files with full metadata into
+`~/.csengine/tx/<id>/`. It **simulates** the command inside a bubblewrap sandbox
+against *copies* of the target directories and prints the exact before/after
+filesystem diff — what the command *would* delete, modify, or create — before it
+runs for real. It generates an **AI undo plan** (a deterministic offline
+static plan merged with LLM recovery steps when Ollama is present). And when the
+user runs `csengine undo <id>`, every snapshotted file is restored byte-for-byte
+with its permissions, ownership, and symlinks — a one-command rollback that
+turns a fatal `rm -rf` into an inconvenience.
+
 ## 2. Problem Statement
 
 Users routinely execute destructive or risky shell commands with no safeguard.
@@ -56,9 +70,11 @@ keeps the user in control — without false-positive fatigue.**
 |---|---|---|
 | Rule Engine | Python + YAML rules | 27 deterministic rule groups, MITRE-mapped, instant |
 | ML Classifier | scikit-learn GradientBoosting | Generalises to novel commands from 20 hand-crafted features |
-| LLM Explainer | Ollama + Qwen 2.5 3B Q4 | Human explanations for ambiguous/novel commands |
-| Sandbox | bubblewrap (optional) | Safe execution of untrusted downloads |
-| Shell Hooks | bash-preexec / zsh preexec | Intercepts every command before execution |
+| LLM Explainer | Ollama + Qwen 2.5 3B Q4 | Human explanations + AI undo-plan steps for risky commands |
+| Sandbox | bubblewrap | Simulation of risky commands against staged directory copies |
+| Transaction Manager | Python + sha256-tagged tree | Snapshots target files before risky commands run |
+| Undo Planner | static rules + LLM | Deterministic restore/move-back plan, optionally enriched by LLM |
+| Shell Hooks | bash-preexec / zsh preexec | Intercepts commands, auto-snapshots on WARN confirm |
 | Audit | SHA-256-hashed JSONL log | Privacy-preserving accountability |
 
 **Decision logic:** a critical rule match always BLOCKs (safety-first, even if the
@@ -73,7 +89,7 @@ commands skip analysis entirely (zero false positives for daily workflows).
 - Feature extraction + rule check: **~0.3 ms** mean (p95 ~0.5 ms)
 - Full pipeline: **~2.7 ms** mean (p95 ~3 ms) with no LLM resident; tens of ms with
   local Qwen pre-warmed — measured via `scripts/benchmark_latency.py --n 1000`
-- Regression suite: **44/44 tests passing**, ruff lint clean, real-pty hook tests pass on Ubuntu **and Kali Linux** (bash + zsh)
+- Regression suite: **65/65 tests passing** (44 original + 21 new SafeShell transaction/simulation tests), ruff lint clean, real-pty hook tests pass on Ubuntu **and Kali Linux** (bash + zsh)
 - Dataset: **1,379 unique commands** (759 safe / 381 risky / 239 destructive) built by a
   deterministic three-step pipeline — `generate_synthetic.py` → `auto_label_raw.py`
   (300 real-world commands) → `dedupe_dataset.py` — with per-row provenance
@@ -124,14 +140,25 @@ never BLOCK (naive substring detectors fail exactly here).
    near zero while still offering natural-language explanations.
 2. **Safety-first critical override:** a single critical rule match blocks
    regardless of ML confidence — the model cannot talk the system out of a block.
-3. **Fully offline, sovereign-first:** no cloud API, no data egress; aligned with
+3. **Transactional command execution:** risky commands become reversible.
+   Target files are snapshotted before execution and restored byte-for-byte by
+   `csengine undo` — no other shell-safety tool offers rollback for a command
+   that already ran.
+4. **Simulation-based safety guarantees:** the exact filesystem impact
+   (deletions/modifications/creations) is predicted in a bwrap sandbox and shown
+   before the command touches the real machine — turning "trust me" into "here is
+   the diff".
+5. **AI-generated undo plans:** every risky command carries a structured
+   recovery plan (deterministic static steps guaranteed offline, LLM-enriched
+   when available), so a human never has to reverse-engineer the damage.
+6. **Fully offline, sovereign-first:** no cloud API, no data egress; aligned with
    India's AtmaNirbhar/sovereign OS mission and deployable on BOSS Linux.
-4. **0 ms overhead on the happy path:** whitelist short-circuit means everyday
+7. **0 ms overhead on the happy path:** whitelist short-circuit means everyday
    commands cost nothing, eliminating the false-positive fatigue that kills other
    tools.
-5. **Privacy-preserving audit:** commands are stored only as truncated SHA-256
+8. **Privacy-preserving audit:** commands are stored only as truncated SHA-256
    hashes, enabling forensics without storing plaintext commands.
-6. **Safe-alternative suggestions:** every rule carries a constructive
+9. **Safe-alternative suggestions:** every rule carries a constructive
    "do this instead" so users learn secure habits instead of just being blocked.
 
 ## 5. Alignment with C-DAC Mission
@@ -150,8 +177,12 @@ bash setup.sh            # venv, deps, model training, Ollama pull, hooks
 source ~/.bashrc
 csengine status
 csengine check "rm -rf /"          # BLOCK
-csengine check "chmod -R 777 /var/www"   # WARN
+csengine check "chmod -R 777 /var/www"   # WARN + undo plan + simulated diff
 csengine check "git status"        # ALLOW (instant)
+
+# SafeShell: run with undo protection, then roll back
+csengine run "rm -rf build/"           # undo plan + simulated diff → confirm → snapshot → run
+csengine undo last                     # restores build/ byte-for-byte
 ```
 
 ---
@@ -171,7 +202,9 @@ csengine check "git status"        # ALLOW (instant)
 | 6 | **ML generalisation** | Type a novel attack not in the rules (e.g. `base64 -d <<< <payload> | bash`) → WARN/BLOCK via ML + rule | "The ML model catches attacks no rule can enumerate." |
 | 7 | **LLM explanation** | Type a deliberately ambiguous command with Ollama running → natural-language explanation appears | "For genuinely novel commands, a local Qwen model writes a plain-language explanation — still fully offline." |
 | 8 | **Audit** | `cat ~/.csengine/audit.log` → hashed entries | "Every decision is audited, and privacy is preserved — only hashes are stored." |
-| 9 | **Status** | `csengine status` → rules loaded, model loaded, LLM available | "The whole system runs on this laptop, on BOSS OS, with nothing sent to the cloud." |
+| 9 | **Simulation** | `csengine check "rm -rf build/"` → shows the predicted deleted/modified file diff from the bwrap sandbox | "Before anything runs, the engine simulates the command and shows exactly what it would do." |
+| 10 | **Undo** | `csengine run "rm -rf projects"` → confirm → snapshot → then `csengine undo last`, `cat projects/data.txt` → file is back | "And if damage happens anyway, one command rolls it all back from the snapshot." |
+| 11 | **Status** | `csengine status` → rules loaded, model loaded, LLM available | "The whole system runs on this laptop, on BOSS OS, with nothing sent to the cloud." |
 
 **Video tips:** keep it under 4:30; screen record at 1080p; one terminal window,
 no cuts needed; end card with repo URL. The demo_seed_commands.sh script in the
@@ -182,7 +215,7 @@ repo automates scenes 2-6.
 - BOSS OS `.deb` packaging polish + RPM for other Indian distros
 - More languages for explanations (Hindi-first UI)
 - Time-based learning: personal allowlists that adapt per user
-- Containment: auto-sandbox risky-but-required commands via bubblewrap
+- Transaction lifecycle policy: automatic expiry/cleanup of stale snapshots
 - IDE/sudo integration and Docker alias hooking
 
 ## 9. Risk Mitigation
@@ -266,10 +299,34 @@ A: Yes — scene 6 of the demo: a base64-obfuscated download-and-run payload tha
 blocklist string can match is flagged by the ML layer (obfuscation + network + pipe
 features), and an LLM explanation appears in plain language, fully offline.
 
+**Q: How does the undo transaction actually work — doesn't the damage happen first?**
+A: Yes, and that is the point. Blocking is not enough when a user legitimately confirms
+a risky command. On confirm, the hook snapshots every file the command may touch into
+`~/.csengine/tx/<id>/` with full metadata (content, mode, owner, symlink target),
+then lets the command run. `csengine undo <id>` replays the snapshot byte-for-byte and
+re-verses `mv` moves. The demo proves it: `rm -rf projects` followed by `undo` restores
+the tree exactly.
+
+**Q: How do you know a risky command is safe to let run?**
+A: We simulate first. The target directories are copied (size-capped at 200 files /
+20 MB per parent) into a staging area and the command is dry-run inside a bubblewrap
+sandbox (`--ro-bind / /`, no network, dies with the parent). A filesystem diff of
+before/after tells the user exactly what *would* be deleted, modified, or created —
+on the real machine nothing has happened yet. Simulation adds ~0.07 s when targets are
+small and is skipped for enormous trees.
+
+**Q: What does the "AI-generated undo plan" contain?**
+A: A structured list of recovery steps per target path. The static planner always
+produces a deterministic plan offline (restore from snapshot / move-back / chmod-back),
+so recovery never depends on a model. When Ollama is available, the LLM enriches the
+plan with human-readable, command-specific recovery steps. Static steps remain
+authoritative — the LLM can never talk the system out of a valid restore.
+
 ## 11. Submission Checklist
 
 - [x] Register on **ssm.cdac.in** before **04 Aug 2026** (team of 1-5)
 - [x] Push repo to GitHub and verify CI is green on the latest commit
+- [x] SafeShell feature complete: transactions, undo, simulation, AI undo plans (65 tests passing)
 - [x] Architecture image: `docs/architecture.png` (portal field 6)
 - [x] Presentation deck: `docs/presentation.pdf` (12 slides, rubric-mapped; regenerate with `python scripts/build_deck.py`)
 - [x] Portal fields drafted: `docs/PORTAL_SUBMISSION.md` (all 13 fields, copy-paste ready)

@@ -23,11 +23,11 @@ bash "$REPO_DIR/setup.sh"
 # 4. optional .deb packaging
 if [[ "${CSENGINE_BUILD_DEB:-0}" == "1" ]]; then
   echo "[csengine] building .deb"
-  DEB_DIR="$HOME/.csengine/deb/command-safety-engine_1.0_amd64"
+  DEB_DIR="$HOME/.csengine/deb/command-safety-engine_1.1_amd64"
   mkdir -p "$DEB_DIR/DEBIAN"
   cat > "$DEB_DIR/DEBIAN/control" <<EOF
 Package: command-safety-engine
-Version: 1.0
+Version: 1.1
 Section: utils
 Priority: optional
 Architecture: amd64
@@ -46,7 +46,7 @@ ln -sf /opt/command-safety-engine/.venv/bin/python /usr/local/bin/csengine
 EOF
   chmod +x "$DEB_DIR/DEBIAN/postinst"
   dpkg-deb --build "$DEB_DIR"
-  echo "[csengine] built: $HOME/.csengine/deb/command-safety-engine_1.0_amd64.deb"
+  echo "[csengine] built: $HOME/.csengine/deb/command-safety-engine_1.1_amd64.deb"
 fi
 
 echo "[csengine] done. Verify offline: run 'nmcli radio all off' then 'csengine status'."

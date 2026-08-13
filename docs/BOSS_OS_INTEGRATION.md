@@ -12,7 +12,7 @@ bash install-boss-os.sh
 
 # or build the .deb
 CSENGINE_BUILD_DEB=1 bash install-boss-os.sh
-sudo dpkg -i ~/.csengine/deb/command-safety-engine_1.0_amd64.deb
+sudo dpkg -i ~/.csengine/deb/command-safety-engine_1.1_amd64.deb
 ```
 
 What the installer does:

@@ -30,6 +30,15 @@ sandbox:
   enabled: false
   timeout_seconds: 3
 
+simulation:
+  enabled: true
+  timeout_seconds: 5
+
+transaction:
+  enabled: true
+  storage_path: "~/.csengine/tx"
+  max_open: 20
+
 output:
   json_pretty: true
   color: true

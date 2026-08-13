@@ -8,7 +8,7 @@ Compulsory fields below. Copy each block verbatim into the matching form field.
 
 ## 1. Project Title
 
-**Command Safety Engine (csengine) — an offline AI guard for the Linux shell**
+**SafeShell — Command Safety Engine (csengine): transactional command execution with AI-generated undo plans and simulation-based safety guarantees**
 
 ---
 
@@ -18,22 +18,29 @@ Build a fast, accurate, fully offline command-analysis layer that intercepts eve
 shell command before execution, classifies it as safe / risky / destructive,
 explains the decision in plain language, recommends a safer alternative, and asks
 for confirmation before anything harmful reaches the operating system — while
-keeping the user in control and preserving system security. Everything runs
-on-device (no cloud, no telemetry) so it is deployable on sovereign and
-air-gapped systems such as BOSS OS.
+keeping the user in control and preserving system security. Going further than
+detection, the system wraps risky commands in a **transaction**: it snapshots the
+files they may touch, **simulates** the command in a sandbox to show its exact
+impact before it runs, and generates an **AI undo plan** so any damage can be
+rolled back with a single command. Everything runs on-device (no cloud, no
+telemetry) so it is deployable on sovereign and air-gapped systems such as BOSS OS.
 
 ---
 
 ## 3. Problem Statement Addressed
 
-*Quoted verbatim from the hackathon portal (Track 2 · Problem Statement 3):*
+*Quoted verbatim from the hackathon portal (Trusted Computing & Embedded Security
+Track · SafeShell):*
 
 > Create an intelligent safety layer that understands the intent behind Linux
 > commands before they execute. The system should detect risky operations,
 > explain their potential impact, and suggest safer alternatives to prevent
 > accidental system damage.
 
-Our system is a direct, deployable answer to this problem statement.
+Our system is a direct, deployable answer to this problem statement — and it
+goes beyond detection by making risky execution **reversible** (transactional
+snapshots + `undo`) and **verifiable in advance** (sandbox simulation showing
+the exact filesystem impact before anything runs).
 
 ---
 
@@ -50,9 +57,19 @@ Our system is a direct, deployable answer to this problem statement.
 4. **Zero overhead on the happy path:** a whitelist short-circuit means everyday
    commands cost ~0 ms and are never flagged, eliminating the false-positive
    fatigue that makes other safety tools get disabled.
-5. **Privacy-preserving audit:** commands are stored only as truncated SHA-256
+5. **Transactional command execution:** risky commands become reversible —
+   target files are snapshotted before execution and restored byte-for-byte by
+   `csengine undo`. No other shell-safety tool can roll back a command that
+   already ran.
+6. **Simulation-based safety guarantees:** the exact filesystem impact
+   (deletions / modifications / creations) is predicted inside a bubblewrap
+   sandbox and shown before the command touches the real machine.
+7. **AI-generated undo plans:** every risky command carries a structured
+   recovery plan — deterministic offline static steps, enriched by the local LLM
+   when available — so a human never has to reverse-engineer the damage.
+8. **Privacy-preserving audit:** commands are stored only as truncated SHA-256
    hashes, enabling forensics without storing plaintext commands.
-6. **Safe-alternative suggestions on every rule:** the tool teaches secure habits
+9. **Safe-alternative suggestions on every rule:** the tool teaches secure habits
    instead of just refusing.
 
 ---
@@ -83,9 +100,30 @@ rule), WARN 45–79 (asks to confirm), else ALLOW. Whitelisted commands skip
 analysis entirely. Every decision is written to a SHA-256-hashed offline JSONL
 audit log. An optional bubblewrap sandbox can dry-run untrusted downloads.
 
+**SafeShell layer (transactional execution).** When a command is confirmed for
+execution, the engine:
+1. **Extracts target paths** from the parsed command tree (`rm`/`mv`/`cp`/
+   `chmod`/`chown`/`truncate`/`dd`/`touch`/`tee` arguments plus redirection
+   targets), de-duplicated and glob/var-filtered.
+2. **Opens a transaction** — `src/transaction/tx.py` snapshots every target file
+   with full metadata (content, mode, owner, symlink target) into a
+   sha256-tagged tree under `~/.csengine/tx/<id>/`.
+3. **Simulates the command** — `src/simulation/run.py` copies the target
+   directories (size-capped) into a staging area and dry-runs the command inside
+   a bubblewrap sandbox (`--ro-bind / /`, no network, `--die-with-parent`),
+   then diffs the filesystem before/after and reports exactly what *would* be
+   deleted, modified, or created — with sha256 content hashes.
+4. **Generates an undo plan** — `src/transaction/plan.py` builds a deterministic
+   static recovery plan (restore from snapshot / move-back / chmod-back) that
+   works fully offline, and merges LLM-recovery steps when Ollama is present.
+5. **Executes** — the real command runs with the snapshot held open; a later
+   `csengine undo <id>` restores every file byte-for-byte. The bash/zsh hooks
+   trigger this automatically when a WARN command is re-typed to confirm.
+
 Measured performance (Kali VM, `scripts/benchmark_latency.py`): whitelist path
 ~0 ms; feature+rule ~0.3 ms mean (p95 ~0.5 ms); full pipeline ~2.7 ms mean with
-no LLM resident.
+no LLM resident. Simulation adds ~0.07 s for typical small target trees
+(`test_transaction.py` 17/17 passing in 0.18 s; suite 65/65 in ~12 s warm).
 
 ---
 
@@ -106,7 +144,9 @@ no LLM resident.
   `src/features/`), trained in-repo via CI on the committed dataset
 - **LLM:** Qwen 2.5 3B `qwen2.5:3b-instruct-q4_K_M` via Ollama (both open-source)
 - **Tokenization:** bashlex with a built-in fallback for malformed input
-- **Sandbox:** bubblewrap (optional)
+- **Sandbox:** bubblewrap (`--ro-bind / /`, no network, `--die-with-parent`)
+- **Transaction / undo:** in-house, `src/transaction/` (sha256-tagged snapshot tree)
+- **Simulation:** in-house, `src/simulation/` (staged copies + filesystem diff)
 - **Audit:** Python stdlib JSONL, SHA-256 hashing
 
 No external AI APIs are called; the demo runs with no network access.
@@ -153,9 +193,12 @@ CI workflow, tests, and all project resources.)
 - **Model comparison:** GradientBoosting vs RandomForest vs LogisticRegression on
   the identical split (`src/ml/compare.py`).
 - **Runtime:** mean/p95 latency via `scripts/benchmark_latency.py --n 1000`.
-- **Functional:** 44 pytest regression tests (rules, features, end-to-end,
-  wrapper-unwrap, safe battery), `scripts/verify_demo.sh` (17 checks),
-  real-PTY hook tests on bash + zsh (pass on Ubuntu and Kali).
+- **Functional:** 65 pytest regression tests (44 original rules/features/e2e +
+  21 SafeShell transaction/simulation tests), `scripts/verify_demo.sh` (17
+  checks), real-PTY hook tests on bash + zsh (pass on Ubuntu and Kali).
+- **Transaction/simulation:** 17-test unit suite for snapshot/undo (0.18 s);
+  end-to-end demo proves `rm -rf <dir>` → `csengine undo` restores the tree
+  byte-for-byte; simulation diff matches the real deleted-file set exactly.
 - **Reproducibility:** CI (`train.yml`) regenerates the dataset, retrains, and
   runs the full test suite on every push.
 
@@ -173,9 +216,12 @@ CI workflow, tests, and all project resources.)
   patterns deterministically).
 - Latency: feature+rule ~0.3 ms mean (p95 ~0.5 ms); full pipeline ~2.7 ms mean.
 - Coverage: 27 rule groups, 87-pattern whitelist; `verify_demo.sh` 17/17;
-  44/44 tests; bash+zsh PTY hooks verified on Ubuntu and Kali Linux.
+  65/65 tests; bash+zsh PTY hooks verified on Ubuntu and Kali Linux.
 - Rule-verified hard blocks: `rm -rf /`, fork bomb, `dd of=/dev/sda`,
   `mkfs.ext4 /dev/sda`, `shutdown -h now`, `rm --no-preserve-root` and more.
+- SafeShell: 21 new tests (path extraction, undo-plan generation, snapshot
+  begin/rollback/commit, simulation diff, tx layers); end-to-end `rm -rf` →
+  `undo` demo restores original file contents and metadata.
 
 ---
 
@@ -189,6 +235,8 @@ CI workflow, tests, and all project resources.)
 | 4 | Model drift / silent performance loss | Low | Medium | CI regenerates data, retrains, prints 5-fold CV on every push; dataset rebuild is deterministic (seed 42) |
 | 5 | User override abused to disable safety | Low | High | Overrides recorded as SHA-256 hashes; repeat overrides of BLOCK verdicts detectable in the audit log |
 | 6 | Privacy leak of typed commands | Low | High | Only truncated SHA-256 hashes stored; fully offline, no network egress by design |
+| 7 | Snapshot storage exhaustion (many open transactions) | Low | Medium | Transaction snapshots are size-capped (200 files / 20 MB per staged parent); `tx list` + `tx commit/rollback` close transactions; open transactions are pruned at 20; undo plans are recoverable |
+| 8 | Simulation misses a side-effect (e.g. network write) | Low | Medium | Sandbox runs with `--ro-bind / /` + `--unshare-net` so the simulated tree cannot touch the real machine; the transaction snapshot still backs up every extracted target regardless of what the simulation predicts |
 
 ---
 
