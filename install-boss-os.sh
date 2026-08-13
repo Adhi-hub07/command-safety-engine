@@ -2,7 +2,7 @@
 # BOSS OS specific installer — wraps setup.sh, installs system packages,
 # and builds/installs a .deb for a "government-ready" feel.
 set -euo pipefail
- 
+
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "[csengine] BOSS OS installer"
