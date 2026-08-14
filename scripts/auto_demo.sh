@@ -8,11 +8,15 @@
 # USAGE (run in the terminal you will RECORD):
 #   bash scripts/auto_demo.sh            # normal pace
 #   bash scripts/auto_demo.sh fast       # rehearsal
-#   bash scripts/auto_demo.sh pause-on   # press Enter after each SAY line (RECORDING)
+#   bash scripts/auto_demo.sh pause-on   # press Enter after each scene (interactive)
+#   bash scripts/auto_demo.sh clean      # RECORD THIS: no text boxes, clean screen,
+#                                        # generous pauses; add your voiceover in editing
 #
-# Recording tips:
+# Recording tips (clean mode):
 #   - Maximise the window, dark theme, 1080p.
-#   - Speak each SAY line when it appears in the box, then press Enter.
+#   - Start screen recording, run clean mode, let it play top-to-bottom.
+#   - After recording, record your real voice reading the SAY lines from
+#     docs/demo_video_script.md and overlay it in your video editor.
 set -u
 cd "$(dirname "$0")/.."
 ROOT="$(pwd)"
@@ -22,6 +26,7 @@ MODE="${1:-normal}"
 case "$MODE" in
   fast)     PAUSE=2 ;;
   pause-on) PAUSE=0 ;;
+  clean)    PAUSE=8 ;;
   *)        PAUSE=6 ;;
 esac
 
@@ -44,8 +49,9 @@ type_cmd() {
   echo ""
 }
 
-# Teleprompter box — your voice line, shown big and clear.
+# Teleprompter box — your voice line, shown big and clear (hidden in clean mode).
 say() {
+  [ "$MODE" = "clean" ] && return
   echo ""
   echo -e "${BOX}  🎙  ${RST}"
   local line
@@ -57,6 +63,7 @@ say() {
 }
 
 scene() {
+  [ "$MODE" = "clean" ] && return
   echo ""
   echo -e "$BANNER"
   echo -e "$SCENE $1"
@@ -64,6 +71,7 @@ scene() {
 
 pause() {
   if [ "$PAUSE" = "0" ]; then
+    [ "$MODE" = "clean" ] && return
     echo -e "\e[1;35m   [recording] after speaking, press Enter for the next scene...\e[0m"
     read -r _
   else
