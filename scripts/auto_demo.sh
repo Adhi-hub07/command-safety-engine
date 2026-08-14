@@ -26,7 +26,7 @@ MODE="${1:-normal}"
 case "$MODE" in
   fast)     PAUSE=2 ;;
   pause-on) PAUSE=0 ;;
-  clean)    PAUSE=8 ;;
+  clean)    PAUSE=20 ;;
   *)        PAUSE=6 ;;
 esac
 
