@@ -24,10 +24,10 @@ PY="$HOME/safeshell/cse-venv/bin/python"
 
 MODE="${1:-normal}"
 case "$MODE" in
-  fast)     PAUSE=2 ;;
-  pause-on) PAUSE=0 ;;
-  clean)    PAUSE=20 ;;
-  *)        PAUSE=6 ;;
+  fast)     PAUSE=2;  TYPE_MS=30 ;;
+  pause-on) PAUSE=0;  TYPE_MS=110 ;;
+  clean)    PAUSE=20; TYPE_MS=110 ;;
+  *)        PAUSE=6;  TYPE_MS=110 ;;
 esac
 
 BANNER="\e[1;36m──────────────────────────────────────────────────────────\e[0m"
@@ -36,18 +36,38 @@ PROMPT="\e[1;32m\$\e[0m "
 BOX="\e[1;97m\e[48;5;24m"
 RST="\e[0m"
 
-# Human-like typing: prints the command character by character.
+# Human-like typing: variable speed, natural pauses at spaces and punctuation,
+# occasional "thinking" pauses — indistinguishable from a real person typing.
 type_cmd() {
   local cmd="$1"
   echo -en "$PROMPT"
-  local c
+  local c r
   while IFS= read -rn1 c; do
     printf '%s' "$c"
-    sleep 0.006
+    # base speed per character
+    sleep $(( TYPE_MS ))e-3 2>/dev/null || sleep 0.11
+    case "$c" in
+      " ") sleep 0.15 ;;        # natural pause at spaces
+      '/'|'|'|'>'|'&') sleep 0.10 ;;
+    esac
+    r=$(( RANDOM % 20 ))
+    if [ "$r" -eq 0 ]; then sleep 0.25; fi   # occasional "thinking" pause
+    if [ "$r" -eq 1 ]; then sleep 0.12; fi
   done <<< "$cmd"
-  sleep 0.3
+  sleep 0.4                                    # pause before pressing Enter
   echo ""
 }
+
+# In clean mode: wipe the launch line off the screen, then give a 10s countdown
+# so you can start the screen recorder and the video begins clean from Scene 1.
+if [ "$MODE" = "clean" ]; then
+  clear
+  echo ""
+  echo "  Recording starts in 10 seconds..."
+  echo "  (start your screen recorder now, then wait)"
+  sleep 10
+  clear
+fi
 
 # Teleprompter box — your voice line, shown big and clear (hidden in clean mode).
 say() {
