@@ -11,6 +11,26 @@
 
 ---
 
+## Recording modes
+
+You can record two ways:
+
+1. **Manual (original):** type each command yourself, following the scenes below.
+2. **Automated (recommended, easy):** run the built-in auto-demo — it plays every
+   scene on screen with scene banners, pausing so you can narrate:
+
+   ```bash
+   bash scripts/auto_demo.sh          # normal pace (6 s pause between scenes)
+   bash scripts/auto_demo.sh fast     # 2 s pauses (for rehearsal)
+   bash scripts/auto_demo.sh pause-on # wait for Enter between scenes (safest)
+   ```
+
+   Just start recording, then read the **SAY** line for each scene as it appears
+   on screen. If you flub a line, pause 2 s and continue from the next scene —
+   the automation keeps going and you can edit nothing.
+
+---
+
 ## Before recording (5 min, not on camera)
 
 ```bash
