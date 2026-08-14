@@ -41,6 +41,7 @@ RST="\e[0m"
 type_cmd() {
   local cmd="$1"
   echo -en "$PROMPT"
+  sleep 0.4   # thinking pause after $ before typing starts
   local c r
   while IFS= read -rn1 c; do
     printf '%s' "$c"
