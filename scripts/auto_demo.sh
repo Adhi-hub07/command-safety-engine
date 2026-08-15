@@ -40,9 +40,14 @@ RST="\e[0m"
 
 # Human-like typing: variable speed, natural pauses at spaces and punctuation,
 # occasional "thinking" pauses — indistinguishable from a real person typing.
+# If $PROMPT_SHOWN is 1, the "$ " is already on screen (pace mode) — we just type.
 type_cmd() {
   local cmd="$1"
-  echo -en "$PROMPT"
+  if [ "${PROMPT_SHOWN:-0}" = "1" ]; then
+    PROMPT_SHOWN=0
+  else
+    echo -en "$PROMPT"
+  fi
   sleep 0.4   # thinking pause after $ before typing starts
   local c r
   while IFS= read -rn1 c; do
@@ -94,8 +99,11 @@ scene() {
 
 pause() {
   if [ "$MODE" = "pace" ]; then
-    # silent wait — nothing printed to screen; you read your SAY line from the
-    # printed script, then press Enter when ready. The video stays perfectly clean.
+    # Show the $ prompt first, then wait silently. You read your SAY line from
+    # the printed script, then press Enter — the next command types right after
+    # the $ already on screen. Video stays perfectly clean.
+    echo -en "$PROMPT"
+    PROMPT_SHOWN=1
     read -r _
     return
   fi
