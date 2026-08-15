@@ -6,17 +6,18 @@
 # nothing fake, exactly matching docs/demo_video_script.md.
 #
 # USAGE (run in the terminal you will RECORD):
-#   bash scripts/auto_demo.sh            # normal pace
+#   bash scripts/auto_demo.sh            # normal pace (banners + voice lines shown)
 #   bash scripts/auto_demo.sh fast       # rehearsal
 #   bash scripts/auto_demo.sh pause-on   # press Enter after each scene (interactive)
-#   bash scripts/auto_demo.sh clean      # RECORD THIS: no text boxes, clean screen,
-#                                        # generous pauses; add your voiceover in editing
+#   bash scripts/auto_demo.sh clean      # clean screen, auto-advances; add voiceover in editing
+#   bash scripts/auto_demo.sh pace       # BEST FOR RECORDING: clean screen + waits for
+#                                        # you to read/explain each scene, press Enter
 #
-# Recording tips (clean mode):
+# Recording tips (pace mode):
 #   - Maximise the window, dark theme, 1080p.
-#   - Start screen recording, run clean mode, let it play top-to-bottom.
-#   - After recording, record your real voice reading the SAY lines from
-#     docs/demo_video_script.md and overlay it in your video editor.
+#   - Keep docs/demo_video_script.md open. After each scene, the script waits —
+#     read your SAY line aloud (your real voice, live), then press Enter.
+#   - The launch command is cleared first, so the video starts clean.
 set -u
 cd "$(dirname "$0")/.."
 ROOT="$(pwd)"
@@ -24,10 +25,11 @@ PY="$HOME/safeshell/cse-venv/bin/python"
 
 MODE="${1:-normal}"
 case "$MODE" in
-  fast)     PAUSE=2;  TYPE_MS=30 ;;
-  pause-on) PAUSE=0;  TYPE_MS=110 ;;
-  clean)    PAUSE=2;  TYPE_MS=110 ;;
-  *)        PAUSE=6;  TYPE_MS=110 ;;
+  fast)     PAUSE=2;  TYPE_MS=30; CLEAN=0 ;;
+  pause-on) PAUSE=0;  TYPE_MS=110; CLEAN=0 ;;
+  pace)     PAUSE=0;  TYPE_MS=110; CLEAN=1 ;;
+  clean)    PAUSE=2;  TYPE_MS=110; CLEAN=1 ;;
+  *)        PAUSE=6;  TYPE_MS=110; CLEAN=0 ;;
 esac
 
 BANNER="\e[1;36m──────────────────────────────────────────────────────────\e[0m"
@@ -59,9 +61,9 @@ type_cmd() {
   echo ""
 }
 
-# In clean mode: wipe the launch line off the screen, then give a 10s countdown
-# so you can start the screen recorder and the video begins clean from Scene 1.
-if [ "$MODE" = "clean" ]; then
+# In clean/pace mode: wipe the launch line off the screen, then give a 10s
+# countdown so you can start the screen recorder and the video begins clean.
+if [ "$CLEAN" = "1" ]; then
   clear
   echo ""
   echo "  Recording starts in 10 seconds..."
@@ -70,9 +72,9 @@ if [ "$MODE" = "clean" ]; then
   clear
 fi
 
-# Teleprompter box — your voice line, shown big and clear (hidden in clean mode).
+# Teleprompter box — your voice line, shown big and clear (hidden in clean/pace).
 say() {
-  [ "$MODE" = "clean" ] && return
+  [ "$CLEAN" = "1" ] && return
   echo ""
   echo -e "${BOX}  🎙  ${RST}"
   local line
@@ -84,13 +86,19 @@ say() {
 }
 
 scene() {
-  [ "$MODE" = "clean" ] && return
+  [ "$CLEAN" = "1" ] && return
   echo ""
   echo -e "$BANNER"
   echo -e "$SCENE $1"
 }
 
 pause() {
+  if [ "$MODE" = "pace" ]; then
+    echo ""
+    echo -e "\e[1;35m   [next: read your line, then press Enter]\e[0m"
+    read -r _
+    return
+  fi
   if [ "$PAUSE" = "0" ]; then
     [ "$MODE" = "clean" ] && return
     echo -e "\e[1;35m   [recording] after speaking, press Enter for the next scene...\e[0m"
