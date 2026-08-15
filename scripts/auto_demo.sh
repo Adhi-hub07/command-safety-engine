@@ -99,12 +99,14 @@ scene() {
 
 pause() {
   if [ "$MODE" = "pace" ]; then
-    # Show the $ prompt first, then wait silently. You read your SAY line from
-    # the printed script, then press Enter — the next command types right after
-    # the $ already on screen. Video stays perfectly clean.
+    # Show the $ prompt, then wait silently. Use stty -echo so the Enter keypress
+    # does NOT print a newline — the cursor stays right after $, and the next
+    # command types on the same line, exactly like a real terminal.
     echo -en "$PROMPT"
     PROMPT_SHOWN=1
+    if [ -t 0 ]; then stty -echo; fi
     read -r _
+    if [ -t 0 ]; then stty echo; fi
     return
   fi
   if [ "$PAUSE" = "0" ]; then
