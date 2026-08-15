@@ -94,8 +94,8 @@ scene() {
 
 pause() {
   if [ "$MODE" = "pace" ]; then
-    echo ""
-    echo -e "\e[1;35m   [next: read your line, then press Enter]\e[0m"
+    # silent wait — nothing printed to screen; you read your SAY line from the
+    # printed script, then press Enter when ready. The video stays perfectly clean.
     read -r _
     return
   fi
