@@ -8,7 +8,7 @@ llm:
   model: "qwen2.5:3b-instruct-q4_K_M"
   base_url: "http://localhost:11434"
   enabled: true
-  timeout_seconds: 8
+  timeout_seconds: 60
   use_for_ambiguous_only: true
   ambiguity_threshold: 0.65
 

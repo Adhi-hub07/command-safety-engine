@@ -80,6 +80,10 @@ def run_check(command, json_out=False, audit=False, tx=False):
     from src.output.formatter import render_rich, to_json
 
     engine = CommandSafetyEngine(project_root=PROJECT_ROOT)
+    if not json_out and engine.llm is not None and engine.llm.is_available():
+        def _on_think():
+            print("\n\033[1;36mThe on-device model is analyzing this command...\033[0m", file=sys.stderr, flush=True)
+        engine.llm.on_think = _on_think
     result = engine.analyze(command)
     if audit:
         engine.audit(result)

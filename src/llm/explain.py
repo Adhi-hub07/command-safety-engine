@@ -3,13 +3,24 @@
 import json
 import re
 
-SYSTEM_PROMPT = """You are a Linux command safety analyst. Given a shell command, decide its risk level and explain in one short paragraph. Always return STRICT JSON only, with exactly these keys:
-{"risk": "safe"|"risky"|"destructive", "summary": "...", "alternative": "..."}
-Never explain yourself outside the JSON. Keep summary under 40 words."""
+SYSTEM_PROMPT = (
+    "You are a Linux command safety analyst. Given a shell command, decide its risk level and "
+    "explain in one short paragraph. Always return STRICT JSON only, with exactly these keys:\n"
+    '{"risk": "safe"|"risky"|"destructive", "summary": "...", "alternative": "..."}\n'
+    "Never explain yourself outside the JSON. Keep summary under 40 words.\n"
+    'For "alternative": always give a genuinely safe Linux command the user could run instead '
+    "that does NOT involve executing or decoding the suspicious payload. If no safe equivalent "
+    'exists, set it to "Do not run this command."'
+)
 
-UNDO_PROMPT = """You are a filesystem recovery planner. Given a shell command, list concrete actions a user could take to undo its effects. Always return STRICT JSON only:
-{"steps": [{"action": "restore"|"move"|"delete"|"chmod", "target": "/abs/path", "description": "..."}]}
-Use absolute paths. Max 5 steps. If undo is impossible, return {"steps": []}. No text outside the JSON."""
+UNDO_PROMPT = (
+    "You are a filesystem recovery planner. Given a shell command, list concrete actions a user "
+    "could take to undo its effects. Always return STRICT JSON only:\n"
+    '{"steps": [{"action": "restore"|"move"|"delete"|"chmod", "target": "/abs/path", '
+    '"description": "..."}]}\n'
+    "Use absolute paths. Max 5 steps. If undo is impossible, return {\"steps\": []}. "
+    "No text outside the JSON."
+)
 
 
 class LLMExplainer:
@@ -19,6 +30,7 @@ class LLMExplainer:
         self.timeout_seconds = timeout_seconds
         self._client = None
         self._available = None
+        self.on_think = None
 
     def _ensure_client(self):
         """Import ollama lazily so a missing install costs ~0ms at load time."""
@@ -51,7 +63,7 @@ class LLMExplainer:
                 self._available = False
         return self._available
 
-    def explain(self, command, rule_matches=None):
+    def explain(self, command, rule_matches=None, decoded_payload=None):
         """Return {"summary": ..., "alternative": ...} or raise on failure."""
         client = self._ensure_client()
         if not client:
@@ -60,7 +72,15 @@ class LLMExplainer:
         if rule_matches:
             ids = ", ".join(m["rule_id"] for m in rule_matches)
             context = f" A rule engine already flagged this as matching: {ids}."
+        if decoded_payload:
+            context += (
+                f" The obfuscated payload in this command, when decoded, is: "
+                f"{decoded_payload!r}. Analyze the impact of that decoded payload, "
+                f"not just the surface text."
+            )
         user_msg = f"Command: {command}\n{context}\nReturn JSON."
+        if self.on_think is not None:
+            self.on_think()
         response = client.chat(
             model=self.model,
             messages=[

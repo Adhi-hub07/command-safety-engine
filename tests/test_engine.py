@@ -68,7 +68,7 @@ class _FakeLLM:
     def is_available(self):
         return True
 
-    def explain(self, command, rule_matches=None):
+    def explain(self, command, rule_matches=None, decoded_payload=None):
         self.calls += 1
         return {"summary": "explained", "alternative": "safer alternative"}
 

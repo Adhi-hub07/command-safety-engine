@@ -190,7 +190,8 @@ class CommandSafetyEngine:
         if not self.llm.is_available():
             return result
         try:
-            explanation = self.llm.explain(original, rule_matches)
+            decoded = tokenizer.decode_obfuscated_payload(normalized)
+            explanation = self.llm.explain(original, rule_matches, decoded_payload=decoded)
             return {
                 "model": llm_cfg.get("model"),
                 "summary": explanation.get("summary"),
@@ -229,7 +230,10 @@ class CommandSafetyEngine:
         """Attach the SafeShell layers: target paths, undo plan, simulation."""
         paths = extract_paths(normalized)
         plan = static_undo_plan(normalized, paths)
-        if self.llm is not None and self.llm.is_available():
+        # Only pay for an LLM recovery pass when there is something a snapshot
+        # could restore. For path-less commands (e.g. an obfuscated hex decode)
+        # the static plan is complete, so skip the extra generation.
+        if paths and self.llm is not None and self.llm.is_available():
             try:
                 plan = plan_with_llm(self.llm, normalized, plan)
             except Exception:
