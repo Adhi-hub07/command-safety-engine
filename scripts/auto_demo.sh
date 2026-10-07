@@ -119,12 +119,12 @@ pause() {
 }
 
 # Scene 1 — watch silently
-scene "1/9 — SafeShell watches every command silently"
+scene "1/10 — SafeShell watches every command silently"
 say "This is SafeShell — the Command Safety Engine. It watches every command you type, silently, before it ever reaches the operating system."
 pause
 
 # Scene 2 — everyday commands pass
-scene "2/9 — Everyday commands cost nothing"
+scene "2/10 — Everyday commands cost nothing"
 type_cmd "echo hello"
 echo "hello"
 type_cmd "ls -la"
@@ -133,21 +133,21 @@ say "Everyday commands pass instantly — they're whitelisted, zero false positi
 pause
 
 # Scene 3 — block rm -rf /
-scene "3/9 — BLOCK: rm -rf /"
+scene "3/10 — BLOCK: rm -rf /"
 type_cmd 'csengine check "rm -rf /"'
 "$PY" src/main.py check "rm -rf /"
 say "Recursive deletion of the system root — blocked instantly, with the MITRE technique named and a safe alternative suggested. The machine stays alive."
 pause
 
 # Scene 4 — block fork bomb
-scene "4/9 — BLOCK: fork bomb"
+scene "4/10 — BLOCK: fork bomb"
 type_cmd 'csengine check ":(){ :|:& };:"'
 "$PY" src/main.py check ":(){ :|:& };:"
 say "A fork bomb that would freeze the machine in seconds. Rule and model agree — critical rules always win."
 pause
 
 # Scene 5 — warn chmod 777
-scene "5/9 — WARN: chmod -R 777"
+scene "5/10 — WARN: chmod -R 777"
 type_cmd 'csengine check "chmod -R 777 /var/www"'
 "$PY" src/main.py check "chmod -R 777 /var/www"
 say "Riskier commands aren't hard-blocked — they warn. Graded control: allow, warn, block. The user keeps the final say, but it's an informed one."
@@ -156,7 +156,7 @@ pause
 # Scene 6 — THE STAR: transactional undo (runs in a clean small folder so the
 # sandbox simulation can stage it fully and report real created/deleted/modified)
 DEMOWORK="$HOME/demowork"
-scene "6/9 — THE STAR: transactional undo"
+scene "6/10 — THE STAR: transactional undo"
 rm -rf "$DEMOWORK" && mkdir -p "$DEMOWORK/demo"
 echo A > "$DEMOWORK/demo/1.txt" && echo B > "$DEMOWORK/demo/2.txt" && echo C > "$DEMOWORK/demo/3.txt"
 type_cmd "mkdir -p demo && echo A > demo/1.txt && echo B > demo/2.txt && echo C > demo/3.txt"
@@ -178,21 +178,28 @@ say "Now the part that makes this different. Before a risky command runs, SafeSh
 pause
 
 # Scene 7 — ML generalisation: base64 payload
-scene "7/9 — ML generalisation: base64 payload"
+scene "7/10 — ML generalisation: base64 payload"
 type_cmd 'csengine check "base64 -d <<< cHJpbnRmIGhhY2tlZCA+IC9ldGMvcGFzc3dkIHwgYmFzaA=="'
 "$PY" src/main.py check 'base64 -d <<< cHJpbnRmIGhhY2tlZCA+IC9ldGMvcGFzc3dkIHwgYmFzaA=='
 say "No blocklist can match this — a base64 payload that decodes to a write to /etc/passwd piped to bash. The ML layer generalises: obfuscation plus redirection plus a shell pipe, flagged fully offline."
 pause
 
-# Scene 8 — all offline
-scene "8/9 — Everything runs offline, on this machine"
+# Scene 8 — local LLM explains a novel obfuscated command
+scene "8/10 — Local AI reasons about an unknown command"
+type_cmd 'csengine check "xxd -r -p <<< 77686f616d69"'
+"$PY" src/main.py check "xxd -r -p <<< 77686f616d69"
+say "This is a command no rule can name and the ML model has never trained on — an obfuscated hex blob. Watch the terminal: that's a 3-billion-parameter model running on this laptop, generating the explanation itself. No cloud, no API key. Sovereign AI."
+pause
+
+# Scene 9 — all offline
+scene "9/10 — Everything runs offline, on this machine"
 type_cmd "csengine status"
 "$PY" src/main.py status
 say "Everything you saw runs on this machine — on BOSS OS, on Ubuntu, on any office laptop. Open-source, offline, sovereign. No data leaves the device."
 pause
 
-# Scene 9 — close
-scene "9/9 — Close"
+# Scene 10 — close
+scene "10/10 — Close"
 echo ""
 say "SafeShell: your terminal defends itself — and when it doesn't, it undoes."
 echo "github.com/Adhi-hub07/command-safety-engine"

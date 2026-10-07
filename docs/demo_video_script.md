@@ -196,7 +196,33 @@ ML prediction      risky
 
 ---
 
-## Scene 8 — All offline (3:15–3:40)
+## Scene 8 — Local AI reasons about an unknown command (3:15–3:55)
+
+**TYPE**
+```bash
+csengine check "xxd -r -p <<< 77686f616d69"
+```
+
+**YOU WILL SEE**
+```
+Verdict            WARN
+Risk score         49/100
+ML prediction      risky (50%)
+Explanation        <generated live by qwen2.5:3b, on this machine>
+```
+
+**SAY**
+> "This is a command no rule can name and the ML model has never trained on — an
+> obfuscated hex blob. Watch the terminal: that's a 3-billion-parameter model
+> running on this laptop, generating the explanation itself. No cloud, no API
+> key. Sovereign AI."
+
+> The explanation takes a few seconds while Qwen reasons on-device — that pause
+> *is* the point. Keep talking through it; do not skip it.
+
+---
+
+## Scene 9 — All offline (3:55–4:20)
 
 **TYPE**
 ```bash
@@ -218,7 +244,7 @@ Whitelist    : 87 safe patterns
 
 ---
 
-## Scene 9 — Close (3:40–3:55)
+## Scene 10 — Close (4:20–4:35)
 
 **SAY**
 > "SafeShell: your terminal defends itself — and when it doesn't, it undoes."
