@@ -17,6 +17,10 @@ _SUBSTITUTION_RE = re.compile(r"\$\(.*?\)|`[^`]*`|\$\{.*?\}")
 _VARIABLE_RE = re.compile(r"\$([A-Za-z_][A-Za-z0-9_]*)")
 _GLOB_RE = re.compile(r"(\*|\?|\[.*?\])")
 
+_HEX_BLOB_RE = re.compile(r"(?i)(?:^|[^A-Fa-f0-9])([0-9a-f]{10,}(?:[0-9a-fA-F\s]{0,40})?)(?:['\"]?\s*)$")
+_BASE64_BLOB_RE = re.compile(r"(?i)(?:base64\s+[-]d\b(?:[^A-Za-z0-9+/=]*))([A-Za-z0-9+/=]{12,})['\"]?\s*$")
+_LITERAL_HEX_RE = re.compile(r"(?<![\w.])([0-9a-fA-F]{8,})(?![\w.])")
+
 
 class CommandToken:
     __slots__ = ("kind", "text")
@@ -179,3 +183,37 @@ def detect_obfuscation(command):
     if re.search(r"\b(?:printf|echo)\b[^;|]*\\x[0-9a-f]{2}", command):
         indicators.append("hex_escape")
     return indicators
+
+
+def decode_obfuscated_payload(command):
+    """Best-effort decode of hex/base64 blobs hidden in a command.
+
+    Returns the decoded string (e.g. ``rm -rf /`` from ``xxd -r -p <<< 726d...``)
+    or None when nothing can be decoded. Used to ground the LLM explanation so
+    it never has to guess what an obfuscated payload really says.
+    """
+    m = _BASE64_BLOB_RE.search(command)
+    if m:
+        blob = m.group(1).strip()
+        try:
+            decoded = __import__("base64").b64decode(blob, validate=False).decode("utf-8", "replace")
+            if decoded and any(ch.isprintable() for ch in decoded):
+                return decoded
+        except Exception:
+            pass
+
+    m = _HEX_BLOB_RE.search(command)
+    if not m:
+        # fall back to any long hex token (xxd pipeline / heredoc style)
+        m = _LITERAL_HEX_RE.search(command)
+    if m:
+        hex_blob = m.group(1)
+        hex_blob = re.sub(r"[^0-9a-fA-F]", "", hex_blob)
+        if len(hex_blob) % 2 == 0:
+            try:
+                decoded = bytes.fromhex(hex_blob)
+                if all(32 <= b <= 126 or b in (10, 13, 9) for b in decoded):
+                    return decoded.decode("utf-8", "replace")
+            except ValueError:
+                pass
+    return None
