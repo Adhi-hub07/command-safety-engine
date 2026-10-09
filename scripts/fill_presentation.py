@@ -66,7 +66,9 @@ def content(c, num, title, sections):
     c.showPage()
 
 def main():
-    out = "/home/hack/Downloads/Telegram Desktop/FILLED-project-presentation.pdf"
+    import os, sys
+    repo_docs = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "docs")
+    out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(repo_docs, "presentation-stage2-template.pdf")
     c = canvas.Canvas(out, pagesize=landscape((PAGE_W, PAGE_H)))
     c.setTitle("SafeShell - Project Presentation")
     c.setAuthor("Adhithya J")

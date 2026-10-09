@@ -13,6 +13,48 @@
 
 > 🌐 **Live website:** <https://adhi-hub07.github.io/command-safety-engine/>
 
+## Hackathon submission
+
+| Field | Value |
+|---|---|
+| **Event** | C-DAC Secure OS Hackathon 2026 — National Level SSM Hackathon ([ssm.cdac.in](https://ssm.cdac.in/hackathon)), organised by C-DAC under MeitY |
+| **Team** | **SOLO ARC** (solo participation — team size 1–5 allowed) |
+| **Member** | Adhithya J |
+| **Track** | **Track 1 · AI at Application Level** |
+| **Problem statement** | SafeShell — A Transactional Command Execution Framework with AI-Generated Undo Plans and Simulation-Based Safety Guarantees |
+| **Ref Code** | Issued by the portal after Stage-1 submission — used for all future correspondence (check your registration confirmation e-mail) |
+| **Repository** | <https://github.com/Adhi-hub07/command-safety-engine> |
+
+**Which track, exactly:** the official hackathon guidelines define two tracks for
+this event — **Track 1: AI at Application Level** (Storage Optimization, Linux AI
+Assistant, **Command Safety**) and **Track 2: AI Usage at OS & Kernel Level**
+(Kernel Security, Self-Healing OS, Dependency Resolver). This submission is
+**Track 1**, because the problem statement is the *Command Safety* one. Earlier
+drafts of this README said "Trusted Computing & Embedded Security Track" — no
+such track exists in the guidelines; the label was corrected on 2026-10-09.
+
+**Stages:**
+
+1. **Stage 1 — Submission & Screening** (deadline 25 Aug 2026): solution
+   proposal, architecture, source code, documentation and demo video submitted
+   through the portal — copy-paste content in
+   [docs/PORTAL_SUBMISSION.md](docs/PORTAL_SUBMISSION.md).
+2. **Stage 2 — Online Technical Presentation**: solution walkthrough, live demo
+   and jury Q&A. Presentation material:
+   - [Stage-2 project presentation PDF](docs/presentation.pdf) — 12-slide
+     rubric-mapped deck (`scripts/build_deck.py` regenerates it)
+   - [Stage-2 presentation (organisers' 5-page template)](docs/presentation-stage2-template.pdf) —
+     the official PROJECT PRESENTATION template filled with SafeShell content
+     (`scripts/fill_presentation.py` regenerates it)
+   - Q&A prep for judges in [docs/SUBMISSION.md](docs/SUBMISSION.md)
+3. **Stage 3 — Prize distribution**.
+
+**Evaluation criteria** (per the guidelines): novelty, technical feasibility &
+architecture, AI/technical approach, implementation quality, problem-statement
+alignment, documentation, security, scalability, datasets, UX and presentation.
+
+---
+
 Every command you type is checked **before it runs**. Dangerous commands are
 **blocked**, risky ones ask for **confirmation**, and everything else passes
 through in milliseconds — fully offline, fully open-source, on a normal laptop.
@@ -35,6 +77,7 @@ Command → Rule Engine → ML Classifier → Local LLM (Qwen 2.5 3B) → Allow 
 
 ## Table of Contents
 
+- [Hackathon submission](#hackathon-submission)
 - [What it does](#what-it-does)
 - [Features](#features)
 - [How it works](#how-it-works)
@@ -480,6 +523,7 @@ command-safety-engine/
 - [Portal fields](docs/PORTAL_SUBMISSION.md) — copy-paste answers for all 13 submission fields
 - [Demo video script](docs/demo_video_script.md) — 4-minute one-take recording script
 - [Presentation deck](docs/presentation.pdf) — 12-slide rubric-mapped deck (`scripts/build_deck.py` regenerates it)
+- [Stage-2 presentation](docs/presentation-stage2-template.pdf) — organisers' 5-page template filled with SafeShell content (`scripts/fill_presentation.py` regenerates it)
 
 ## Demo
 
