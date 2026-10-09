@@ -1,6 +1,6 @@
 # SafeShell / Command Safety Engine — C-DAC Secure OS Hackathon 2026 Submission
 
-**Track:** Trusted Computing & Embedded Security Track
+**Track:** Track 1 (AI at Application Level)
 **Problem Statement:** SafeShell — A Transactional Command Execution Framework with AI-Generated Undo Plans and Simulation-Based Safety Guarantees
 **Target OS:** Ubuntu 22.04/24.04, BOSS Linux
 **Status:** code complete — all 65 tests passing, model trained, demo-ready

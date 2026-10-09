@@ -7,7 +7,7 @@
 > **The output blocks below are the REAL engine output — copy them from here so
 > what you type matches what you see.** Do not fake output.
 >
-> End card: repo URL + "SafeShell · Made for C-DAC Secure OS Hackathon 2026 · Track 2: AI at Application Level".
+> End card: repo URL + "SafeShell · Made for C-DAC Secure OS Hackathon 2026 · Track 1: AI at Application Level".
 
 ---
 
@@ -250,7 +250,7 @@ Whitelist    : 87 safe patterns
 > "SafeShell: your terminal defends itself — and when it doesn't, it undoes."
 
 **SHOW** end card: `github.com/Adhi-hub07/command-safety-engine` ·
-"Made for C-DAC Secure OS Hackathon 2026 · Track 2: AI at Application Level".
+"Made for C-DAC Secure OS Hackathon 2026 · Track 1: AI at Application Level".
 
 ---
 

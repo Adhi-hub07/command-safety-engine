@@ -29,8 +29,8 @@ telemetry) so it is deployable on sovereign and air-gapped systems such as BOSS 
 
 ## 3. Problem Statement Addressed
 
-*Quoted verbatim from the hackathon portal (Trusted Computing & Embedded Security
-Track · SafeShell):*
+*Quoted verbatim from the hackathon portal (Track 1 · AI at Application Level
+· SafeShell):*
 
 > Create an intelligent safety layer that understands the intent behind Linux
 > commands before they execute. The system should detect risky operations,

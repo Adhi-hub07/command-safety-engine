@@ -9,7 +9,7 @@
 > **Made by Adhithya J** · C-DAC Secure OS Hackathon 2026
 > · Problem Statement: **SafeShell — A Transactional Command Execution Framework
 > with AI-Generated Undo Plans and Simulation-Based Safety Guarantees**
-> · Trusted Computing & Embedded Security Track
+> · Track 1 · AI at Application Level
 
 > 🌐 **Live website:** <https://adhi-hub07.github.io/command-safety-engine/>
 

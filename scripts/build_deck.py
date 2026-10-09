@@ -94,7 +94,7 @@ def header(draw, num, title, subtitle=None):
     draw.line(48, 46, PAGE_W - 48, 46)
     draw.setFillColor(MUTED)
     draw.setFont(SANS, 9)
-    draw.drawString(48, 30, "SafeShell csengine · Adhithya J · Track 2: AI at Application Level")
+    draw.drawString(48, 30, "SafeShell csengine · Adhithya J · Track 1: AI at Application Level")
     draw.drawRightString(PAGE_W - 48, 30, "fully offline · open-source (MIT)")
 
 
@@ -120,7 +120,7 @@ def slide_title(draw):
     draw.drawString(72, PAGE_H - 172, "Transactional execution with AI-generated undo plans")
     draw.setFillColor(MUTED)
     draw.setFont(SANS, 13)
-    draw.drawString(72, PAGE_H - 200, "C-DAC Secure OS Hackathon 2026 · Track 2: AI at Application Level")
+    draw.drawString(72, PAGE_H - 200, "C-DAC Secure OS Hackathon 2026 · Track 1: AI at Application Level")
     draw.setFillColor(BODY)
     draw.setFont(SANS, 13)
     draw.drawString(72, 170, "Adhithya J")
